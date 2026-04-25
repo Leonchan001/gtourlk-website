@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply font-sans text-forest-900 bg-cream-50 antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-forest-700 hover:bg-forest-800 text-cream-50 font-semibold rounded-full shadow-lg transition-all;
+  }
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-forest-800 mb-3;
+  }
+  .section-subtitle {
+    @apply text-forest-600 text-lg mb-12;
+  }
+}
+
+.hero-gradient {
+  background:
+    radial-gradient(ellipse at top left, rgba(245, 158, 11, 0.15), transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(45, 97, 57, 0.3), transparent 50%),
+    linear-gradient(135deg, #14291a 0%, #254d2f 50%, #2d6139 100%);
+}
+
+.pattern-bamboo {
+  background-image:
+    linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
