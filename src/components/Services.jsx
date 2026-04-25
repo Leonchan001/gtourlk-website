@@ -130,7 +130,7 @@ export default function Services() {
         </div>
 
         <div className="mt-12 p-5 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl text-sm text-amber-900">
-          💡 <strong>提醒：</strong>所有方案皆需提前 LINE 或電話預約。預約 1.5 小時以上完成 50% 訂金即享 9 折優惠！
+          💡 <strong>提醒：</strong>所有方案皆需提前 LINE 或電話預約。加入官方 LINE 好友享 95 折優惠！
         </div>
       </div>
     </section>
