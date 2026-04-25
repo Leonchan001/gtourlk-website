@@ -1,21 +1,21 @@
 const plans = [
   {
     title: '經典導覽 60 分鐘',
-    price: 'NT$ 600',
-    unit: '/ 每台車（可坐 2 人）',
+    price: 'NT$ 199',
+    unit: '/ 人',
     badge: '快速體驗',
     color: 'forest',
     features: [
       '鹿港天后宮 + 老街精華',
       '在地導覽員專業講解',
-      '全新節能環保電動車',
+      '全新節能環保電動車（可乘 5 人）',
       '免費停車場資訊提供',
     ],
   },
   {
     title: '深度文化 90 分鐘',
-    price: 'NT$ 900',
-    unit: '/ 每台車（可坐 2 人）',
+    price: 'NT$ 299',
+    unit: '/ 人',
     badge: '⭐ 最熱門',
     color: 'amber',
     popular: true,
@@ -24,13 +24,13 @@ const plans = [
       '摸乳巷・九曲巷典故詳解',
       '米其林指南景點導覽',
       '在地小吃 / 伴手禮推薦',
-      '臨時預約 9 折優惠',
+      '加好友享 95 折優惠',
     ],
   },
   {
-    title: '米其林全覽 120 分鐘',
-    price: 'NT$ 1,200',
-    unit: '/ 每台車（可坐 2 人）',
+    title: '米其林全覽 2.5 小時',
+    price: 'NT$ 499',
+    unit: '/ 人',
     badge: '深度首選',
     color: 'forest',
     features: [
@@ -61,7 +61,7 @@ export default function Services() {
             為您量身打造的<span className="text-amber-600">鹿港旅遊推薦</span>行程
           </h2>
           <p className="section-subtitle">
-            從 60 分鐘快閃到 120 分鐘深度，每一分鐘都是在地文化故事
+            從 60 分鐘快閃到 2.5 小時深度，每一分鐘都是在地文化故事
           </p>
         </div>
 

@@ -10,7 +10,7 @@ export default function Hero() {
         <div className="animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-400/40 rounded-full text-amber-300 text-sm mb-6">
             <span className="text-base">⭐</span>
-            <span>Google 205 則評論 · 5.0 滿分好評</span>
+            <span>Google 200 則評論 · 5.0 滿分好評</span>
           </div>
 
           <h1 className="font-serif font-black text-4xl md:text-6xl text-cream-50 leading-tight mb-6">
@@ -66,7 +66,7 @@ export default function Hero() {
                 { icon: '📚', text: '在地導覽員深度文化講解' },
                 { icon: '👨‍👩‍👧', text: '親子・長者・無障礙友善' },
                 { icon: '🎋', text: '龍山寺・天后宮・桂花巷全覽' },
-                { icon: '💰', text: '1.5 小時起 NT$600 起跳' },
+                { icon: '💰', text: '60 分鐘起 NT$199 起跳 / 人' },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 bg-cream-50/10 rounded-xl border border-cream-50/10">
                   <span className="text-xl">{item.icon}</span>

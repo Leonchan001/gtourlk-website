@@ -53,7 +53,7 @@ export default function SocialProof() {
             真實 Google 評論
           </div>
           <h2 className="section-title">
-            205 位旅人的<span className="text-amber-600">五星真心推薦</span>
+            200 位旅人的<span className="text-amber-600">五星真心推薦</span>
           </h2>
           <p className="section-subtitle">
             鹿港導覽中評價最高的品牌之一 — 每一則好評都是我們最珍貴的勳章
@@ -68,7 +68,7 @@ export default function SocialProof() {
             </div>
             <div className="h-16 w-px bg-forest-100" />
             <div className="text-left">
-              <div className="text-2xl font-bold text-forest-800">205 則</div>
+              <div className="text-2xl font-bold text-forest-800">200 則</div>
               <div className="text-forest-600 text-sm">Google 評論</div>
               <div className="text-amber-600 text-xs mt-1">✓ 彰化友善店家認證</div>
             </div>
@@ -123,7 +123,7 @@ export default function SocialProof() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-forest-700 hover:text-amber-600 font-medium"
           >
-            查看全部 205 則 Google 評論
+            查看全部 200 則 Google 評論
             <svg className="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>

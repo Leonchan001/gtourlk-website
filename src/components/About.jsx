@@ -4,7 +4,7 @@ const features = [
   { icon: '🌿', title: '永續環保', desc: '全車隊使用節能電動車，用行動愛地球愛鹿港。' },
   { icon: '👨‍👩‍👧‍👦', title: '全齡友善', desc: '親子、長者、行動不便者都能輕鬆暢遊。' },
   { icon: '💬', title: '彈性貼心', desc: '臨時預約也能接待，把每一位旅人當朋友。' },
-  { icon: '⭐', title: '五星品質', desc: 'Google 205 則評論、滿分 5.0、零負評紀錄。' },
+  { icon: '⭐', title: '五星品質', desc: 'Google 200 則評論、滿分 5.0、零負評紀錄。' },
 ]
 
 export default function About() {
