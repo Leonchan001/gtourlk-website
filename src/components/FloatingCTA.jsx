@@ -18,7 +18,7 @@ export default function FloatingCTA() {
       {open && (
         <div className="flex flex-col gap-3 animate-fade-in-up">
           <a
-            href="https://line.me/R/ti/p/@137ebaq"
+            href="https://line.me/R/ti/p/@137ebkaq"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-3 bg-[#06C755] hover:bg-[#04a444] text-white px-5 py-3 rounded-full shadow-xl transition-all"

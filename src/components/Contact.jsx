@@ -16,7 +16,7 @@ export default function Contact() {
 
         <div className="grid md:grid-cols-2 gap-6 mb-10">
           <a
-            href="https://line.me/R/ti/p/@137ebaq"
+            href="https://line.me/R/ti/p/@137ebkaq"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative overflow-hidden bg-gradient-to-br from-[#06C755] to-[#04a444] text-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
@@ -37,7 +37,7 @@ export default function Contact() {
               </p>
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
                 <div className="text-white/70 text-xs mb-1">官方 LINE ID</div>
-                <div className="font-mono font-bold text-xl">@137ebaq</div>
+                <div className="font-mono font-bold text-xl">@137ebkaq</div>
               </div>
               <div className="flex items-center gap-2 text-white font-semibold">
                 立即加入 LINE

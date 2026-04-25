@@ -41,7 +41,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>📍 彰化縣鹿港鎮永寧街 236 號</li>
               <li>📞 0927-013-167</li>
-              <li>💬 LINE：@137ebaq</li>
+              <li>💬 LINE：@137ebkaq</li>
               <li>🕗 08:00 – 19:00</li>
             </ul>
           </div>
