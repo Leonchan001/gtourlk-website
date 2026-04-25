@@ -23,11 +23,7 @@ export default function Header() {
     }`}>
       <div className="max-w-7xl mx-auto px-5 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-colors ${
-            scrolled ? 'bg-forest-700 text-amber-400' : 'bg-amber-500 text-forest-900'
-          }`}>
-            鹿
-          </div>
+          <img src="/gtourlk-logo.png" alt="導鹿 GtourLK Logo" className="h-12 w-auto" />
           <div className={`leading-tight ${scrolled ? 'text-forest-800' : 'text-cream-50'}`}>
             <div className="font-serif font-bold text-lg">導鹿 GtourLK</div>
             <div className="text-xs opacity-80">鹿港三輪車觀光導覽</div>
