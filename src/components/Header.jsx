@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import logoImg from '/gtourlk-logo.png'
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -23,7 +24,7 @@ export default function Header() {
     }`}>
       <div className="max-w-7xl mx-auto px-5 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-3">
-          <img src="/gtourlk-logo.png" alt="導鹿 GtourLK Logo" className="h-12 w-auto" />
+          <img src={logoImg} alt="導鹿 GtourLK Logo" className="h-12 w-auto" />
           <div className={`leading-tight ${scrolled ? 'text-forest-800' : 'text-cream-50'}`}>
             <div className="font-serif font-bold text-lg">導鹿 GtourLK</div>
             <div className="text-xs opacity-80">鹿港三輪車觀光導覽</div>
