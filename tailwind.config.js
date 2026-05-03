@@ -7,54 +7,62 @@ export default {
   theme: {
     extend: {
       colors: {
-        amber: {
-          50:  '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
+        // 紙感米白 — 主要背景
+        paper: {
+          50:  '#fbf8f2',
+          100: '#f6f1e7',
+          200: '#ece4d2',
+          300: '#ddd0b3',
         },
-        forest: {
-          50:  '#f0f7f2',
-          100: '#dcebdf',
-          200: '#bcd8c2',
-          300: '#8fbc99',
-          400: '#5e9a6c',
-          500: '#3f7d4f',
-          600: '#2d6139',
-          700: '#254d2f',
-          800: '#1f3e27',
-          900: '#14291a',
+        // 墨色 — 主要文字
+        ink: {
+          50:  '#f4f2ee',
+          100: '#dcd8d1',
+          200: '#a9a39a',
+          300: '#807a72',
+          400: '#5a544d',
+          500: '#3a3530',
+          600: '#2a2622',
+          700: '#1f1c19',
+          800: '#171513',
+          900: '#100e0c',
         },
-        cream: {
-          50: '#fdfaf3',
-          100: '#faf3e3',
-          200: '#f5e7c6',
-        }
+        // 廟宇磚紅 — 唯一強調色，僅用於 CTA 與品牌點綴
+        brick: {
+          50:  '#faecea',
+          100: '#f2cdc7',
+          400: '#b34a3a',
+          500: '#9a3a2a',
+          600: '#7d2e21',
+          700: '#5e2218',
+        },
+        // 印泥色 — 輔助強調
+        seal: {
+          500: '#a23320',
+        },
       },
       fontFamily: {
-        serif: ['"Noto Serif TC"', 'serif'],
-        sans: ['"Noto Sans TC"', 'system-ui', 'sans-serif'],
+        // 中文標題 — 思源宋體
+        serif: ['"Noto Serif TC"', 'Georgia', 'serif'],
+        // 中文內文 — 思源黑體
+        sans: ['"Noto Sans TC"', 'system-ui', '-apple-system', 'sans-serif'],
+        // 英文 / 數字標題 — 古典襯線
+        display: ['"Cormorant Garamond"', '"Noto Serif TC"', 'serif'],
+        // 標籤 / 編號 — 等寬無襯線，用於 01 / 02 編號
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+      },
+      letterSpacing: {
+        widest: '0.25em',
       },
       animation: {
-        'float': 'float 3s ease-in-out infinite',
-        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+        'fade-up': 'fadeUp 0.7s ease-out forwards',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-6px)' },
-        },
-        fadeInUp: {
-          '0%': { opacity: 0, transform: 'translateY(20px)' },
+        fadeUp: {
+          '0%': { opacity: 0, transform: 'translateY(12px)' },
           '100%': { opacity: 1, transform: 'translateY(0)' },
-        }
-      }
+        },
+      },
     },
   },
   plugins: [],
