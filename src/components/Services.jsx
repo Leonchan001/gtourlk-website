@@ -7,7 +7,7 @@ const PLANS = [
     duration: '60 分鐘',
     price: '199',
     photo: 'https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '鹿港老街上的傳統紙燈籠特寫',
+    photoAlt: '老街上撐著紙傘的和服身影',
     tagline: '快速感受鹿港的氣味與光影。',
     features: [
       '天后宮 + 鹿港老街精華段',
@@ -23,8 +23,8 @@ const PLANS = [
     duration: '90 分鐘',
     price: '299',
     featured: true,
-    photo: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '亞洲傳統廟宇建築的飛簷與窗櫺',
+    photo: 'https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=1200&q=80',
+    photoAlt: '亞洲傳統廟宇建築的飛簷與彩繪',
     tagline: '穿過摸乳巷、九曲巷，讀一座古鎮。',
     features: [
       '龍山寺・天后宮・桂花巷',
@@ -40,8 +40,8 @@ const PLANS = [
     en: 'Michelin Grand Tour',
     duration: '150 分鐘',
     price: '499',
-    photo: 'https://images.unsplash.com/photo-1565009637-a3344999a479?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '俯瞰廟宇紅瓦屋頂的傳統建築群',
+    photo: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=1200&q=80',
+    photoAlt: '夜晚的紅燈籠映照著古老巷弄',
     tagline: '北鹿港、南鹿港，一次走完。',
     features: [
       '米其林指南 3 星景點全覽',
