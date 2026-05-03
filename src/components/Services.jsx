@@ -1,4 +1,5 @@
 // 導覽行程方案 — 編輯式攝影卡
+// 圖片來源：Wikimedia Commons（鹿港龍山寺實照）+ Unsplash 老街氛圍圖
 const PLANS = [
   {
     no: '01',
@@ -7,7 +8,7 @@ const PLANS = [
     duration: '60 分鐘',
     price: '199',
     photo: 'https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '老街上撐著紙傘的和服身影',
+    photoAlt: '老街上撐著紙傘的旅人身影',
     tagline: '快速感受鹿港的氣味與光影。',
     features: [
       '天后宮 + 鹿港老街精華段',
@@ -23,8 +24,8 @@ const PLANS = [
     duration: '90 分鐘',
     price: '299',
     featured: true,
-    photo: 'https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '亞洲傳統廟宇建築的飛簷與彩繪',
+    photo: 'https://commons.wikimedia.org/wiki/Special:FilePath/Lukang%20Longshan%20Temple,%20Taiwan.jpg?width=1200',
+    photoAlt: '鹿港龍山寺的雕花飛簷與彩繪細節',
     tagline: '穿過摸乳巷、九曲巷，讀一座古鎮。',
     features: [
       '龍山寺・天后宮・桂花巷',
@@ -40,8 +41,8 @@ const PLANS = [
     en: 'Michelin Grand Tour',
     duration: '150 分鐘',
     price: '499',
-    photo: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '夜晚的紅燈籠映照著古老巷弄',
+    photo: 'https://commons.wikimedia.org/wiki/Special:FilePath/2022%20Longshan%20Temple,%20Lukang.jpg?width=1200',
+    photoAlt: '鹿港龍山寺紅燈籠廊道',
     tagline: '北鹿港、南鹿港，一次走完。',
     features: [
       '米其林指南 3 星景點全覽',
