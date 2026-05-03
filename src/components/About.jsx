@@ -1,6 +1,6 @@
-// 關於我們 — 攝影分割版面
-const ABOUT_PHOTO_LARGE = 'https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=1400&q=80'
-const ABOUT_PHOTO_SMALL = 'https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?auto=format&fit=crop&w=900&q=80'
+// 關於我們 — 攝影分割版面（鹿港龍山寺實照）
+const ABOUT_PHOTO_LARGE = 'https://commons.wikimedia.org/wiki/Special:FilePath/Lugang%20Lukang%20Longshan%20Temple%20Garten.jpg?width=1400'
+const ABOUT_PHOTO_SMALL = 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=900&q=80'
 
 const VALUES = [
   { no: '01', title: '在地深度', body: '不是死背的觀光稿，而是世居鹿港才知道的巷弄典故。' },
@@ -20,7 +20,7 @@ export default function About() {
             <div className="photo-frame aspect-[4/3] bg-ink-700">
               <img
                 src={ABOUT_PHOTO_LARGE}
-                alt="鹿港廟宇的飛簷與彩繪細節"
+                alt="鹿港龍山寺庭園"
                 loading="lazy"
                 className="w-full h-full object-cover"
               />
@@ -29,7 +29,7 @@ export default function About() {
               <div className="photo-frame aspect-[3/4] bg-ink-700 border-4 border-ink-800">
                 <img
                   src={ABOUT_PHOTO_SMALL}
-                  alt="鹿港老街夜晚的燈火"
+                  alt="鹿港老街夜晚的紅燈籠"
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />
