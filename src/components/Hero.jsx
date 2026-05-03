@@ -1,7 +1,7 @@
 // 主視覺 — 編輯式攝影風
 // 圖片：Unsplash 鹿港/廟宇主題佔位圖（之後可換成自家攝影）
-const HERO_PHOTO = 'https://images.unsplash.com/photo-1545569310-9d02be1c4b87?auto=format&fit=crop&w=2000&q=80'
-const HERO_PHOTO_CREDIT = '攝影｜Vernon Raineil Cenzon · Unsplash'
+const HERO_PHOTO = 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=2000&q=80'
+const HERO_PHOTO_CREDIT = '攝影｜Unsplash'
 
 export default function Hero() {
   return (
