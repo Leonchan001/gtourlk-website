@@ -1,137 +1,193 @@
-const plans = [
+// 導覽行程方案 — 編輯式攝影卡
+// 圖片：Unsplash 廟宇/老街佔位圖
+const PLANS = [
   {
-    title: '經典導覽 60 分鐘',
-    price: 'NT$ 199',
-    unit: '/ 人',
-    badge: '快速體驗',
-    color: 'forest',
+    no: '01',
+    title: '老街輕旅',
+    en: 'Lukang Old Street Tour',
+    duration: '60 分鐘',
+    price: '199',
+    photo: 'https://images.unsplash.com/photo-1546554137-f86b9593a222?auto=format&fit=crop&w=1200&q=80',
+    photoAlt: '鹿港老街上的傳統紙燈籠特寫',
+    tagline: '快速感受鹿港的氣味與光影。',
     features: [
-      '鹿港天后宮 + 老街精華',
+      '天后宮 + 鹿港老街精華段',
       '在地導覽員專業講解',
-      '全新節能環保電動車（可乘 5 人）',
+      '節能電動三輪車・可乘 5 人',
       '免費停車場資訊提供',
     ],
   },
   {
-    title: '深度文化 90 分鐘',
-    price: 'NT$ 299',
-    unit: '/ 人',
-    badge: '⭐ 最熱門',
-    color: 'amber',
-    popular: true,
+    no: '02',
+    title: '深度文化',
+    en: 'Heritage Walking Tour',
+    duration: '90 分鐘',
+    price: '299',
+    featured: true,
+    photo: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1200&q=80',
+    photoAlt: '亞洲傳統廟宇建築的飛簷與窗櫺',
+    tagline: '穿過摸乳巷、九曲巷，讀一座古鎮。',
     features: [
       '龍山寺・天后宮・桂花巷',
-      '摸乳巷・九曲巷典故詳解',
+      '摸乳巷、九曲巷典故詳解',
       '米其林指南景點導覽',
-      '在地小吃 / 伴手禮推薦',
-      '加好友享 95 折優惠',
+      '在地小吃與伴手禮推薦',
+      '加 LINE 好友享 95 折',
     ],
   },
   {
-    title: '米其林全覽 2.5 小時',
-    price: 'NT$ 499',
-    unit: '/ 人',
-    badge: '深度首選',
-    color: 'forest',
+    no: '03',
+    title: '米其林全覽',
+    en: 'Michelin Grand Tour',
+    duration: '150 分鐘',
+    price: '499',
+    photo: 'https://images.unsplash.com/photo-1565009637-a3344999a479?auto=format&fit=crop&w=1200&q=80',
+    photoAlt: '俯瞰廟宇紅瓦屋頂的傳統建築群',
+    tagline: '北鹿港、南鹿港，一次走完。',
     features: [
       '米其林指南 3 星景點全覽',
       '北鹿港 + 南鹿港全方位',
-      '在地百年古蹟深度走讀',
+      '百年古蹟深度走讀',
       '攝影最佳路線規劃',
       '長者・親子・無障礙友善',
     ],
   },
 ]
 
-const extras = [
-  { icon: '🚐', title: '六人座電動車租賃', desc: '2 小時起，自由騎乘探索鹿港小鎮。' },
-  { icon: '👵', title: '長者醫療接駁', desc: '平日短程搭載長輩到鹿港鎮內診所就診。' },
-  { icon: '🎓', title: '企業 / 學校包團', desc: '客製化主題導覽，文史、建築、工藝任選。' },
+const EXTRAS = [
+  {
+    no: 'A',
+    title: '六人座電動車租賃',
+    desc: '兩小時起，無導覽員，自由騎乘探索鹿港小鎮。',
+  },
+  {
+    no: 'B',
+    title: '長者醫療接駁',
+    desc: '平日短程接送鎮內長者就醫，彈性配合時段。',
+  },
+  {
+    no: 'C',
+    title: '企業 / 學校包團',
+    desc: '客製化主題導覽，文史、建築、工藝任選。',
+  },
 ]
 
 export default function Services() {
   return (
-    <section id="services" className="py-20 md:py-28 bg-gradient-to-b from-cream-100 to-cream-50 relative">
-      <div className="max-w-7xl mx-auto px-5">
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-forest-100 text-forest-700 rounded-full text-sm font-medium mb-4">
-            鹿港觀光三輪車・四輪車方案
+    <section id="experience" className="py-24 md:py-32 bg-paper-50">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* 章節標題 */}
+        <div className="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
+          <div className="md:col-span-3">
+            <div className="eyebrow mb-3">N°02 — Experiences</div>
+            <div className="rule-thick w-12" />
           </div>
-          <h2 className="section-title">
-            為您量身打造的<span className="text-amber-600">鹿港旅遊推薦</span>行程
-          </h2>
-          <p className="section-subtitle">
-            從 60 分鐘快閃到 2.5 小時深度，每一分鐘都是在地文化故事
-          </p>
+          <div className="md:col-span-9">
+            <h2 className="section-title max-w-2xl">
+              三種長度，<br />
+              一場專屬於你的<span className="font-display italic"> 鹿港散策</span>。
+            </h2>
+            <p className="lead mt-6 max-w-xl">
+              從 60 分鐘的快閃，到 150 分鐘的米其林全覽 ——
+              每段路線都由在地導覽員量身規劃，搭乘節能電動車，
+              用最舒適的速度讀懂鹿港。
+            </p>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 md:gap-4 mb-16">
-          {plans.map((p, i) => (
-            <div
-              key={i}
-              className={`relative rounded-3xl p-8 transition-all hover:-translate-y-2 ${
-                p.popular
-                  ? 'bg-gradient-to-br from-forest-700 to-forest-900 text-cream-50 shadow-2xl md:scale-105 border-2 border-amber-400'
-                  : 'bg-white text-forest-800 shadow-lg border border-forest-100'
-              }`}
-            >
-              {p.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-amber-500 text-forest-900 font-bold text-sm rounded-full shadow-md">
-                  {p.badge}
+        {/* 三個方案 */}
+        <div className="grid md:grid-cols-3 gap-x-6 gap-y-12 mb-24">
+          {PLANS.map(p => (
+            <article key={p.no} className="group flex flex-col">
+              {/* 攝影圖 */}
+              <a href="#contact" className="block photo-frame aspect-[4/5] mb-6 relative">
+                <img
+                  src={p.photo}
+                  alt={p.photoAlt}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                />
+                {p.featured && (
+                  <div className="absolute top-4 left-4 bg-paper-50 px-3 py-1.5">
+                    <span className="font-mono text-[10px] tracking-widest uppercase text-brick-500">
+                      Most Booked
+                    </span>
+                  </div>
+                )}
+              </a>
+
+              {/* 編號 + 標題列 */}
+              <div className="flex items-baseline justify-between mb-4">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-mono text-xs tracking-widest text-ink-300">{p.no}</span>
+                  <h3 className="font-serif text-2xl text-ink-800">{p.title}</h3>
                 </div>
-              )}
-
-              {!p.popular && (
-                <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-${p.color}-100 text-${p.color}-700`}>
-                  {p.badge}
-                </div>
-              )}
-
-              <h3 className={`font-serif font-bold text-2xl mb-2 ${p.popular ? 'text-amber-300 mt-4' : ''}`}>
-                {p.title}
-              </h3>
-
-              <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-4xl font-bold">{p.price}</span>
-                <span className={`text-sm ${p.popular ? 'text-cream-200' : 'text-forest-500'}`}>{p.unit}</span>
+                <span className="font-mono text-[11px] tracking-widest uppercase text-ink-400">
+                  {p.duration}
+                </span>
               </div>
 
-              <ul className="space-y-3 mb-8">
+              <p className="font-display italic text-ink-500 mb-5">{p.tagline}</p>
+
+              <ul className="space-y-2.5 mb-6 text-sm text-ink-600">
                 {p.features.map((f, j) => (
-                  <li key={j} className="flex items-start gap-3">
-                    <span className={`mt-0.5 flex-shrink-0 ${p.popular ? 'text-amber-400' : 'text-forest-500'}`}>✓</span>
-                    <span className={`text-sm ${p.popular ? 'text-cream-100' : 'text-forest-700'}`}>{f}</span>
+                  <li key={j} className="flex gap-3">
+                    <span className="text-brick-500 mt-1">—</span>
+                    <span>{f}</span>
                   </li>
                 ))}
               </ul>
 
-              <a
-                href="#contact"
-                className={`block text-center py-3 rounded-full font-semibold transition-all ${
-                  p.popular
-                    ? 'bg-amber-500 hover:bg-amber-400 text-forest-900'
-                    : 'bg-forest-700 hover:bg-forest-800 text-cream-50'
-                }`}
-              >
-                預約此方案
-              </a>
-            </div>
+              <div className="mt-auto pt-5 border-t border-ink-100 flex items-end justify-between">
+                <div>
+                  <div className="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-1">
+                    From / 每人
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-display text-3xl text-ink-800">NT${p.price}</span>
+                  </div>
+                </div>
+                <a
+                  href="#contact"
+                  className="text-sm tracking-wider text-ink-700 hover:text-brick-500 inline-flex items-center gap-2 border-b border-ink-700 hover:border-brick-500 pb-1"
+                >
+                  預約此行程
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </a>
+              </div>
+            </article>
           ))}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
-          {extras.map((e, i) => (
-            <div key={i} className="bg-white/60 backdrop-blur-sm border border-forest-100 rounded-2xl p-6 hover:bg-white transition-colors">
-              <div className="text-3xl mb-3">{e.icon}</div>
-              <h4 className="font-serif font-bold text-lg text-forest-800 mb-1">{e.title}</h4>
-              <p className="text-forest-600 text-sm leading-relaxed">{e.desc}</p>
+        {/* 額外服務 — 細線排版 */}
+        <div className="border-t border-ink-200 pt-12">
+          <div className="grid md:grid-cols-12 gap-8">
+            <div className="md:col-span-3">
+              <div className="eyebrow mb-3">Other Services</div>
+              <h3 className="font-serif text-2xl text-ink-800 leading-snug">
+                還有這些<br />可以為你安排
+              </h3>
             </div>
-          ))}
+            <div className="md:col-span-9 grid md:grid-cols-3 gap-8">
+              {EXTRAS.map(e => (
+                <div key={e.no} className="group">
+                  <div className="font-mono text-xs tracking-widest text-brick-500 mb-3">
+                    — {e.no}
+                  </div>
+                  <h4 className="font-serif text-lg text-ink-800 mb-2">{e.title}</h4>
+                  <p className="text-ink-500 text-sm leading-relaxed">{e.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="mt-12 p-5 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl text-sm text-amber-900">
-          💡 <strong>提醒：</strong>所有方案皆需提前 LINE 或電話預約。加入官方 LINE 好友享 95 折優惠！
-        </div>
+        {/* 提醒 — 編輯式注腳 */}
+        <p className="mt-16 pt-6 border-t border-ink-100 text-xs text-ink-400 tracking-wider">
+          * 所有行程皆需提前以 LINE 或電話預約・加入官方 LINE 享 95 折・假日場次建議提早三日預約。
+        </p>
       </div>
     </section>
   )
