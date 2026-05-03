@@ -1,5 +1,4 @@
 // 導覽行程方案 — 編輯式攝影卡
-// 圖片：Unsplash 廟宇/老街佔位圖
 const PLANS = [
   {
     no: '01',
@@ -86,33 +85,22 @@ export default function Services() {
           {PLANS.map(p => (
             <article key={p.no} className="group flex flex-col">
               <a href="#contact" className="block photo-frame aspect-[4/5] mb-6 relative">
-                <img
-                  src={p.photo}
-                  alt={p.photoAlt}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                />
+                <img src={p.photo} alt={p.photoAlt} loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
                 {p.featured && (
                   <div className="absolute top-4 left-4 bg-paper-50 px-3 py-1.5">
-                    <span className="font-mono text-[10px] tracking-widest uppercase text-brick-500">
-                      Most Booked
-                    </span>
+                    <span className="font-mono text-[10px] tracking-widest uppercase text-brick-500">Most Booked</span>
                   </div>
                 )}
               </a>
-
               <div className="flex items-baseline justify-between mb-4">
                 <div className="flex items-baseline gap-3">
                   <span className="font-mono text-xs tracking-widest text-ink-300">{p.no}</span>
                   <h3 className="font-serif text-2xl text-ink-800">{p.title}</h3>
                 </div>
-                <span className="font-mono text-[11px] tracking-widest uppercase text-ink-400">
-                  {p.duration}
-                </span>
+                <span className="font-mono text-[11px] tracking-widest uppercase text-ink-400">{p.duration}</span>
               </div>
-
               <p className="font-display italic text-ink-500 mb-5">{p.tagline}</p>
-
               <ul className="space-y-2.5 mb-6 text-sm text-ink-600">
                 {p.features.map((f, j) => (
                   <li key={j} className="flex gap-3">
@@ -121,20 +109,14 @@ export default function Services() {
                   </li>
                 ))}
               </ul>
-
               <div className="mt-auto pt-5 border-t border-ink-100 flex items-end justify-between">
                 <div>
-                  <div className="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-1">
-                    From / 每人
-                  </div>
+                  <div className="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-1">From / 每人</div>
                   <div className="flex items-baseline gap-1">
                     <span className="font-display text-3xl text-ink-800">NT${p.price}</span>
                   </div>
                 </div>
-                <a
-                  href="#contact"
-                  className="text-sm tracking-wider text-ink-700 hover:text-brick-500 inline-flex items-center gap-2 border-b border-ink-700 hover:border-brick-500 pb-1"
-                >
+                <a href="#contact" className="text-sm tracking-wider text-ink-700 hover:text-brick-500 inline-flex items-center gap-2 border-b border-ink-700 hover:border-brick-500 pb-1">
                   預約此行程
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -149,9 +131,7 @@ export default function Services() {
           <div className="grid md:grid-cols-12 gap-8">
             <div className="md:col-span-3">
               <div className="eyebrow mb-3">Other Services</div>
-              <h3 className="font-serif text-2xl text-ink-800 leading-snug">
-                還有這些<br />可以為你安排
-              </h3>
+              <h3 className="font-serif text-2xl text-ink-800 leading-snug">還有這些<br />可以為你安排</h3>
             </div>
             <div className="md:col-span-9 grid md:grid-cols-3 gap-8">
               {EXTRAS.map(e => (
