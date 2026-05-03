@@ -1,77 +1,130 @@
-const features = [
-  { icon: '📚', title: '在地深度故事', desc: '不是死背的觀光稿，而是世居鹿港才知道的巷弄典故。' },
-  { icon: '🏆', title: '米其林級體驗', desc: '走訪米其林旅遊指南推薦的鹿港 3 星景點。' },
-  { icon: '🌿', title: '永續環保', desc: '全車隊使用節能電動車，用行動愛地球愛鹿港。' },
-  { icon: '👨‍👩‍👧‍👦', title: '全齡友善', desc: '親子、長者、行動不便者都能輕鬆暢遊。' },
-  { icon: '💬', title: '彈性貼心', desc: '臨時預約也能接待，把每一位旅人當朋友。' },
-  { icon: '⭐', title: '五星品質', desc: 'Google 200 則評論、滿分 5.0、零負評紀錄。' },
+// 關於我們 — 攝影分割版面
+const ABOUT_PHOTO_LARGE = 'https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=1400&q=80'
+const ABOUT_PHOTO_SMALL = 'https://images.unsplash.com/photo-1583004586580-3a82ad1e7c37?auto=format&fit=crop&w=900&q=80'
+
+const VALUES = [
+  {
+    no: '01',
+    title: '在地深度',
+    body: '不是死背的觀光稿，而是世居鹿港才知道的巷弄典故。',
+  },
+  {
+    no: '02',
+    title: '米其林級',
+    body: '走訪米其林指南推薦的鹿港 3 星景點，路線經過反覆打磨。',
+  },
+  {
+    no: '03',
+    title: '永續環保',
+    body: '全車隊使用節能電動車，用行動愛這座古鎮、愛地球。',
+  },
+  {
+    no: '04',
+    title: '全齡友善',
+    body: '親子、長者、行動不便者都能輕鬆暢遊，無障礙也照顧到。',
+  },
+  {
+    no: '05',
+    title: '彈性貼心',
+    body: '臨時預約也能接待，把每一位旅人都當朋友看待。',
+  },
+  {
+    no: '06',
+    title: '五星品質',
+    body: 'Google 200 則評論、滿分 5.0、零負評紀錄。',
+  },
 ]
 
 export default function About() {
   return (
-    <section id="about" className="py-20 md:py-28 bg-forest-900 text-cream-50 relative overflow-hidden">
-      <div className="absolute inset-0 pattern-bamboo opacity-10" />
-      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
-
-      <div className="relative max-w-7xl mx-auto px-5">
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-          <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/20 text-amber-300 rounded-full text-sm font-medium mb-4">
-              關於導鹿 GtourLK
+    <section id="about" className="bg-ink-800 text-paper-100">
+      {/* 上半 — 大圖 + 文字 */}
+      <div className="max-w-7xl mx-auto px-6 pt-24 md:pt-32 pb-16">
+        <div className="grid md:grid-cols-12 gap-10 items-center">
+          {/* 左側 — 大圖 */}
+          <div className="md:col-span-7 relative">
+            <div className="photo-frame aspect-[4/3] bg-ink-700">
+              <img
+                src={ABOUT_PHOTO_LARGE}
+                alt="鹿港廟宇的飛簷與彩繪細節"
+                loading="lazy"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h2 className="font-serif font-black text-3xl md:text-5xl mb-6 leading-tight">
-              一群熱愛鹿港的人<br />
-              <span className="text-amber-400">用行動愛鹿港、愛地球</span>
-            </h2>
-            <p className="text-cream-100/90 text-lg leading-relaxed mb-6">
-              「導鹿 GtourLK」是鹿港在地的<strong className="text-amber-300">電動觀光三輪車・四輪車租賃</strong>品牌。
-              我們由一群熱愛這片土地的解說員組成，騎著全新節能環保電動車，帶您探索鹿港小鎮、米其林旅遊指南推薦的 3 星景點。
-            </p>
-            <p className="text-cream-100/80 leading-relaxed">
-              一種旅遊方式、一種生活態度。我們相信慢慢走、細細聽，才能讀懂這座
-              <span className="text-amber-300 font-semibold">「一府二鹿三艋舺」</span>
-              的歷史古鎮。歡迎您把我們當朋友，一起完成一場物超所值的鹿港古蹟之旅。
-            </p>
+            {/* 小圖 — 重疊 */}
+            <div className="absolute -bottom-12 -right-6 md:right-0 md:translate-x-1/3 w-2/5 hidden md:block">
+              <div className="photo-frame aspect-[3/4] bg-ink-700 border-4 border-ink-800">
+                <img
+                  src={ABOUT_PHOTO_SMALL}
+                  alt="鹿港老街夜晚的燈火"
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="relative">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="bg-gradient-to-br from-amber-500 to-amber-700 aspect-square rounded-3xl p-6 flex flex-col justify-end shadow-2xl">
-                  <div className="text-5xl mb-2">🛺</div>
-                  <div className="font-serif font-bold text-xl text-cream-50">電動三輪車</div>
-                  <div className="text-amber-100 text-sm">經典・浪漫・慢遊</div>
-                </div>
-                <div className="bg-gradient-to-br from-forest-600 to-forest-800 aspect-[4/5] rounded-3xl p-6 flex flex-col justify-end shadow-2xl border border-amber-400/20">
-                  <div className="text-5xl mb-2">🏯</div>
-                  <div className="font-serif font-bold text-xl text-amber-300">百年龍山寺</div>
-                  <div className="text-cream-100 text-sm">米其林指南推薦</div>
-                </div>
-              </div>
-              <div className="space-y-4 pt-12">
-                <div className="bg-gradient-to-br from-forest-700 to-forest-900 aspect-[4/5] rounded-3xl p-6 flex flex-col justify-end shadow-2xl border border-amber-400/20">
-                  <div className="text-5xl mb-2">🏮</div>
-                  <div className="font-serif font-bold text-xl text-amber-300">天后宮</div>
-                  <div className="text-cream-100 text-sm">古鎮信仰中心</div>
-                </div>
-                <div className="bg-gradient-to-br from-amber-600 to-amber-800 aspect-square rounded-3xl p-6 flex flex-col justify-end shadow-2xl">
-                  <div className="text-5xl mb-2">🌿</div>
-                  <div className="font-serif font-bold text-xl text-cream-50">永續導覽</div>
-                  <div className="text-amber-100 text-sm">愛鹿港愛地球</div>
-                </div>
-              </div>
+          {/* 右側 — 編輯式文字 */}
+          <div className="md:col-span-5 md:pl-8">
+            <div className="eyebrow-light mb-4">N°04 — About</div>
+            <div className="rule-thick w-12 bg-paper-200/40 mb-8" />
+
+            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-paper-50 leading-[1.25] mb-8">
+              一群熱愛鹿港的人，<br />
+              <span className="font-display italic text-paper-200">
+                用行動讀寫這座古鎮。
+              </span>
+            </h2>
+
+            <div className="space-y-5 text-paper-100/85 leading-relaxed">
+              <p>
+                「導鹿 GtourLK」是鹿港在地的電動觀光三輪車・四輪車租賃品牌。
+                我們由一群熱愛這片土地的解說員組成，
+                騎著全新節能環保電動車，帶您探索鹿港小鎮、米其林旅遊指南推薦的 3 星景點。
+              </p>
+              <p>
+                一種旅遊方式、一種生活態度。我們相信慢慢走、細細聽，
+                才能讀懂這座<span className="text-paper-50 font-medium">「一府二鹿三艋舺」</span>
+                的歷史古鎮。歡迎您把我們當朋友，一起完成一場物超所值的鹿港古蹟之旅。
+              </p>
+            </div>
+
+            {/* 簽名感的標記 */}
+            <div className="mt-10 flex items-center gap-4">
+              <span className="font-display italic text-paper-200 text-2xl">— GtourLK</span>
+              <span className="h-px flex-1 bg-paper-200/30 max-w-[120px]" />
+              <span className="font-mono text-[10px] tracking-widest uppercase text-paper-200/50">
+                Lukang, est. 2019
+              </span>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map((f, i) => (
-            <div key={i} className="bg-cream-50/5 backdrop-blur-sm border border-cream-50/10 rounded-2xl p-6 hover:border-amber-400/40 hover:bg-cream-50/10 transition-all">
-              <div className="text-3xl mb-3">{f.icon}</div>
-              <h3 className="font-serif font-bold text-lg text-amber-300 mb-2">{f.title}</h3>
-              <p className="text-cream-100/80 text-sm leading-relaxed">{f.desc}</p>
+      {/* 下半 — 六大特色，編輯式條列 */}
+      <div className="border-t border-paper-100/10 mt-12 md:mt-24">
+        <div className="max-w-7xl mx-auto px-6 py-20">
+          <div className="grid md:grid-cols-12 gap-8 mb-12">
+            <div className="md:col-span-3">
+              <div className="eyebrow-light mb-3">Why GtourLK</div>
+              <h3 className="font-serif text-2xl text-paper-50 leading-snug">
+                我們<br />在意這六件事
+              </h3>
             </div>
-          ))}
+            <div className="md:col-span-9 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10">
+              {VALUES.map(v => (
+                <div key={v.no} className="group">
+                  <div className="flex items-baseline gap-3 mb-3">
+                    <span className="font-mono text-[11px] tracking-widest text-brick-400">
+                      — {v.no}
+                    </span>
+                  </div>
+                  <h4 className="font-serif text-lg text-paper-50 mb-2">{v.title}</h4>
+                  <p className="text-paper-100/65 text-sm leading-relaxed">{v.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
