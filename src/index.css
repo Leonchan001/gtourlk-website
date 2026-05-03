@@ -7,38 +7,84 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply font-sans text-forest-900 bg-cream-50 antialiased;
+    @apply font-sans text-ink-700 bg-paper-50 antialiased;
+    font-feature-settings: "palt" 1, "kern" 1;
   }
   h1, h2, h3, h4 {
-    @apply font-serif;
+    @apply font-serif text-ink-800;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: #9a3a2a;
+    color: #fbf8f2;
+  }
+  /* 細緻的水平分隔線 — 編輯式風格 */
+  hr {
+    @apply border-ink-100;
   }
 }
 
 @layer components {
+  /* 主要 CTA — 磚紅實心，方角，沉穩 */
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all;
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5
+           bg-brick-500 hover:bg-brick-600 text-paper-50
+           text-sm font-medium tracking-wider
+           transition-colors duration-200;
   }
+  /* 次要 CTA — 墨線描邊，方角 */
   .btn-secondary {
-    @apply inline-flex items-center gap-2 px-6 py-3 bg-forest-700 hover:bg-forest-800 text-cream-50 font-semibold rounded-full shadow-lg transition-all;
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5
+           border border-ink-700 text-ink-700 hover:bg-ink-700 hover:text-paper-50
+           text-sm font-medium tracking-wider
+           transition-colors duration-200;
   }
+  /* 反白 CTA — 用於深色照片之上 */
+  .btn-light {
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5
+           bg-paper-50 hover:bg-paper-100 text-ink-800
+           text-sm font-medium tracking-wider
+           transition-colors duration-200;
+  }
+
+  /* 編號 — 編輯式風格的 01 / 02 */
+  .eyebrow {
+    @apply font-mono text-[11px] tracking-widest uppercase text-ink-400;
+  }
+  .eyebrow-light {
+    @apply font-mono text-[11px] tracking-widest uppercase text-paper-200;
+  }
+
+  /* 章節標題 — 大字襯線，左對齊 */
   .section-title {
-    @apply text-3xl md:text-4xl font-bold text-forest-800 mb-3;
+    @apply font-serif text-3xl md:text-4xl lg:text-5xl text-ink-800 leading-[1.25];
+    font-weight: 600;
   }
-  .section-subtitle {
-    @apply text-forest-600 text-lg mb-12;
+
+  /* 編輯式 lead 段落 */
+  .lead {
+    @apply text-ink-500 text-base md:text-lg leading-relaxed;
+  }
+
+  /* 細線分隔 */
+  .rule {
+    @apply h-px bg-ink-200;
+  }
+  .rule-thick {
+    @apply h-px bg-ink-700;
+  }
+
+  /* 圖片底色 — 用於 Unsplash 圖未載入時的優雅 fallback */
+  .photo-frame {
+    @apply bg-ink-100 overflow-hidden;
   }
 }
 
-.hero-gradient {
-  background:
-    radial-gradient(ellipse at top left, rgba(245, 158, 11, 0.15), transparent 50%),
-    radial-gradient(ellipse at bottom right, rgba(45, 97, 57, 0.3), transparent 50%),
-    linear-gradient(135deg, #14291a 0%, #254d2f 50%, #2d6139 100%);
-}
-
-.pattern-bamboo {
+/* 紙質紋理 — 極淡，僅供品牌大區使用 */
+.texture-paper {
+  background-color: #f6f1e7;
   background-image:
-    linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
-  background-size: 24px 24px;
+    radial-gradient(circle at 1px 1px, rgba(60, 50, 40, 0.04) 1px, transparent 0);
+  background-size: 18px 18px;
 }
