@@ -1,56 +1,85 @@
+// 頁尾 — 編輯式低調風
+const PHONES = [
+  { label: '王姐', tel: '+886927013167', display: '0927-013-167' },
+  { label: '小郭', tel: '+886927291828', display: '0927-291-828' },
+  { label: '店面', tel: '+88647740142',  display: '(04) 7740-142' },
+]
+
 export default function Footer() {
   return (
-    <footer className="bg-forest-900 text-cream-100/70 pt-16 pb-8 border-t border-forest-700">
-      <div className="max-w-7xl mx-auto px-5">
-        <div className="grid md:grid-cols-4 gap-10 mb-12">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-amber-500 text-forest-900 rounded-full flex items-center justify-center font-bold">
-                鹿
-              </div>
-              <div>
-                <div className="font-serif font-bold text-cream-50 text-lg">導鹿 GtourLK</div>
-                <div className="text-xs">鹿港三輪車觀光導覽</div>
-              </div>
+    <footer className="bg-ink-900 text-paper-100/70">
+      <div className="max-w-7xl mx-auto px-6 pt-20 pb-10">
+        <div className="grid md:grid-cols-12 gap-10 pb-14 border-b border-paper-100/10">
+
+          {/* 品牌區 */}
+          <div className="md:col-span-5">
+            <div className="font-display text-3xl text-paper-50 tracking-wide mb-1">
+              GtourLK
             </div>
-            <p className="text-sm leading-relaxed mb-4 max-w-md">
-              鹿港在地的電動觀光導覽品牌，提供米其林級的鹿港深度旅遊推薦行程。
-              一群熱愛鹿港的解說員，用行動愛鹿港、愛地球。
+            <div className="font-serif text-sm tracking-[0.25em] text-paper-200 mb-6">
+              導 · 鹿
+            </div>
+            <p className="text-sm leading-relaxed max-w-md">
+              鹿港在地的電動觀光導覽品牌，
+              提供米其林級的鹿港深度散策。
+              一群熱愛鹿港的解說員，用行動讀寫這座古鎮。
             </p>
-            <div className="flex gap-3">
+            <div className="mt-8 flex items-center gap-4">
               {['Facebook', 'Instagram', 'Threads'].map(s => (
-                <span key={s} className="px-3 py-1 bg-forest-800 border border-forest-700 rounded-full text-xs">
+                <a key={s} href="#" className="text-xs tracking-widest uppercase font-mono text-paper-100/50 hover:text-paper-50 border-b border-paper-100/15 hover:border-paper-50 pb-1 transition-colors">
                   {s}
-                </span>
+                </a>
               ))}
             </div>
           </div>
 
-          <div>
-            <h4 className="text-amber-400 font-semibold mb-4">快速導覽</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#services" className="hover:text-amber-300">導覽方案</a></li>
-              <li><a href="#reviews" className="hover:text-amber-300">五星評價</a></li>
-              <li><a href="#about" className="hover:text-amber-300">關於導鹿</a></li>
-              <li><a href="#contact" className="hover:text-amber-300">聯絡預約</a></li>
+          {/* 站內導航 */}
+          <div className="md:col-span-3">
+            <h4 className="eyebrow-light mb-5">Sitemap</h4>
+            <ul className="space-y-3">
+              {[
+                ['#experience', '導覽行程'],
+                ['#reviews',    '旅人評價'],
+                ['#about',      '關於我們'],
+                ['#contact',    '預約聯絡'],
+              ].map(([href, label]) => (
+                <li key={href}>
+                  <a href={href} className="text-sm hover:text-paper-50 transition-colors">
+                    {label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-amber-400 font-semibold mb-4">聯絡資訊</h4>
-            <ul className="space-y-2 text-sm">
-              <li>📍 彰化縣鹿港鎮永寧街 236 號</li>
-              <li>📞 0927-013-167</li>
-              <li>💬 LINE：@137ebkaq</li>
-              <li>🕗 08:00 – 19:00</li>
+          {/* 聯絡資訊 — 三隻電話 */}
+          <div className="md:col-span-4">
+            <h4 className="eyebrow-light mb-5">Contact</h4>
+            <ul className="space-y-3 text-sm">
+              <li className="text-paper-100/70">彰化縣鹿港鎮永寧街 236 號</li>
+              <li className="text-paper-100/70">每日 08:00 — 19:00</li>
+              <li className="text-paper-100/70">LINE 　@137ebkaq</li>
             </ul>
+
+            <div className="mt-5 pt-5 border-t border-paper-100/10 space-y-2">
+              {PHONES.map(p => (
+                <a key={p.tel} href={`tel:${p.tel}`}
+                  className="flex items-center justify-between text-sm hover:text-paper-50 transition-colors">
+                  <span className="text-paper-100/50 text-[11px] uppercase tracking-widest">{p.label}</span>
+                  <span className="font-mono">{p.display}</span>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-forest-800 flex flex-col md:flex-row justify-between items-center gap-3 text-xs">
-          <div>© {new Date().getFullYear()} 導鹿 GtourLK 鹿港三輪車觀光導覽．All rights reserved.</div>
-          <div className="text-forest-500">
-            鹿港導覽 · 鹿港觀光三輪車 · 鹿港旅遊推薦 · 米其林指南景點
+        {/* 版權列 */}
+        <div className="mt-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-[11px] tracking-wider">
+          <div className="text-paper-100/40">
+            © {new Date().getFullYear()} 導鹿 GtourLK　·　鹿港三輪車觀光導覽　·　All rights reserved.
+          </div>
+          <div className="text-paper-100/30 font-mono uppercase">
+            Lukang · Changhua · Taiwan
           </div>
         </div>
       </div>
