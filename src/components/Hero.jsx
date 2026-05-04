@@ -1,14 +1,13 @@
-// 主視覺 — 鹿港龍山寺實照
-// 圖片來源：Wikimedia Commons（公開授權，可商用）
-const HERO_PHOTO = 'https://commons.wikimedia.org/wiki/Special:FilePath/Main%20Gate%20of%20the%20Lukang%20Longshan%20Temple.jpg?width=2000'
-const HERO_PHOTO_CREDIT = '攝影｜Wikimedia Commons · 鹿港龍山寺'
+// 主視覺 — 鹿港老街實照
+const HERO_PHOTO = 'https://commons.wikimedia.org/wiki/Special:FilePath/%E9%B9%BF%E6%B8%AF%E8%80%81%E8%A1%97%E5%B0%8F%E5%B7%B707.jpg?width=2000'
+const HERO_PHOTO_CREDIT = '攝影｜Wikimedia Commons · 鹿港老街'
 
 export default function Hero() {
   return (
     <section id="top" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-ink-800">
       <img
         src={HERO_PHOTO}
-        alt="鹿港龍山寺主大門全景"
+        alt="鹿港老街傍晚的紅燈籠與紅磚老屋"
         className="absolute inset-0 w-full h-full object-cover"
         loading="eager"
         fetchPriority="high"
@@ -17,7 +16,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-t from-ink-900/85 via-ink-900/40 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-r from-ink-900/60 via-transparent to-transparent" />
 
-      <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-end pb-16 md:pb-24">
+      <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-end pb-14 md:pb-20">
         <div className="max-w-3xl">
           <div className="flex items-center gap-4 mb-6">
             <span className="font-mono text-[11px] tracking-widest uppercase text-paper-200">
@@ -26,15 +25,14 @@ export default function Hero() {
             <span className="h-px w-16 bg-paper-200/60" />
           </div>
 
-          <h1 className="font-serif text-paper-50 text-[44px] md:text-[68px] lg:text-[80px] leading-[1.05] mb-2">
-            穿過巷弄，<br className="md:hidden" />
-            走進鹿港的<br />
-            <span className="font-display italic text-paper-100">百年時間</span>
+          <h1 className="font-serif text-paper-50 text-[40px] md:text-[56px] lg:text-[64px] leading-[1.1] mb-2">
+            鹿港的故事，<br />
+            <span className="font-display italic text-paper-100">就藏在巷弄裡。</span>
           </h1>
 
-          <p className="text-paper-100/85 text-base md:text-lg max-w-xl leading-relaxed mt-8 mb-10">
-            搭乘節能電動三輪車，跟著在地導覽員走訪龍山寺、天后宮與九曲巷，
-            一場以米其林指南景點為線的鹿港深度散策。
+          <p className="text-paper-100/85 text-base md:text-lg max-w-xl leading-relaxed mt-7 mb-9">
+            我們開電動三輪車載你逛龍山寺、天后宮、老街巷弄。
+            想去哪裡可以說，沒想法的話就交給我們安排。
           </p>
 
           <div className="flex flex-wrap items-center gap-4">
@@ -43,17 +41,17 @@ export default function Hero() {
               <Arrow />
             </a>
             <a href="#experience" className="text-paper-50 text-sm tracking-wider hover:text-paper-200 inline-flex items-center gap-2 px-2 py-3.5 border-b border-paper-50/40">
-              查看三種行程
+              查看所有方案
               <Arrow light />
             </a>
           </div>
         </div>
 
-        <div className="mt-14 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
+        <div className="mt-12 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
           <Fact eyebrow="Google" big="5.0" small="／200 則五星評論" />
           <Fact eyebrow="Itinerary" big="60—150" small="分鐘・三種長度" />
           <Fact eyebrow="Vehicle" big="EV" small="全車隊節能電動車" />
-          <Fact eyebrow="Since" big="2019" small="鹿港在地經營" />
+          <Fact eyebrow="Since" big="2024" small="鹿港新創團隊" />
         </div>
       </div>
 
