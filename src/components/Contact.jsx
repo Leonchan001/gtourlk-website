@@ -1,8 +1,8 @@
-// 聯絡預約 — 編輯式版面，三隻電話、LINE、地址
+// 聯絡預約 — 三隻公司電話、LINE、地址
 const PHONES = [
-  { name: '王姐 · 導覽行程',  tel: '+886927013167', display: '0927-013-167' },
-  { name: '小郭 · 導覽行程',  tel: '+886927291828', display: '0927-291-828' },
-  { name: '店面 · 一般洽詢',  tel: '+88647740142',  display: '(04) 7740-142' },
+  { name: '預約專線（一）',  tel: '+886927013167', display: '0927-013-167' },
+  { name: '預約專線（二）',  tel: '+886927291828', display: '0927-291-828' },
+  { name: '店面總機',        tel: '+88647740142',  display: '(04) 7740-142' },
 ]
 
 export default function Contact() {
@@ -10,7 +10,6 @@ export default function Contact() {
     <section id="contact" className="py-24 md:py-32 bg-paper-50">
       <div className="max-w-7xl mx-auto px-6">
 
-        {/* 章節標題 */}
         <div className="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
           <div className="md:col-span-3">
             <div className="eyebrow mb-3">N°05 — Contact</div>
@@ -22,13 +21,11 @@ export default function Contact() {
               <span className="font-display italic">隨你方便。</span>
             </h2>
             <p className="lead mt-6 max-w-xl">
-              平均 30 分鐘內回覆。平日臨時預約也歡迎，
-              假日場次建議提早三日聯繫，以保留你想要的時段。
+              平均 30 分鐘內回覆。平日臨時預約也可以，假日場次建議提早三天聯繫。
             </p>
           </div>
         </div>
 
-        {/* 主要 CTA — LINE 大方塊 */}
         <div className="grid md:grid-cols-12 gap-8 mb-20">
           <div className="md:col-span-7">
             <a
@@ -65,7 +62,6 @@ export default function Contact() {
             </a>
           </div>
 
-          {/* 三隻電話 — 直立列表 */}
           <div className="md:col-span-5">
             <div className="eyebrow mb-5">直撥電話</div>
             <div className="border-t border-ink-200">
@@ -101,7 +97,6 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* 店面資訊 — 三欄細線 */}
         <div className="border-t border-ink-200 pt-12 grid md:grid-cols-3 gap-10">
           <InfoBlock
             label="Studio"
