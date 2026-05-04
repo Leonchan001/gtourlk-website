@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 
 // 浮動 CTA — 低調、編輯式
-// 預設只顯示一顆 LINE 按鈕；點開展開電話 + 地圖
 export default function FloatingCTA() {
   const [open, setOpen] = useState(false)
   const [show, setShow] = useState(false)
@@ -19,8 +18,8 @@ export default function FloatingCTA() {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {open && (
         <div className="flex flex-col gap-2 mb-1">
-          <Item href="tel:+886927013167" sub="王姐">0927-013-167</Item>
-          <Item href="tel:+886927291828" sub="小郭">0927-291-828</Item>
+          <Item href="tel:+886927013167" sub="預約">0927-013-167</Item>
+          <Item href="tel:+886927291828" sub="預約">0927-291-828</Item>
           <Item href="tel:+88647740142"  sub="店面">(04) 7740-142</Item>
           <Item
             href="https://www.google.com/maps/search/?api=1&query=505彰化縣鹿港鎮永寧街236號"
@@ -32,7 +31,6 @@ export default function FloatingCTA() {
       )}
 
       <div className="flex items-center gap-2">
-        {/* 主按鈕 — LINE */}
         <a
           href="https://line.me/R/ti/p/@137ebkaq"
           target="_blank"
@@ -45,7 +43,6 @@ export default function FloatingCTA() {
           </span>
         </a>
 
-        {/* 展開更多選項按鈕 */}
         <button
           onClick={() => setOpen(!open)}
           aria-label={open ? '收起' : '更多聯絡方式'}
