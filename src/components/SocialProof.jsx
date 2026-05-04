@@ -37,7 +37,6 @@ export default function SocialProof() {
     <section id="reviews" className="py-24 md:py-32 bg-paper-100 texture-paper">
       <div className="max-w-7xl mx-auto px-6">
 
-        {/* 章節標題 */}
         <div className="grid md:grid-cols-12 gap-8 mb-20">
           <div className="md:col-span-3">
             <div className="eyebrow mb-3">N°03 — Reviews</div>
@@ -47,16 +46,14 @@ export default function SocialProof() {
             <h2 className="section-title max-w-2xl">
               <span className="font-mono text-base text-brick-500 align-top mr-2">★ 5.0</span>
               <br className="md:hidden" />
-              200 位旅人，<br />留下了一致的評價。
+              200 位客人，<br />都給了 5 顆星。
             </h2>
             <p className="lead mt-6 max-w-xl">
-              不是行銷文案，而是 Google 上 200 則真實的五星評論。
-              這是我們最珍視的、也是最不能造假的勳章。
+              Google 上 200 則五星評論，是客人留下的真實回饋，沒有經過篩選或刪改。
             </p>
           </div>
         </div>
 
-        {/* 大型 pull quote — 編輯式重點引言 */}
         <figure className="grid md:grid-cols-12 gap-8 items-start mb-20 pb-20 border-b border-ink-200">
           <div className="md:col-span-1">
             <span className="font-display text-7xl text-brick-500 leading-none block">"</span>
@@ -75,7 +72,6 @@ export default function SocialProof() {
           </div>
         </figure>
 
-        {/* 四則小評論 — 兩欄排版 */}
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-12">
           {REVIEWS.map((r, i) => (
             <article key={i} className="group">
@@ -103,11 +99,10 @@ export default function SocialProof() {
           ))}
         </div>
 
-        {/* 看更多 — 編輯式底線連結 */}
         <div className="mt-20 pt-10 border-t border-ink-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="eyebrow mb-2">Verified · 彰化友善店家認證</div>
-            <p className="text-ink-500">每一則評論都經 Google 真實驗證・無任何刪改</p>
+            <p className="text-ink-500">每則評論都經 Google 真實驗證，內容沒有刪改。</p>
           </div>
           <a
             href="https://www.google.com/search?q=%E5%B0%8E%E9%B9%BFgtourlk"
