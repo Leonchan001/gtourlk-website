@@ -69,7 +69,7 @@ const SUMMER = {
     '附課本對照學習單，可當暑假作業',
     '簡單闖關小遊戲（找半邊井、數九曲巷的彎）',
     '結束送鹿港小紀念品',
-    '全程冷氣電動車，怕熱也沒問題',
+    '車是半開放式無冷氣，建議穿涼爽、自備飲水',
   ],
 }
 
@@ -146,7 +146,6 @@ export default function Services() {
           ))}
         </div>
 
-        {/* 暑假親子限定 banner */}
         <div className="mb-24 grid md:grid-cols-12 gap-0 bg-ink-800 text-paper-100 overflow-hidden">
           <div className="md:col-span-6 photo-frame aspect-[4/3] md:aspect-auto bg-ink-700">
             <img src={SUMMER.photo} alt={SUMMER.photoAlt} loading="lazy"
