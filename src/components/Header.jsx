@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import logoImg from '/gtourlk-logo.png'
 
 const PHONES = [
-  { label: '預約', tel: '+886927013167', display: '0927-013-167' },
-  { label: '預約', tel: '+886927291828', display: '0927-291-828' },
+  { label: '王姐', tel: '+886927013167', display: '0927-013-167' },
+  { label: '小郭', tel: '+886927291828', display: '0927-291-828' },
   { label: '店面', tel: '+88647740142',  display: '(04) 7740-142' },
 ]
 
@@ -11,6 +11,7 @@ const NAV = [
   { href: '#experience', label: '導覽行程', en: 'Experiences' },
   { href: '#reviews',    label: '旅人評價', en: 'Reviews' },
   { href: '#about',      label: '關於我們', en: 'About' },
+  { href: '#faq',        label: '常見問題', en: 'FAQ' },
   { href: '#contact',    label: '預約聯絡', en: 'Contact' },
 ]
 
@@ -26,6 +27,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 inset-x-0 z-40">
+      {/* 上方細線資訊條 — 三隻電話 */}
       <div className={`hidden md:block border-b transition-colors duration-300 ${
         scrolled ? 'bg-paper-50 border-ink-100' : 'bg-ink-800/40 backdrop-blur-sm border-white/10'
       }`}>
@@ -52,10 +54,12 @@ export default function Header() {
         </div>
       </div>
 
+      {/* 主導航列 */}
       <div className={`transition-colors duration-300 ${
         scrolled ? 'bg-paper-50 border-b border-ink-100' : 'bg-transparent'
       }`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-4">
+          {/* Logo 區 */}
           <a href="#top" className="flex items-center gap-3">
             <img src={logoImg} alt="導鹿 GtourLK" className="h-10 w-auto" />
             <div className={`leading-tight ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}>
@@ -64,6 +68,7 @@ export default function Header() {
             </div>
           </a>
 
+          {/* 桌機導航 */}
           <nav className="hidden md:flex items-center gap-9">
             {NAV.map(item => (
               <a
@@ -88,6 +93,7 @@ export default function Header() {
             </a>
           </nav>
 
+          {/* 手機選單按鈕 */}
           <button
             className={`md:hidden p-2 -mr-2 ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}
             onClick={() => setMenuOpen(!menuOpen)}
@@ -101,6 +107,7 @@ export default function Header() {
         </div>
       </div>
 
+      {/* 手機選單 */}
       {menuOpen && (
         <div className="md:hidden bg-paper-50 border-b border-ink-100">
           <div className="px-6 py-6 flex flex-col">

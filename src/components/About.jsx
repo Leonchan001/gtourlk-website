@@ -1,35 +1,61 @@
-// 關於我們 — 鹿港天后宮 + 半邊井實照
-const ABOUT_PHOTO_LARGE = 'https://commons.wikimedia.org/wiki/Special:FilePath/%E9%B9%BF%E6%B8%AF%E5%A4%A9%E5%90%8E%E5%AE%AE.JPG?width=1400'
-const ABOUT_PHOTO_SMALL = 'https://commons.wikimedia.org/wiki/Special:FilePath/%E5%8D%8A%E9%82%8A%E4%BA%95%20Half-sided%20Well%20-%20panoramio.jpg?width=900'
+const ABOUT_PHOTO_LARGE = 'https://images.unsplash.com/photo-1761410364742-90682ab8d6f3?auto=format&fit=crop&w=1400&q=80'
+const ABOUT_PHOTO_SMALL = 'https://images.unsplash.com/photo-1552550018-5253c1b171e1?auto=format&fit=crop&w=900&q=80'
 
 const VALUES = [
-  { no: '01', title: '在地團隊', body: '導覽員都是鹿港在地人，故事從小聽到大，講起來自然。' },
-  { no: '02', title: '路線彈性', body: '想去哪都可以說。沒想法的話，就交給我們安排。' },
-  { no: '03', title: '電動車隊', body: '全車隊都是電動車，安靜、不排廢氣，老街走起來舒服。' },
-  { no: '04', title: '全齡上車', body: '車有四輪很穩，長輩、小朋友、坐輪椅都能上車。' },
-  { no: '05', title: '彈性預約', body: '想去哪可以告訴我們。臨時預約也歡迎。' },
-  { no: '06', title: '五星好評', body: 'Google 200 則評論平均 5.0，目前還沒有客人給負評。' },
+  {
+    no: '01',
+    title: '在地深度',
+    body: '不是死背的觀光稿，而是世居鹿港才知道的巷弄典故。',
+  },
+  {
+    no: '02',
+    title: '米其林級',
+    body: '走訪米其林指南推薦的鹿港 3 星景點，路線經過反覆打磨。',
+  },
+  {
+    no: '03',
+    title: '永續環保',
+    body: '全車隊使用節能電動車，用行動愛這座古鎮、愛地球。',
+  },
+  {
+    no: '04',
+    title: '全齡友善',
+    body: '親子、長者、行動不便者都能輕鬆暢遊，無障礙也照顧到。',
+  },
+  {
+    no: '05',
+    title: '彈性貼心',
+    body: '臨時預約也能接待，把每一位旅人都當朋友看待。',
+  },
+  {
+    no: '06',
+    title: '五星品質',
+    body: 'Google 200 則評論、滿分 5.0、零負評紀錄。',
+  },
 ]
 
 export default function About() {
   return (
     <section id="about" className="bg-ink-800 text-paper-100">
+      {/* 上半 — 大圖 + 文字 */}
       <div className="max-w-7xl mx-auto px-6 pt-24 md:pt-32 pb-16">
         <div className="grid md:grid-cols-12 gap-10 items-center">
+          {/* 左側 — 大圖 */}
           <div className="md:col-span-7 relative">
             <div className="photo-frame aspect-[4/3] bg-ink-700">
               <img
                 src={ABOUT_PHOTO_LARGE}
-                alt="鹿港天后宮主廟正面與紅燈籠"
+                alt="導鹿GtourLK導覽員帶旅客遊覽鹿港古蹟"
                 loading="lazy"
                 className="w-full h-full object-cover"
               />
             </div>
+            {/* 小圖 — 重疊 */}
             <div className="absolute -bottom-12 -right-6 md:right-0 md:translate-x-1/3 w-2/5 hidden md:block">
               <div className="photo-frame aspect-[3/4] bg-ink-700 border-4 border-ink-800">
                 <img
                   src={ABOUT_PHOTO_SMALL}
-                  alt="鹿港半邊井古樸的紅磚老牆"
+                  alt="鹿港三輪車停靠在古鎮街頭"
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />
@@ -37,40 +63,44 @@ export default function About() {
             </div>
           </div>
 
+          {/* 右側 — 編輯式文字 */}
           <div className="md:col-span-5 md:pl-8">
             <div className="eyebrow-light mb-4">N°04 — About</div>
             <div className="rule-thick w-12 bg-paper-200/40 mb-8" />
 
             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-paper-50 leading-[1.25] mb-8">
-              鹿港在地團隊，<br />
+              一群熱愛鹿港的人，<br />
               <span className="font-display italic text-paper-200">
-                2024 年才剛起步。
+                用行動讀寫這座古鎮。
               </span>
             </h2>
 
             <div className="space-y-5 text-paper-100/85 leading-relaxed">
               <p>
-                導鹿 GtourLK 是 2024 年成立的鹿港在地導覽團隊，到現在剛滿兩年。
-                我們開電動三輪車跟四輪車，主要帶人走鹿港老街、龍山寺、天后宮這些米其林指南推薦的點。
+                「導鹿 GtourLK」是鹿港在地的電動觀光三輪車・四輪車租賃品牌。
+                我們由一群熱愛這片土地的解說員組成，
+                騎著全新節能環保電動車，帶您探索鹿港小鎮、米其林旅遊指南推薦的 3 星景點。
               </p>
               <p>
-                這座小鎮的故事用走的、用聽的，比拍照拍幾張更有感覺。
-                想看什麼景點都可以告訴我們，想不出來就讓我們來規劃，
-                把你帶到值得停下來的地方。
+                一種旅遊方式、一種生活態度。我們相信慢慢走、細細聽，
+                才能讀懂這座<span className="text-paper-50 font-medium">「一府二鹿三艋舺」</span>
+                的歷史古鎮。歡迎您把我們當朋友，一起完成一場物超所值的鹿港古蹟之旅。
               </p>
             </div>
 
+            {/* 簽名感的標記 */}
             <div className="mt-10 flex items-center gap-4">
               <span className="font-display italic text-paper-200 text-2xl">— GtourLK</span>
               <span className="h-px flex-1 bg-paper-200/30 max-w-[120px]" />
               <span className="font-mono text-[10px] tracking-widest uppercase text-paper-200/50">
-                Lukang, est. 2024
+                Lukang, est. 2019
               </span>
             </div>
           </div>
         </div>
       </div>
 
+      {/* 下半 — 六大特色，編輯式條列 */}
       <div className="border-t border-paper-100/10 mt-12 md:mt-24">
         <div className="max-w-7xl mx-auto px-6 py-20">
           <div className="grid md:grid-cols-12 gap-8 mb-12">
@@ -84,7 +114,9 @@ export default function About() {
               {VALUES.map(v => (
                 <div key={v.no} className="group">
                   <div className="flex items-baseline gap-3 mb-3">
-                    <span className="font-mono text-[11px] tracking-widest text-brick-400">— {v.no}</span>
+                    <span className="font-mono text-[11px] tracking-widest text-brick-400">
+                      — {v.no}
+                    </span>
                   </div>
                   <h4 className="font-serif text-lg text-paper-50 mb-2">{v.title}</h4>
                   <p className="text-paper-100/65 text-sm leading-relaxed">{v.body}</p>

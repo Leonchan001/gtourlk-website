@@ -1,8 +1,8 @@
-// 聯絡預約 — 三隻公司電話、LINE、地址
+// 聯絡預約 — 編輯式版面，三隻電話、LINE、地址
 const PHONES = [
-  { name: '預約專線（一）',  tel: '+886927013167', display: '0927-013-167' },
-  { name: '預約專線（二）',  tel: '+886927291828', display: '0927-291-828' },
-  { name: '店面總機',        tel: '+88647740142',  display: '(04) 7740-142' },
+  { name: '王姐 · 導覽行程',  tel: '+886927013167', display: '0927-013-167' },
+  { name: '小郭 · 導覽行程',  tel: '+886927291828', display: '0927-291-828' },
+  { name: '店面 · 一般洽詢',  tel: '+88647740142',  display: '(04) 7740-142' },
 ]
 
 export default function Contact() {
@@ -10,9 +10,10 @@ export default function Contact() {
     <section id="contact" className="py-24 md:py-32 bg-paper-50">
       <div className="max-w-7xl mx-auto px-6">
 
+        {/* 章節標題 */}
         <div className="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
           <div className="md:col-span-3">
-            <div className="eyebrow mb-3">N°05 — Contact</div>
+            <div className="eyebrow mb-3">N°06 — Contact</div>
             <div className="rule-thick w-12" />
           </div>
           <div className="md:col-span-9">
@@ -21,11 +22,13 @@ export default function Contact() {
               <span className="font-display italic">隨你方便。</span>
             </h2>
             <p className="lead mt-6 max-w-xl">
-              平均 30 分鐘內回覆。平日臨時預約也可以，假日場次建議提早三天聯繫。
+              平均 30 分鐘內回覆。平日臨時預約也歡迎，
+              假日場次建議提早三日聯繫，以保留你想要的時段。
             </p>
           </div>
         </div>
 
+        {/* 主要 CTA — LINE 大方塊 */}
         <div className="grid md:grid-cols-12 gap-8 mb-20">
           <div className="md:col-span-7">
             <a
@@ -62,6 +65,7 @@ export default function Contact() {
             </a>
           </div>
 
+          {/* 三隻電話 — 直立列表 */}
           <div className="md:col-span-5">
             <div className="eyebrow mb-5">直撥電話</div>
             <div className="border-t border-ink-200">
@@ -97,13 +101,14 @@ export default function Contact() {
           </div>
         </div>
 
+        {/* 店面資訊 — 三欄細線 */}
         <div className="border-t border-ink-200 pt-12 grid md:grid-cols-3 gap-10">
           <InfoBlock
             label="Studio"
             title="店面地址"
             line1="彰化縣鹿港鎮永寧街 236 號"
             line2="505 鹿港鎮埔崙里"
-            link="https://www.google.com/maps/search/?api=1&query=505彰化縣鹿港鎮永寧街236號"
+            link="https://maps.app.goo.gl/Ej2KZiMvKAzaCCxe7"
             linkText="開啟 Google 地圖"
           />
           <InfoBlock
@@ -117,6 +122,8 @@ export default function Contact() {
             title="社群追蹤"
             line1="Facebook · Instagram · Threads"
             line2="@gtourlk"
+            link="https://www.facebook.com/p/%E5%B0%8E%E9%B9%BFgtourlk-%E9%B9%BF%E6%B8%AF%E4%B8%89%E8%BC%AA%E8%BB%8A%E8%A7%80%E5%85%89%E5%B0%8E%E8%A6%BD-61566567161745/"
+            linkText="前往 Facebook 粉絲頁"
           />
         </div>
       </div>
