@@ -1,8 +1,8 @@
 // 聯絡預約 — 編輯式版面，三隻電話、LINE、地址
 const PHONES = [
-  { name: '王姐 · 導覽行程',  tel: '+886927013167', display: '0927-013-167' },
-  { name: '小郭 · 導覽行程',  tel: '+886927291828', display: '0927-291-828' },
-  { name: '店面 · 一般洽詢',  tel: '+88647740142',  display: '(04) 7740-142' },
+  { name: '預約專線 ①', tel: '+886927013167', display: '0927-013-167' },
+  { name: '預約專線 ②', tel: '+886927291828', display: '0927-291-828' },
+  { name: '客服總機',   tel: '+88647740142',  display: '(04) 7740-142' },
 ]
 
 export default function Contact() {
@@ -65,9 +65,12 @@ export default function Contact() {
             </a>
           </div>
 
-          {/* 三隻電話 — 直立列表 */}
+          {/* 三隻公司專線 — 直立列表 */}
           <div className="md:col-span-5">
-            <div className="eyebrow mb-5">直撥電話</div>
+            <div className="eyebrow mb-2">公司聯絡專線</div>
+            <p className="text-[12px] text-ink-400 mb-5 leading-relaxed">
+              三支號碼皆為導鹿 GtourLK 對外公司專線，由值班導覽員或店面客服接聽。
+            </p>
             <div className="border-t border-ink-200">
               {PHONES.map((p, i) => (
                 <a
@@ -77,7 +80,7 @@ export default function Contact() {
                 >
                   <div>
                     <div className="font-mono text-[11px] tracking-widest uppercase text-ink-400 mb-1">
-                      0{i + 1}
+                      0{i + 1} · Company Line
                     </div>
                     <div className="font-serif text-lg text-ink-800 group-hover:text-brick-500 transition-colors">
                       {p.name}

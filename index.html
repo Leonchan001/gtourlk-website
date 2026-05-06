@@ -29,6 +29,10 @@
     <meta name="twitter:description" content="五星好評・米其林級鹿港深度導覽・立即 LINE 預約" />
     <meta name="twitter:image" content="https://gtourlk.com/hero-main.jpg" />
 
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- 速度優化：首屏 hero 圖預載 + 字型 preconnect -->
+    <link rel="preload" as="image" href="/hero-main.jpg" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -36,13 +40,17 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "TouristAttraction",
+      "@type": ["LocalBusiness", "TouristAttraction"],
+      "@id": "https://gtourlk.com/#business",
       "name": "導鹿 GtourLK 鹿港三輪車觀光導覽",
+      "alternateName": ["GtourLK", "導鹿"],
       "url": "https://gtourlk.com/",
       "image": "https://gtourlk.com/hero-main.jpg",
+      "logo": "https://gtourlk.com/gtourlk-logo.png",
       "sameAs": [
         "https://www.facebook.com/p/%E5%B0%8E%E9%B9%BFgtourlk-%E9%B9%BF%E6%B8%AF%E4%B8%89%E8%BC%AA%E8%BB%8A%E8%A7%80%E5%85%89%E5%B0%8E%E8%A6%BD-61566567161745/",
         "https://www.instagram.com/gtourlk",
+        "https://www.threads.net/@gtourlk",
         "https://maps.app.goo.gl/Ej2KZiMvKAzaCCxe7"
       ],
       "description": "鹿港在地五星好評的三輪車與四輪車觀光導覽，深度走訪米其林指南景點與百年古蹟。",
@@ -54,13 +62,53 @@
         "postalCode": "505",
         "addressCountry": "TW"
       },
-      "telephone": "+886-927-013-167",
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 24.0537,
+        "longitude": 120.4348
+      },
+      "areaServed": "鹿港鎮",
+      "telephone": ["+886-927-013-167", "+886-927-291-828", "+886-4-7740-142"],
+      "priceRange": "NT$199 - NT$499",
+      "currenciesAccepted": "TWD",
+      "paymentAccepted": "Cash, LINE Pay",
       "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "5.0",
-        "reviewCount": "205"
+        "ratingValue": "4.9",
+        "reviewCount": "215",
+        "bestRating": "5",
+        "worstRating": "1"
       },
-      "openingHours": "Mo-Su 08:00-19:00"
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        "opens": "08:00",
+        "closes": "19:00"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "鹿港導覽行程",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "name": "老街輕旅 60 分鐘",
+            "price": "199",
+            "priceCurrency": "TWD"
+          },
+          {
+            "@type": "Offer",
+            "name": "深度文化 90 分鐘",
+            "price": "299",
+            "priceCurrency": "TWD"
+          },
+          {
+            "@type": "Offer",
+            "name": "米其林全覽 150 分鐘",
+            "price": "499",
+            "priceCurrency": "TWD"
+          }
+        ]
+      }
     }
     </script>
   </head>

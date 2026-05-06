@@ -1,5 +1,4 @@
-// 導覽行程方案 — 編輯式攝影卡
-// 圖片：Unsplash 廟宇/老街佔位圖
+// 導覽行程方案 — 編輯式攝影卡（鹿港實景）
 const PLANS = [
   {
     no: '01',
@@ -7,8 +6,9 @@ const PLANS = [
     en: 'Lukang Old Street Tour',
     duration: '60 分鐘',
     price: '199',
-    photo: 'https://images.unsplash.com/photo-1591962176551-cb2d2febb7be?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '導鹿GtourLK電動三輪車停靠鹿港老街旁，旅客開心遊覽',
+    photo: '/photos/lukang-old-street-night.jpg',
+    photoAlt: '鹿港老街小巷夜景，紅燈籠串連紅磚老屋',
+    coverSub: 'Old Street',
     tagline: '快速感受鹿港的氣味與光影。',
     features: [
       '天后宮 + 鹿港老街精華段',
@@ -24,8 +24,9 @@ const PLANS = [
     duration: '90 分鐘',
     price: '299',
     featured: true,
-    photo: 'https://images.unsplash.com/photo-1682228287072-5e23cbffd487?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '導覽員帶領旅客穿越鹿港摸乳巷、九曲巷古蹟',
+    photo: '/photos/lukang-rooftops-aerial.jpg',
+    photoAlt: '鹿港老街紅瓦屋頂空拍俯瞰，旅客穿梭於九曲巷弄',
+    coverSub: 'Heritage',
     tagline: '穿過摸乳巷、九曲巷，讀一座古鎮。',
     features: [
       '龍山寺・天后宮・桂花巷',
@@ -41,8 +42,9 @@ const PLANS = [
     en: 'Michelin Grand Tour',
     duration: '150 分鐘',
     price: '499',
-    photo: 'https://images.unsplash.com/photo-1571555787518-6ac85ee2529e?auto=format&fit=crop&w=1200&q=80',
-    photoAlt: '導鹿GtourLK帶旅客遊覽鹿港米其林3星景點全覽',
+    photo: '/photos/lukang-koo-house.jpg',
+    photoAlt: '鹿港辜家大宅 — 巴洛克建築，米其林指南推薦景點',
+    coverSub: 'Lukang ★★★',
     tagline: '北鹿港、南鹿港，一次走完。',
     features: [
       '米其林指南 3 星景點全覽',
@@ -99,16 +101,42 @@ export default function Services() {
         <div className="grid md:grid-cols-3 gap-x-6 gap-y-12 mb-24">
           {PLANS.map(p => (
             <article key={p.no} className="group flex flex-col">
-              {/* 攝影圖 */}
-              <a href="#contact" className="block photo-frame aspect-[4/5] mb-6 relative">
+              {/* 攝影封面 — 鹿港實景 + 漸層 + 編輯式編號 */}
+              <a
+                href="#contact"
+                aria-label={`預約${p.title}行程`}
+                className="block photo-frame aspect-[4/5] mb-6 relative overflow-hidden bg-ink-800"
+              >
                 <img
                   src={p.photo}
                   alt={p.photoAlt}
                   loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  width="1200"
+                  height="1500"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-900/85 via-ink-900/20 to-ink-900/40" />
+                <div className="absolute inset-0 flex flex-col justify-between p-6 text-paper-50">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[10px] tracking-[0.28em] uppercase text-brick-300">
+                      N°{p.no}
+                    </span>
+                    <span className="h-px w-10 bg-paper-50/60" />
+                    <span className="font-mono text-[10px] tracking-[0.28em] uppercase text-paper-100/85">
+                      {p.coverSub}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="font-display italic text-2xl text-paper-50 drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
+                      {p.en}
+                    </div>
+                    <div className="font-mono text-[11px] tracking-[0.28em] uppercase text-paper-200/80 mt-2">
+                      {p.duration}
+                    </div>
+                  </div>
+                </div>
                 {p.featured && (
-                  <div className="absolute top-4 left-4 bg-paper-50 px-3 py-1.5">
+                  <div className="absolute top-4 right-4 bg-paper-50 px-3 py-1.5">
                     <span className="font-mono text-[10px] tracking-widest uppercase text-brick-500">
                       Most Booked
                     </span>

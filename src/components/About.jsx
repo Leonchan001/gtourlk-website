@@ -1,5 +1,5 @@
-const ABOUT_PHOTO_LARGE = 'https://images.unsplash.com/photo-1761410364742-90682ab8d6f3?auto=format&fit=crop&w=1400&q=80'
-const ABOUT_PHOTO_SMALL = 'https://images.unsplash.com/photo-1552550018-5253c1b171e1?auto=format&fit=crop&w=900&q=80'
+const ABOUT_PHOTO_LARGE = '/hero-main.jpg'
+const ABOUT_PHOTO_SMALL = '/photos/lukang-art-village.jpg'
 
 const VALUES = [
   {
@@ -30,7 +30,7 @@ const VALUES = [
   {
     no: '06',
     title: '五星品質',
-    body: 'Google 200 則評論、滿分 5.0、零負評紀錄。',
+    body: 'Google 200+ 則評論、4.9 平均評分，絕大多數五星好評。',
   },
 ]
 
@@ -40,23 +40,27 @@ export default function About() {
       {/* 上半 — 大圖 + 文字 */}
       <div className="max-w-7xl mx-auto px-6 pt-24 md:pt-32 pb-16">
         <div className="grid md:grid-cols-12 gap-10 items-center">
-          {/* 左側 — 大圖 */}
+          {/* 左側 — 鹿港實景大圖 + 小圖（不重疊到右側標題） */}
           <div className="md:col-span-7 relative">
             <div className="photo-frame aspect-[4/3] bg-ink-700">
               <img
                 src={ABOUT_PHOTO_LARGE}
-                alt="導鹿GtourLK導覽員帶旅客遊覽鹿港古蹟"
+                alt="導鹿GtourLK電動三輪車停靠鹿港老街，在地導覽員帶旅客遊覽古蹟"
                 loading="lazy"
+                width="1400"
+                height="1050"
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* 小圖 — 重疊 */}
-            <div className="absolute -bottom-12 -right-6 md:right-0 md:translate-x-1/3 w-2/5 hidden md:block">
-              <div className="photo-frame aspect-[3/4] bg-ink-700 border-4 border-ink-800">
+            {/* 小圖 — 左下重疊，停在主圖內，不會蓋到右側標題 */}
+            <div className="absolute -bottom-8 left-4 md:left-6 w-1/3 hidden md:block">
+              <div className="photo-frame aspect-[4/3] bg-ink-700 border-4 border-ink-800 shadow-2xl">
                 <img
                   src={ABOUT_PHOTO_SMALL}
-                  alt="鹿港三輪車停靠在古鎮街頭"
+                  alt="鹿港在地藝術村場景，紅磚老屋與童趣裝置藝術"
                   loading="lazy"
+                  width="900"
+                  height="675"
                   className="w-full h-full object-cover"
                 />
               </div>

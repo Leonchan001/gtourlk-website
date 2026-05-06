@@ -2,7 +2,7 @@
 const PULL = {
   text: '在地人帶路果然不一樣。摸乳巷、九曲巷、桂花巷的典故都說得精彩，環保電動車安靜又平穩，沿著老街慢慢走，像走進時光膠囊。',
   author: '旅人日誌',
-  meta: 'Google 評論 · ★ 5.0',
+  meta: 'Google 評論 · ★ 4.9',
 }
 
 const REVIEWS = [
@@ -45,13 +45,13 @@ export default function SocialProof() {
           </div>
           <div className="md:col-span-9">
             <h2 className="section-title max-w-2xl">
-              <span className="font-mono text-base text-brick-500 align-top mr-2">★ 5.0</span>
+              <span className="font-mono text-base text-brick-500 align-top mr-2">★ 4.9</span>
               <br className="md:hidden" />
-              200 位旅人，<br />留下了一致的評價。
+              200+ 位旅人，<br />留下了真實的評價。
             </h2>
             <p className="lead mt-6 max-w-xl">
-              不是行銷文案，而是 Google 上 200 則真實的五星評論。
-              這是我們最珍視的、也是最不能造假的勳章。
+              不是行銷文案，而是 Google 上 200+ 則真實留言・絕大多數五星好評。
+              我們珍視每一則回饋——包含建議與批評，作為下一趟導覽更好的依據。
             </p>
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function SocialProof() {
             className="inline-flex items-center gap-3 text-ink-800 hover:text-brick-500 group"
           >
             <span className="text-sm tracking-wider border-b border-ink-700 group-hover:border-brick-500 pb-1">
-              閱讀全部 200 則 Google 評論
+              閱讀全部 Google 評論
             </span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />

@@ -1,8 +1,8 @@
 // 頁尾 — 編輯式低調風
 const PHONES = [
-  { label: '王姐', tel: '+886927013167', display: '0927-013-167' },
-  { label: '小郭', tel: '+886927291828', display: '0927-291-828' },
-  { label: '店面', tel: '+88647740142',  display: '(04) 7740-142' },
+  { label: '預約專線 ①', tel: '+886927013167', display: '0927-013-167' },
+  { label: '預約專線 ②', tel: '+886927291828', display: '0927-291-828' },
+  { label: '客服總機',   tel: '+88647740142',  display: '(04) 7740-142' },
 ]
 
 export default function Footer() {

@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import logoImg from '/gtourlk-logo.png'
 
 const PHONES = [
-  { label: '王姐', tel: '+886927013167', display: '0927-013-167' },
-  { label: '小郭', tel: '+886927291828', display: '0927-291-828' },
-  { label: '店面', tel: '+88647740142',  display: '(04) 7740-142' },
+  { label: '預約專線 ①', tel: '+886927013167', display: '0927-013-167' },
+  { label: '預約專線 ②', tel: '+886927291828', display: '0927-291-828' },
+  { label: '客服總機',   tel: '+88647740142',  display: '(04) 7740-142' },
 ]
 
 const NAV = [
@@ -61,7 +61,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-4">
           {/* Logo 區 */}
           <a href="#top" className="flex items-center gap-3">
-            <img src={logoImg} alt="導鹿 GtourLK" className="h-10 w-auto" />
+            <img src={logoImg} alt="導鹿 GtourLK" width="40" height="40" className="h-10 w-auto" />
             <div className={`leading-tight ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}>
               <div className="font-display text-lg tracking-wide">GtourLK</div>
               <div className="font-serif text-[11px] tracking-[0.2em] opacity-70">導 · 鹿</div>
