@@ -1,5 +1,5 @@
-const ABOUT_PHOTO_LARGE = '/hero-main.jpg'
-const ABOUT_PHOTO_SMALL = '/photos/lukang-art-village.jpg'
+const ABOUT_PHOTO_LARGE = './hero-main.jpg'
+const ABOUT_PHOTO_SMALL = './photos/lukang-art-village.jpg'
 
 const VALUES = [
   {

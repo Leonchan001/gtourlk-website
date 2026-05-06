@@ -1,4 +1,4 @@
-const HERO_PHOTO = '/hero-main.jpg'
+const HERO_PHOTO = './hero-main.jpg'
 
 export default function Hero() {
   return (
