@@ -97,7 +97,7 @@ export default function About() {
               <span className="font-display italic text-paper-200 text-2xl">— GtourLK</span>
               <span className="h-px flex-1 bg-paper-200/30 max-w-[120px]" />
               <span className="font-mono text-[10px] tracking-widest uppercase text-paper-200/50">
-                Lukang, est. 2019
+                Lukang, est. 2024.11
               </span>
             </div>
           </div>
