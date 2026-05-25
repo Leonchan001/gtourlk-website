@@ -65,7 +65,7 @@ export default function Hero() {
           <Fact eyebrow="Google" big="4.9" small="／200+ 則五星好評" />
           <Fact eyebrow="Itinerary" big="60—150" small="分鐘・三種長度" />
           <Fact eyebrow="Vehicle" big="EV" small="全車隊節能電動車" />
-          <Fact eyebrow="Since" big="2019" small="鹿港在地經營" />
+          <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
         </div>
       </div>
 
