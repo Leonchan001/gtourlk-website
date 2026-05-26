@@ -34,7 +34,7 @@ jobs:
         run: npm run build
         env:
           # 若 repo 名稱不是根網域，改為 /your-repo-name/
-          VITE_BASE_PATH: /gtourlk-website/
+          VITE_BASE_PATH: /
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   base: process.env.VITE_BASE_PATH || '/',
   server: {
-    port: 5173,
+    port: parseInt(process.env.PORT) || 5173,
     host: true
   },
   build: {
