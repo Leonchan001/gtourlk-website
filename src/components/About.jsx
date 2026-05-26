@@ -37,10 +37,9 @@ const VALUES = [
 export default function About() {
   return (
     <section id="about" className="bg-ink-800 text-paper-100">
-      {/* 上半 — 大圖 + 文字 */}
       <div className="max-w-7xl mx-auto px-6 pt-24 md:pt-32 pb-16">
         <div className="grid md:grid-cols-12 gap-10 items-center">
-          {/* 左側 — 鹿港實景大圖 + 小圖（不重疊到右側標題） */}
+          {/* 左側 — 大圖 + 小圖 */}
           <div className="md:col-span-7 relative">
             <div className="photo-frame aspect-[4/3] bg-ink-700">
               <img
@@ -52,9 +51,9 @@ export default function About() {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* 小圖 — 左下重疊，停在主圖內，不會蓋到右側標題 */}
-            <div className="absolute -bottom-8 left-4 md:left-6 w-1/3 hidden md:block">
-              <div className="photo-frame aspect-[4/3] bg-ink-700 border-4 border-ink-800 shadow-2xl">
+            {/* 小圖：桌機重疊在左下，手機改為獨立顯示在下方 */}
+            <div className="mt-4 md:mt-0 md:absolute md:-bottom-8 md:left-6 w-1/2 md:w-1/3">
+              <div className="photo-frame aspect-[4/3] bg-ink-700 md:border-4 md:border-ink-800 md:shadow-2xl">
                 <img
                   src={ABOUT_PHOTO_SMALL}
                   alt="鹿港在地藝術村場景，紅磚老屋與童趣裝置藝術"
@@ -67,7 +66,7 @@ export default function About() {
             </div>
           </div>
 
-          {/* 右側 — 編輯式文字 */}
+          {/* 右側 — 文字 */}
           <div className="md:col-span-5 md:pl-8">
             <div className="eyebrow-light mb-4">N°04 — About</div>
             <div className="rule-thick w-12 bg-paper-200/40 mb-8" />
@@ -92,7 +91,6 @@ export default function About() {
               </p>
             </div>
 
-            {/* 簽名感的標記 */}
             <div className="mt-10 flex items-center gap-4">
               <span className="font-display italic text-paper-200 text-2xl">— GtourLK</span>
               <span className="h-px flex-1 bg-paper-200/30 max-w-[120px]" />
@@ -104,7 +102,6 @@ export default function About() {
         </div>
       </div>
 
-      {/* 下半 — 六大特色，編輯式條列 */}
       <div className="border-t border-paper-100/10 mt-12 md:mt-24">
         <div className="max-w-7xl mx-auto px-6 py-20">
           <div className="grid md:grid-cols-12 gap-8 mb-12">

@@ -1,16 +1,19 @@
-// 聯絡預約 — 編輯式版面，三隻電話、LINE、地址
+import QRCode from 'react-qr-code'
+
 const PHONES = [
   { name: '預約專線 ①', tel: '+886927013167', display: '0927-013-167' },
   { name: '預約專線 ②', tel: '+886927291828', display: '0927-291-828' },
   { name: '客服總機',   tel: '+88647740142',  display: '(04) 7740-142' },
 ]
 
-export default function Contact() {
+const LINE_URL = 'https://line.me/R/ti/p/@137ebkaq'
+const LINE_ID = '@137ebkaq'
+
+export default function Contact({ selectedPlan, clearPlan }) {
   return (
     <section id="contact" className="py-24 md:py-32 bg-paper-50">
       <div className="max-w-7xl mx-auto px-6">
 
-        {/* 章節標題 */}
         <div className="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
           <div className="md:col-span-3">
             <div className="eyebrow mb-3">N°06 — Contact</div>
@@ -28,11 +31,29 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* 主要 CTA — LINE 大方塊 */}
+        {/* 已選行程提示條 */}
+        {selectedPlan && (
+          <div className="mb-8 flex items-center justify-between bg-brick-500 text-paper-50 px-6 py-4">
+            <div className="flex items-center gap-4">
+              <span className="font-mono text-[10px] tracking-widest uppercase text-paper-50/70">已選擇行程</span>
+              <span className="font-serif text-lg">{selectedPlan.title}</span>
+              <span className="font-mono text-sm text-paper-50/80">{selectedPlan.duration}・NT${selectedPlan.price} / 人</span>
+            </div>
+            <button
+              onClick={clearPlan}
+              aria-label="清除選擇"
+              className="font-mono text-paper-50/60 hover:text-paper-50 text-lg leading-none"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-12 gap-8 mb-20">
+          {/* LINE 大方塊 */}
           <div className="md:col-span-7">
             <a
-              href="https://line.me/R/ti/p/@137ebkaq"
+              href={LINE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="group block bg-ink-800 text-paper-50 p-10 md:p-14 hover:bg-ink-900 transition-colors h-full"
@@ -51,21 +72,33 @@ export default function Contact() {
                 Add friend, send a message, done.
               </p>
 
-              <div className="border-t border-paper-100/15 pt-8 flex items-end justify-between">
+              <div className="border-t border-paper-100/15 pt-8 flex items-end justify-between gap-6">
                 <div>
                   <div className="eyebrow-light mb-2">官方 LINE ID</div>
                   <div className="font-mono text-2xl md:text-3xl text-paper-50 tracking-wider">
-                    @137ebkaq
+                    {LINE_ID}
                   </div>
+                  <span className="mt-4 inline-block text-sm tracking-wider border-b border-paper-50 pb-1 group-hover:border-brick-400 group-hover:text-brick-400 transition-colors">
+                    加入好友
+                  </span>
                 </div>
-                <span className="text-sm tracking-wider border-b border-paper-50 pb-1 group-hover:border-brick-400 group-hover:text-brick-400 transition-colors">
-                  加入好友
-                </span>
+                {/* QR Code — 桌機顯示，手機上自己就在 LINE app 裡不需要掃 */}
+                <div className="hidden md:block bg-paper-50 p-3 shrink-0" onClick={e => e.preventDefault()}>
+                  <QRCode
+                    value={LINE_URL}
+                    size={100}
+                    bgColor="#f8f4ef"
+                    fgColor="#1a1a18"
+                  />
+                  <p className="text-center font-mono text-[9px] tracking-widest text-ink-400 mt-2">
+                    掃碼加好友
+                  </p>
+                </div>
               </div>
             </a>
           </div>
 
-          {/* 三隻公司專線 — 直立列表 */}
+          {/* 電話列表 */}
           <div className="md:col-span-5">
             <div className="eyebrow mb-2">公司聯絡專線</div>
             <p className="text-[12px] text-ink-400 mb-5 leading-relaxed">
@@ -97,15 +130,14 @@ export default function Contact() {
                 </a>
               ))}
             </div>
-
             <p className="mt-6 text-xs text-ink-400 leading-relaxed">
               夜間 19:00 後請優先以 LINE 聯繫，導覽員將於隔日 08:00 起回覆。
             </p>
           </div>
         </div>
 
-        {/* 店面資訊 — 三欄細線 */}
-        <div className="border-t border-ink-200 pt-12 grid md:grid-cols-3 gap-10">
+        {/* 店面資訊 */}
+        <div className="border-t border-ink-200 pt-12 grid md:grid-cols-3 gap-10 mb-12">
           <InfoBlock
             label="Studio"
             title="店面地址"
@@ -128,6 +160,23 @@ export default function Contact() {
             link="https://www.facebook.com/p/%E5%B0%8E%E9%B9%BFgtourlk-%E9%B9%BF%E6%B8%AF%E4%B8%89%E8%BC%AA%E8%BB%8A%E8%A7%80%E5%85%89%E5%B0%8E%E8%A6%BD-61566567161745/"
             linkText="前往 Facebook 粉絲頁"
           />
+        </div>
+
+        {/* Google Maps embed */}
+        <div className="border-t border-ink-200 pt-12">
+          <div className="eyebrow mb-4">Location</div>
+          <div className="w-full h-72 md:h-96 overflow-hidden">
+            <iframe
+              title="導鹿 GtourLK 店面位置"
+              src="https://maps.google.com/maps?q=24.0537,120.4348&z=16&output=embed&hl=zh-TW"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         </div>
       </div>
     </section>

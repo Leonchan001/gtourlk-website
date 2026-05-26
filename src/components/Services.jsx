@@ -1,4 +1,3 @@
-// 導覽行程方案 — 編輯式攝影卡（鹿港實景）
 const PLANS = [
   {
     no: '01',
@@ -74,11 +73,15 @@ const EXTRAS = [
   },
 ]
 
-export default function Services() {
+export default function Services({ setSelectedPlan }) {
+  function handleBook(plan) {
+    setSelectedPlan(plan)
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <section id="experience" className="py-24 md:py-32 bg-paper-50">
       <div className="max-w-7xl mx-auto px-6">
-        {/* 章節標題 */}
         <div className="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
           <div className="md:col-span-3">
             <div className="eyebrow mb-3">N°02 — Experiences</div>
@@ -97,13 +100,12 @@ export default function Services() {
           </div>
         </div>
 
-        {/* 三個方案 */}
         <div className="grid md:grid-cols-3 gap-x-6 gap-y-12 mb-24">
           {PLANS.map(p => (
             <article key={p.no} className="group flex flex-col">
-              {/* 攝影封面 — 鹿港實景 + 漸層 + 編輯式編號 */}
               <a
                 href="#contact"
+                onClick={e => { e.preventDefault(); handleBook(p) }}
                 aria-label={`預約${p.title}行程`}
                 className="block photo-frame aspect-[4/5] mb-6 relative overflow-hidden bg-ink-800"
               >
@@ -144,7 +146,6 @@ export default function Services() {
                 )}
               </a>
 
-              {/* 編號 + 標題列 */}
               <div className="flex items-baseline justify-between mb-4">
                 <div className="flex items-baseline gap-3">
                   <span className="font-mono text-xs tracking-widest text-ink-300">{p.no}</span>
@@ -175,21 +176,20 @@ export default function Services() {
                     <span className="font-display text-3xl text-ink-800">NT${p.price}</span>
                   </div>
                 </div>
-                <a
-                  href="#contact"
+                <button
+                  onClick={() => handleBook(p)}
                   className="text-sm tracking-wider text-ink-700 hover:text-brick-500 inline-flex items-center gap-2 border-b border-ink-700 hover:border-brick-500 pb-1"
                 >
                   預約此行程
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
-                </a>
+                </button>
               </div>
             </article>
           ))}
         </div>
 
-        {/* 額外服務 — 細線排版 */}
         <div className="border-t border-ink-200 pt-12">
           <div className="grid md:grid-cols-12 gap-8">
             <div className="md:col-span-3">
@@ -212,7 +212,6 @@ export default function Services() {
           </div>
         </div>
 
-        {/* 提醒 — 編輯式注腳 */}
         <p className="mt-16 pt-6 border-t border-ink-100 text-xs text-ink-400 tracking-wider">
           * 所有行程皆需提前以 LINE 或電話預約・加入官方 LINE 享 95 折・假日場次建議提早三日預約。
         </p>

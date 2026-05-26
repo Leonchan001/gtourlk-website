@@ -61,11 +61,17 @@ export default function FAQ() {
                   {open === i ? '−' : '+'}
                 </span>
               </button>
-              {open === i && (
-                <p className="pb-6 text-ink-600 leading-relaxed text-[15px]">
-                  {item.a}
-                </p>
-              )}
+              {/* 展開動畫：grid-rows trick，不需要 JS 計算高度 */}
+              <div
+                className="grid transition-all duration-300 ease-in-out"
+                style={{ gridTemplateRows: open === i ? '1fr' : '0fr' }}
+              >
+                <div className="overflow-hidden">
+                  <p className="pb-6 text-ink-600 leading-relaxed text-[15px]">
+                    {item.a}
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
