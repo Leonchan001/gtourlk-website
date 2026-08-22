@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const PRIMARY_PHONE = { tel: '+886927013167', display: '0927-013-167' }
-const LINE_URL = 'https://line.me/R/ti/p/@137ebkaq'
+const LINE_URL = 'https://line.me/R/ti/p/@lk167'
 
 export default function FloatingCTA() {
   const [show, setShow] = useState(false)
@@ -38,7 +38,7 @@ export default function FloatingCTA() {
       >
         <span className="text-sm tracking-wider">LINE 預約</span>
         <span className="font-mono text-[10px] tracking-widest text-paper-200/70 uppercase">
-          @137ebkaq
+          @lk167
         </span>
       </a>
     </div>

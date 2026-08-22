@@ -2,8 +2,12 @@ import { useState } from 'react'
 
 const FAQS = [
   {
+    q: '是固定班次、定時發車嗎？',
+    a: '不是。我們全程採預約制，沒有固定班次或固定發車時間。請先透過 LINE 或電話告訴我們希望的日期與時間，確認預約後，導覽員會依雙方約定時間出發。',
+  },
+  {
     q: '需要提前多久預約？',
-    a: '平日彈性，臨時預約也歡迎。假日與連假場次建議提早 3 天以 LINE 或電話預約，以確保你想要的時段。',
+    a: '平日安排彈性，臨時預約也歡迎。假日與連假建議提早 3 天以 LINE 或電話聯繫，較容易安排你希望的出發時間。',
   },
   {
     q: '一台車可以坐幾個人？',
@@ -41,7 +45,7 @@ export default function FAQ() {
           <div className="md:col-span-9">
             <h2 className="section-title max-w-xl">
               出發前，<br />
-              你可能想問的<span className="font-display italic"> 六個問題</span>。
+              你可能想問的<span className="font-display italic"> 七個問題</span>。
             </h2>
           </div>
         </div>

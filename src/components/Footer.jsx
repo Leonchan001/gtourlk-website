@@ -63,8 +63,8 @@ export default function Footer() {
             <h4 className="eyebrow-light mb-5">Contact</h4>
             <ul className="space-y-3 text-sm">
               <li className="text-paper-100/70">彰化縣鹿港鎮永寧街 236 號</li>
-              <li className="text-paper-100/70">每日 08:00 — 19:00</li>
-              <li className="text-paper-100/70">LINE 　@137ebkaq</li>
+              <li className="text-paper-100/70">預約制・彈性安排出發時間</li>
+              <li className="text-paper-100/70">LINE 　@lk167</li>
             </ul>
 
             <div className="mt-5 pt-5 border-t border-paper-100/10 space-y-2">

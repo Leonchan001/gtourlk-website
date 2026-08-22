@@ -48,6 +48,11 @@ export default function Hero() {
             一場以米其林指南景點為線的鹿港深度散策。
           </p>
 
+          <div className="mb-7 -mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 border border-paper-50/35 bg-ink-900/35 px-4 py-2 text-paper-50 backdrop-blur-sm">
+            <span className="font-mono text-[10px] tracking-widest uppercase text-brick-300">By Reservation</span>
+            <span className="text-sm">全程預約制・沒有固定班次・依約定時間出發</span>
+          </div>
+
           {/* CTA */}
           <div className="flex flex-wrap items-center gap-4">
             <a href="#contact" className="btn-light">
@@ -64,7 +69,7 @@ export default function Hero() {
         {/* 底部資訊條 — 信任元素 */}
         <div className="mt-14 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
           <Fact eyebrow="Google" big="5.0" small="／248 則五星評論" href={GOOGLE_REVIEWS_URL} />
-          <Fact eyebrow="Itinerary" big="60—150" small="分鐘・三種長度" />
+          <Fact eyebrow="Itinerary" big="60—150" small="分鐘・行程長度（非班次）" />
           <Fact eyebrow="Vehicle" big="EV" small="全車隊節能電動車" />
           <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
         </div>

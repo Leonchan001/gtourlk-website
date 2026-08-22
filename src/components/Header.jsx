@@ -35,7 +35,7 @@ export default function Header() {
           <div className={`flex items-center gap-5 ${scrolled ? 'text-ink-400' : 'text-paper-100/80'}`}>
             <span className="font-mono tracking-widest uppercase">Lukang · Changhua · Taiwan</span>
             <span className={`h-3 w-px ${scrolled ? 'bg-ink-200' : 'bg-paper-100/30'}`} />
-            <span>每日 08:00 — 19:00</span>
+            <span>全程預約制・沒有固定發車班次</span>
           </div>
           <div className={`flex items-center gap-4 ${scrolled ? 'text-ink-500' : 'text-paper-100/90'}`}>
             {PHONES.map((p, i) => (

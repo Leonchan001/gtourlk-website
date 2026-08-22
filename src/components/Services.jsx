@@ -94,8 +94,8 @@ export default function Services({ setSelectedPlan }) {
             </h2>
             <p className="lead mt-6 max-w-xl">
               從 60 分鐘的快閃，到 150 分鐘的米其林全覽 ——
-              每段路線都由在地導覽員量身規劃，搭乘節能電動車，
-              用最舒適的速度讀懂鹿港。
+              這是行程長度，不是固定發車班次。確認預約後，
+              我們會依雙方約定時間出發，用最舒適的速度讀懂鹿港。
             </p>
           </div>
         </div>
@@ -213,7 +213,7 @@ export default function Services({ setSelectedPlan }) {
         </div>
 
         <p className="mt-16 pt-6 border-t border-ink-100 text-xs text-ink-400 tracking-wider">
-          * 所有行程皆需提前以 LINE 或電話預約・加入官方 LINE 享 95 折・假日場次建議提早三日預約。
+          * 全程預約制・沒有固定班次・確認後依約定時間出發・加入官方 LINE 享 95 折・假日與連假建議提早三日預約。
         </p>
       </div>
     </section>

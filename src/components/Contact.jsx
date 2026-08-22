@@ -6,8 +6,8 @@ const PHONES = [
   { name: '客服總機',   tel: '+88647740142',  display: '(04) 7740-142' },
 ]
 
-const LINE_URL = 'https://line.me/R/ti/p/@137ebkaq'
-const LINE_ID = '@137ebkaq'
+const LINE_URL = 'https://line.me/R/ti/p/@lk167'
+const LINE_ID = '@lk167'
 
 export default function Contact({ selectedPlan, clearPlan }) {
   return (
@@ -25,8 +25,8 @@ export default function Contact({ selectedPlan, clearPlan }) {
               <span className="font-display italic">隨你方便。</span>
             </h2>
             <p className="lead mt-6 max-w-xl">
-              平均 30 分鐘內回覆。平日臨時預約也歡迎，
-              假日場次建議提早三日聯繫，以保留你想要的時段。
+              全程採預約制，沒有固定發車班次。告訴我們希望的日期與時間，
+              確認後依約定時間出發；假日與連假建議提早三日聯繫。
             </p>
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
             label="Hours"
             title="營業時間"
             line1="週一至週日　08:00 — 19:00"
-            line2="夜間預約請先 LINE 聯繫"
+            line2="預約制・出發時間依雙方約定"
           />
           <InfoBlock
             label="Social"
