@@ -1,4 +1,5 @@
 const HERO_PHOTO = './hero-main.jpg'
+const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?q=%E5%B0%8E%E9%B9%BF&si=APenkKm7iecQ4G6P-TsbSMFKIQtv3EFIqRAFw-i8uEbk55Z-_4VIyVstdjrYJ2nmzpvUvQgPKsuO58_cMHDtn2h0SErbUNni7cM43gVwfHNzp_rUIoLlhdGIV0P3fu6ExxbAtlsYqC9dZfrcxCPyILu5j9llu9cf45D0LNoVTb7WdAqFkwys5dw%3D'
 
 export default function Hero() {
   return (
@@ -62,7 +63,7 @@ export default function Hero() {
 
         {/* 底部資訊條 — 信任元素 */}
         <div className="mt-14 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
-          <Fact eyebrow="Google" big="4.9" small="／200+ 則五星好評" />
+          <Fact eyebrow="Google" big="5.0" small="／248 則五星評論" href={GOOGLE_REVIEWS_URL} />
           <Fact eyebrow="Itinerary" big="60—150" small="分鐘・三種長度" />
           <Fact eyebrow="Vehicle" big="EV" small="全車隊節能電動車" />
           <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
@@ -73,8 +74,8 @@ export default function Hero() {
   )
 }
 
-function Fact({ eyebrow, big, small }) {
-  return (
+function Fact({ eyebrow, big, small, href }) {
+  const content = (
     <div>
       <div className="font-mono text-[10px] tracking-widest uppercase text-paper-200/60 mb-2">
         {eyebrow}
@@ -84,6 +85,20 @@ function Fact({ eyebrow, big, small }) {
         <span className="text-paper-100/70 text-xs">{small}</span>
       </div>
     </div>
+  )
+
+  if (!href) return content
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="查看導鹿的 248 則 Google 評論"
+      className="block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-paper-50 hover:opacity-80 transition-opacity"
+    >
+      {content}
+    </a>
   )
 }
 
