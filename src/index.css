@@ -6,6 +6,9 @@
   html {
     scroll-behavior: smooth;
   }
+  section[id] {
+    scroll-margin-top: 96px;
+  }
   body {
     @apply font-sans text-ink-700 bg-paper-50 antialiased;
     font-feature-settings: "palt" 1, "kern" 1;
@@ -22,6 +25,18 @@
   /* 細緻的水平分隔線 — 編輯式風格 */
   hr {
     @apply border-ink-100;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

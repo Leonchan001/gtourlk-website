@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react'
 import logoImg from '/gtourlk-logo.png'
-
-const PHONES = [
-  { label: '預約專線 ①', tel: '+886927013167', display: '0927-013-167' },
-  { label: '預約專線 ②', tel: '+886927291828', display: '0927-291-828' },
-  { label: '客服總機',   tel: '+88647740142',  display: '(04) 7740-142' },
-]
+import { BUSINESS } from '../data/business'
 
 const NAV = [
   { href: '#experience', label: '導覽行程', en: 'Experiences' },
@@ -25,6 +20,15 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    if (!menuOpen) return undefined
+    const onKeyDown = event => {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [menuOpen])
+
   return (
     <header className="fixed top-0 inset-x-0 z-40">
       {/* 上方細線資訊條 — 三隻電話 */}
@@ -38,7 +42,7 @@ export default function Header() {
             <span>全程預約制・沒有固定發車班次</span>
           </div>
           <div className={`flex items-center gap-4 ${scrolled ? 'text-ink-500' : 'text-paper-100/90'}`}>
-            {PHONES.map((p, i) => (
+            {BUSINESS.phones.map((p, i) => (
               <a
                 key={p.tel}
                 href={`tel:${p.tel}`}
@@ -98,6 +102,8 @@ export default function Header() {
             className={`md:hidden p-2 -mr-2 ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="選單"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path aria-hidden="true" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -109,7 +115,7 @@ export default function Header() {
 
       {/* 手機選單 */}
       {menuOpen && (
-        <div className="md:hidden bg-paper-50 border-b border-ink-100">
+        <div id="mobile-navigation" className="md:hidden bg-paper-50 border-b border-ink-100">
           <div className="px-6 py-6 flex flex-col">
             {NAV.map((item, i) => (
               <a
@@ -126,7 +132,7 @@ export default function Header() {
             ))}
 
             <div className="mt-6 space-y-2">
-              {PHONES.map(p => (
+              {BUSINESS.phones.map(p => (
                 <a key={p.tel} href={`tel:${p.tel}`}
                   className="flex items-center justify-between py-2 text-ink-600">
                   <span className="text-[11px] uppercase tracking-widest text-ink-400">{p.label}</span>

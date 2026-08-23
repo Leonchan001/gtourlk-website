@@ -1,3 +1,5 @@
+import { BUSINESS } from '../data/business'
+
 const ABOUT_PHOTO_LARGE = './hero-main.jpg'
 const ABOUT_PHOTO_SMALL = './photos/lukang-art-village.jpg'
 
@@ -30,7 +32,7 @@ const VALUES = [
   {
     no: '06',
     title: '五星品質',
-    body: 'Google 248 則評論、5.0 平均評分，旅客口碑公開可查。',
+    body: `Google ${BUSINESS.reviewCount} 則評論、${BUSINESS.reviewRating} 平均評分，旅客口碑公開可查。`,
   },
 ]
 

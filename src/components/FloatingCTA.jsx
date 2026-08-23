@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const PRIMARY_PHONE = { tel: '+886927013167', display: '0927-013-167' }
-const LINE_URL = 'https://line.me/R/ti/p/@lk167'
+import { BUSINESS } from '../data/business'
 
 export default function FloatingCTA() {
   const [show, setShow] = useState(false)
@@ -19,8 +17,8 @@ export default function FloatingCTA() {
     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
       {/* 電話一鍵撥打 */}
       <a
-        href={`tel:${PRIMARY_PHONE.tel}`}
-        aria-label={`撥打 ${PRIMARY_PHONE.display}`}
+        href={`tel:${BUSINESS.phones[0].tel}`}
+        aria-label={`撥打 ${BUSINESS.phones[0].display}`}
         className="w-12 h-12 bg-paper-50 border border-ink-200 hover:border-brick-500 text-ink-700 hover:text-brick-500 shadow-lg transition-colors flex items-center justify-center"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -31,14 +29,14 @@ export default function FloatingCTA() {
 
       {/* LINE 主按鈕 */}
       <a
-        href={LINE_URL}
+        href={BUSINESS.lineUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-3 bg-ink-800 hover:bg-ink-900 text-paper-50 pl-5 pr-4 py-3 shadow-lg transition-colors"
       >
         <span className="text-sm tracking-wider">LINE 預約</span>
         <span className="font-mono text-[10px] tracking-widest text-paper-200/70 uppercase">
-          @lk167
+          {BUSINESS.lineId}
         </span>
       </a>
     </div>

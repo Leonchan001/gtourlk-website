@@ -1,5 +1,6 @@
+import { BUSINESS } from '../data/business'
+
 const HERO_PHOTO = './hero-main.jpg'
-const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?q=%E5%B0%8E%E9%B9%BF&si=APenkKm7iecQ4G6P-TsbSMFKIQtv3EFIqRAFw-i8uEbk55Z-_4VIyVstdjrYJ2nmzpvUvQgPKsuO58_cMHDtn2h0SErbUNni7cM43gVwfHNzp_rUIoLlhdGIV0P3fu6ExxbAtlsYqC9dZfrcxCPyILu5j9llu9cf45D0LNoVTb7WdAqFkwys5dw%3D'
 
 export default function Hero() {
   return (
@@ -10,7 +11,7 @@ export default function Hero() {
         alt="導鹿GtourLK電動三輪車停靠於鹿港桂花巷藝術村入口，夕陽金光打在古鎮街道"
         className="absolute inset-0 w-full h-full object-cover object-center"
         loading="eager"
-        fetchpriority="high"
+        fetchPriority="high"
         decoding="sync"
         width="2048"
         height="1536"
@@ -68,7 +69,7 @@ export default function Hero() {
 
         {/* 底部資訊條 — 信任元素 */}
         <div className="mt-14 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
-          <Fact eyebrow="Google" big="5.0" small="／248 則五星評論" href={GOOGLE_REVIEWS_URL} />
+          <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={`／${BUSINESS.reviewCount} 則五星評論`} href={BUSINESS.googleReviewsUrl} />
           <Fact eyebrow="Itinerary" big="60—150" small="分鐘・行程長度（非班次）" />
           <Fact eyebrow="Vehicle" big="EV" small="全車隊節能電動車" />
           <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
@@ -99,7 +100,7 @@ function Fact({ eyebrow, big, small, href }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="查看導鹿的 248 則 Google 評論"
+      aria-label={`查看導鹿的 ${BUSINESS.reviewCount} 則 Google 評論`}
       className="block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-paper-50 hover:opacity-80 transition-opacity"
     >
       {content}

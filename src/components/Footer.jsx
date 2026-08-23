@@ -1,9 +1,5 @@
 // 頁尾 — 編輯式低調風
-const PHONES = [
-  { label: '預約專線 ①', tel: '+886927013167', display: '0927-013-167' },
-  { label: '預約專線 ②', tel: '+886927291828', display: '0927-291-828' },
-  { label: '客服總機',   tel: '+88647740142',  display: '(04) 7740-142' },
-]
+import { BUSINESS } from '../data/business'
 
 export default function Footer() {
   return (
@@ -68,7 +64,7 @@ export default function Footer() {
             </ul>
 
             <div className="mt-5 pt-5 border-t border-paper-100/10 space-y-2">
-              {PHONES.map(p => (
+              {BUSINESS.phones.map(p => (
                 <a key={p.tel} href={`tel:${p.tel}`}
                   className="flex items-center justify-between text-sm hover:text-paper-50 transition-colors">
                   <span className="text-paper-100/50 text-[11px] uppercase tracking-widest">{p.label}</span>

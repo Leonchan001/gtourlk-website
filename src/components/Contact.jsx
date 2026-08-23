@@ -1,13 +1,5 @@
 import QRCode from 'react-qr-code'
-
-const PHONES = [
-  { name: '預約專線 ①', tel: '+886927013167', display: '0927-013-167' },
-  { name: '預約專線 ②', tel: '+886927291828', display: '0927-291-828' },
-  { name: '客服總機',   tel: '+88647740142',  display: '(04) 7740-142' },
-]
-
-const LINE_URL = 'https://line.me/R/ti/p/@lk167'
-const LINE_ID = '@lk167'
+import { BUSINESS } from '../data/business'
 
 export default function Contact({ selectedPlan, clearPlan }) {
   return (
@@ -53,7 +45,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
           {/* LINE 大方塊 */}
           <div className="md:col-span-7">
             <a
-              href={LINE_URL}
+              href={BUSINESS.lineUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group block bg-ink-800 text-paper-50 p-10 md:p-14 hover:bg-ink-900 transition-colors h-full"
@@ -76,7 +68,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
                 <div>
                   <div className="eyebrow-light mb-2">官方 LINE ID</div>
                   <div className="font-mono text-2xl md:text-3xl text-paper-50 tracking-wider">
-                    {LINE_ID}
+                    {BUSINESS.lineId}
                   </div>
                   <span className="mt-4 inline-block text-sm tracking-wider border-b border-paper-50 pb-1 group-hover:border-brick-400 group-hover:text-brick-400 transition-colors">
                     加入好友
@@ -85,7 +77,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
                 {/* QR Code — 桌機顯示，手機上自己就在 LINE app 裡不需要掃 */}
                 <div className="hidden md:block bg-paper-50 p-3 shrink-0" onClick={e => e.preventDefault()}>
                   <QRCode
-                    value={LINE_URL}
+                    value={BUSINESS.lineUrl}
                     size={100}
                     bgColor="#f8f4ef"
                     fgColor="#1a1a18"
@@ -105,7 +97,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
               三支號碼皆為導鹿 GtourLK 對外公司專線，由值班導覽員或店面客服接聽。
             </p>
             <div className="border-t border-ink-200">
-              {PHONES.map((p, i) => (
+              {BUSINESS.phones.map((p, i) => (
                 <a
                   key={p.tel}
                   href={`tel:${p.tel}`}
@@ -116,7 +108,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
                       0{i + 1} · Company Line
                     </div>
                     <div className="font-serif text-lg text-ink-800 group-hover:text-brick-500 transition-colors">
-                      {p.name}
+                      {p.label}
                     </div>
                   </div>
                   <div className="text-right">

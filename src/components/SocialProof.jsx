@@ -1,34 +1,34 @@
 // 旅人評價 — 編輯式 pull-quote 排版
-const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?q=%E5%B0%8E%E9%B9%BF&si=APenkKm7iecQ4G6P-TsbSMFKIQtv3EFIqRAFw-i8uEbk55Z-_4VIyVstdjrYJ2nmzpvUvQgPKsuO58_cMHDtn2h0SErbUNni7cM43gVwfHNzp_rUIoLlhdGIV0P3fu6ExxbAtlsYqC9dZfrcxCPyILu5j9llu9cf45D0LNoVTb7WdAqFkwys5dw%3D'
+import { BUSINESS } from '../data/business'
 
 const PULL = {
   text: '在地人帶路果然不一樣。摸乳巷、九曲巷、桂花巷的典故都說得精彩，環保電動車安靜又平穩，沿著老街慢慢走，像走進時光膠囊。',
   author: '旅人日誌',
-  meta: 'Google 評論 · ★ 5.0',
+  meta: `Google 評論 · ★ ${BUSINESS.reviewRating}`,
 }
 
 const REVIEWS = [
   {
     name: 'Allison Wu',
-    when: '兩個月前',
+    when: 'Google 評論',
     excerpt: '臨時帶家人前往鹿港，半夜聯繫預約。導覽員介紹便宜的停車場，全程解說豐富，也協助照顧長輩，非常感謝！',
     tag: '長者友善',
   },
   {
     name: '珊珊',
-    when: '兩個月前',
+    when: 'Google 評論',
     excerpt: '王姐的導覽時光超棒！從不見天街、玉渠宮的傳奇到龍山寺的建築之美，深刻領略鹿港的歷史底蘊。',
     tag: '深度文化',
   },
   {
     name: '陳先生',
-    when: '三個月前',
+    when: 'Google 評論',
     excerpt: '帶小朋友來鹿港玩，導覽員超親切，小孩全程都很專心聽故事。電動四輪車很新很舒服，老人家也覺得輕鬆。',
     tag: '親子友善',
   },
   {
     name: 'Angela L.',
-    when: '五個月前',
+    when: 'Google 評論',
     excerpt: '臨時預約幫忙接送長輩到診所，後來又安排鹿港小旅行，一家人玩得超開心。把客人當朋友的熱忱，這就是鹿港的招待。',
     tag: '貼心服務',
   },
@@ -47,12 +47,12 @@ export default function SocialProof() {
           </div>
           <div className="md:col-span-9">
             <h2 className="section-title max-w-2xl">
-              <span className="font-mono text-base text-brick-500 align-top mr-2">★ 5.0</span>
+              <span className="font-mono text-base text-brick-500 align-top mr-2">★ {BUSINESS.reviewRating}</span>
               <br className="md:hidden" />
-              248 位旅人，<br />留下了真實的評價。
+              {BUSINESS.reviewCount} 位旅人，<br />留下了真實的評價。
             </h2>
             <p className="lead mt-6 max-w-xl">
-              不是行銷文案，而是 Google 上 248 則真實評論・平均評分 5.0 顆星。
+              不是行銷文案，而是 Google 上 {BUSINESS.reviewCount} 則真實評論・平均評分 {BUSINESS.reviewRating} 顆星。
               我們珍視每一則回饋——包含建議與批評，作為下一趟導覽更好的依據。
             </p>
           </div>
@@ -112,13 +112,13 @@ export default function SocialProof() {
             <p className="text-ink-500">評分與評論數以 Google 商家頁面顯示為準・截至 2026 年 8 月</p>
           </div>
           <a
-            href={GOOGLE_REVIEWS_URL}
+            href={BUSINESS.googleReviewsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 text-ink-800 hover:text-brick-500 group"
           >
             <span className="text-sm tracking-wider border-b border-ink-700 group-hover:border-brick-500 pb-1">
-              查看 248 則 Google 評論
+              查看 {BUSINESS.reviewCount} 則 Google 評論
             </span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />

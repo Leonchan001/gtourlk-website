@@ -54,9 +54,11 @@ export default function FAQ() {
           {FAQS.map((item, i) => (
             <div key={i} className="border-b border-ink-200">
               <button
+                id={`faq-button-${i}`}
                 onClick={() => setOpen(open === i ? null : i)}
                 className="w-full text-left py-6 flex items-start justify-between gap-6 group"
                 aria-expanded={open === i}
+                aria-controls={`faq-panel-${i}`}
               >
                 <span className="font-serif text-lg text-ink-800 group-hover:text-brick-500 transition-colors leading-snug">
                   {item.q}
@@ -67,6 +69,10 @@ export default function FAQ() {
               </button>
               {/* 展開動畫：grid-rows trick，不需要 JS 計算高度 */}
               <div
+                id={`faq-panel-${i}`}
+                role="region"
+                aria-labelledby={`faq-button-${i}`}
+                aria-hidden={open !== i}
                 className="grid transition-all duration-300 ease-in-out"
                 style={{ gridTemplateRows: open === i ? '1fr' : '0fr' }}
               >
