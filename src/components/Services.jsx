@@ -89,13 +89,13 @@ export default function Services({ setSelectedPlan }) {
           </div>
           <div className="md:col-span-9">
             <h2 className="section-title max-w-2xl">
-              三種長度，<br />
-              一場專屬於你的<span className="font-display italic"> 鹿港散策</span>。
+              想去哪裡，<br />
+              這趟就由<span className="font-display italic"> 你決定</span>。
             </h2>
             <p className="lead mt-6 max-w-xl">
-              從 60 分鐘的快閃，到 150 分鐘的米其林全覽 ——
-              這是行程長度，不是固定發車班次。確認預約後，
-              我們會依雙方約定時間出發，用最舒適的速度讀懂鹿港。
+              告訴我們想去的景點、同行成員與可用時間，我們會以你的需求安排路線。
+              如果還沒有想法，也可以從下方 60、90 或 150 分鐘的建議路線開始選擇；
+              這些都是參考方向，不是固定套裝行程，也沒有固定發車班次。
             </p>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function Services({ setSelectedPlan }) {
               <a
                 href="#contact"
                 onClick={e => { e.preventDefault(); handleBook(p) }}
-                aria-label={`預約${p.title}行程`}
+                aria-label={`以${p.title}參考路線洽詢`}
                 className="block photo-frame aspect-[4/5] mb-6 relative overflow-hidden bg-ink-800"
               >
                 <img
@@ -180,7 +180,7 @@ export default function Services({ setSelectedPlan }) {
                   onClick={() => handleBook(p)}
                   className="text-sm tracking-wider text-ink-700 hover:text-brick-500 inline-flex items-center gap-2 border-b border-ink-700 hover:border-brick-500 pb-1"
                 >
-                  預約此行程
+                  以此路線洽詢
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -213,7 +213,7 @@ export default function Services({ setSelectedPlan }) {
         </div>
 
         <p className="mt-16 pt-6 border-t border-ink-100 text-xs text-ink-400 tracking-wider">
-          * 全程預約制・沒有固定班次・確認後依約定時間出發・加入官方 LINE 享 95 折・假日與連假建議提早三日預約。
+          * 客製需求優先・以上為參考路線・全程預約制・沒有固定班次・確認後依約定時間出發・加入官方 LINE 享 95 折。
         </p>
       </div>
     </section>

@@ -61,7 +61,7 @@ export default function Hero() {
               <Arrow />
             </a>
             <a href="#experience" className="text-paper-50 text-sm tracking-wider hover:text-paper-200 inline-flex items-center gap-2 px-2 py-3.5 border-b border-paper-50/40">
-              查看三種行程
+              查看參考路線
               <Arrow light />
             </a>
           </div>
@@ -70,7 +70,7 @@ export default function Hero() {
         {/* 底部資訊條 — 信任元素 */}
         <div className="mt-14 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
           <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={`／${BUSINESS.reviewCount} 則五星評論`} href={BUSINESS.googleReviewsUrl} />
-          <Fact eyebrow="Itinerary" big="60—150" small="分鐘・行程長度（非班次）" />
+          <Fact eyebrow="Flexible" big="60—150" small="分鐘・可依需求安排" />
           <Fact eyebrow="Vehicle" big="EV" small="全車隊節能電動車" />
           <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
         </div>

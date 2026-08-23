@@ -39,7 +39,7 @@ export default function Footer() {
             <h4 className="eyebrow-light mb-5">Sitemap</h4>
             <ul className="space-y-3">
               {[
-                ['#experience', '導覽行程'],
+                ['#experience', '路線參考'],
                 ['#reviews',    '旅人評價'],
                 ['#about',      '關於我們'],
                 ['#faq',        '常見問題'],

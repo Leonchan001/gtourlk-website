@@ -27,7 +27,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
         {selectedPlan && (
           <div className="mb-8 flex items-center justify-between bg-brick-500 text-paper-50 px-6 py-4">
             <div className="flex items-center gap-4">
-              <span className="font-mono text-[10px] tracking-widest uppercase text-paper-50/70">已選擇行程</span>
+              <span className="font-mono text-[10px] tracking-widest uppercase text-paper-50/70">洽詢參考路線</span>
               <span className="font-serif text-lg">{selectedPlan.title}</span>
               <span className="font-mono text-sm text-paper-50/80">{selectedPlan.duration}・NT${selectedPlan.price} / 人</span>
             </div>

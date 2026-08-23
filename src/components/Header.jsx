@@ -3,7 +3,7 @@ import logoImg from '/gtourlk-logo.png'
 import { BUSINESS } from '../data/business'
 
 const NAV = [
-  { href: '#experience', label: '導覽行程', en: 'Experiences' },
+  { href: '#experience', label: '路線參考', en: 'Experiences' },
   { href: '#reviews',    label: '旅人評價', en: 'Reviews' },
   { href: '#about',      label: '關於我們', en: 'About' },
   { href: '#faq',        label: '常見問題', en: 'FAQ' },
