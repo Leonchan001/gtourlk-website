@@ -1,6 +1,12 @@
 import QRCode from 'react-qr-code'
 import { BUSINESS } from '../data/business'
 
+const BOOKING_STEPS = [
+  { no: '01', title: '日期與時間', body: '告訴我們希望出發的日期、時間與預計導覽多久。' },
+  { no: '02', title: '同行人數', body: '提供成人與兒童人數；每車最多 5 位旅客，可乘 5 位成人。' },
+  { no: '03', title: '景點與需求', body: '告訴我們想去的景點，以及折疊輪椅或其他乘車需求。' },
+]
+
 export default function Contact({ selectedPlan, clearPlan }) {
   return (
     <section id="contact" className="py-24 md:py-32 bg-paper-50">
@@ -13,14 +19,26 @@ export default function Contact({ selectedPlan, clearPlan }) {
           </div>
           <div className="md:col-span-9">
             <h2 className="section-title max-w-3xl">
-              寫信、撥電話、加 LINE ——<br />
+              加 LINE、撥電話 ——<br />
               <span className="font-display italic">隨你方便。</span>
             </h2>
             <p className="lead mt-6 max-w-xl">
-              全程採預約制，沒有固定發車班次。告訴我們希望的日期與時間，
-              確認後依約定時間出發；假日與連假建議提早三日聯繫。
+              全程採預約制，沒有固定發車班次。提供日期、時間、人數與想去的景點，
+              我們會協助安排；假日與連假建議提早三日聯繫。
             </p>
           </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-px bg-ink-200 border border-ink-200 mb-12">
+          {BOOKING_STEPS.map(step => (
+            <div key={step.no} className="bg-paper-50 p-6 md:p-8">
+              <div className="font-mono text-[10px] tracking-widest uppercase text-brick-500 mb-3">
+                Step {step.no}
+              </div>
+              <h3 className="font-serif text-xl text-ink-800 mb-3">{step.title}</h3>
+              <p className="text-sm text-ink-500 leading-relaxed">{step.body}</p>
+            </div>
+          ))}
         </div>
 
         {/* 已選行程提示條 */}
@@ -29,7 +47,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
             <div className="flex items-center gap-4">
               <span className="font-mono text-[10px] tracking-widest uppercase text-paper-50/70">洽詢參考路線</span>
               <span className="font-serif text-lg">{selectedPlan.title}</span>
-              <span className="font-mono text-sm text-paper-50/80">{selectedPlan.duration}・NT${selectedPlan.price} / 人</span>
+              <span className="font-mono text-sm text-paper-50/80">建議 {selectedPlan.duration}・路線可再客製</span>
             </div>
             <button
               onClick={clearPlan}

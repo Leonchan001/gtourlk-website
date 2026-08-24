@@ -4,7 +4,6 @@ const PLANS = [
     title: '老街輕旅',
     en: 'Lukang Old Street Tour',
     duration: '60 分鐘',
-    price: '199',
     photo: './photos/lukang-old-street-night.jpg',
     photoAlt: '鹿港老街小巷夜景，紅燈籠串連紅磚老屋',
     coverSub: 'Old Street',
@@ -12,16 +11,15 @@ const PLANS = [
     features: [
       '天后宮 + 鹿港老街精華段',
       '在地導覽員專業講解',
-      '節能電動三輪車・可乘 5 人',
+      '節能電動四輪導覽車・最多 5 位旅客',
       '免費停車場資訊提供',
     ],
   },
   {
     no: '02',
     title: '深度文化',
-    en: 'Heritage Walking Tour',
+    en: 'Heritage Culture Tour',
     duration: '90 分鐘',
-    price: '299',
     featured: true,
     photo: './photos/lukang-rooftops-aerial.jpg',
     photoAlt: '鹿港老街紅瓦屋頂空拍俯瞰，旅客穿梭於九曲巷弄',
@@ -32,7 +30,7 @@ const PLANS = [
       '摸乳巷、九曲巷典故詳解',
       '米其林指南景點導覽',
       '在地小吃與伴手禮推薦',
-      '加 LINE 好友享 95 折',
+      '景點與停留時間皆可討論',
     ],
   },
   {
@@ -40,7 +38,6 @@ const PLANS = [
     title: '米其林全覽',
     en: 'Michelin Grand Tour',
     duration: '150 分鐘',
-    price: '499',
     photo: './photos/lukang-koo-house.jpg',
     photoAlt: '鹿港辜家大宅 — 巴洛克建築，米其林指南推薦景點',
     coverSub: 'Lukang ★★★',
@@ -50,7 +47,7 @@ const PLANS = [
       '北鹿港 + 南鹿港全方位',
       '百年古蹟深度走讀',
       '攝影最佳路線規劃',
-      '長者・親子・無障礙友善',
+      '長者・親子友善・可收納折疊輪椅',
     ],
   },
 ]
@@ -58,8 +55,8 @@ const PLANS = [
 const EXTRAS = [
   {
     no: 'A',
-    title: '六人座電動車租賃',
-    desc: '兩小時起，無導覽員，自由騎乘探索鹿港小鎮。',
+    title: '客製包車導覽',
+    desc: '依想去的景點與可用時間安排，導覽員兼任司機並全程同車。',
   },
   {
     no: 'B',
@@ -70,6 +67,31 @@ const EXTRAS = [
     no: 'C',
     title: '企業 / 學校包團',
     desc: '客製化主題導覽，文史、建築、工藝任選。',
+  },
+]
+
+const VEHICLE_FACTS = [
+  { label: 'Vehicle', value: '四輪', detail: '全車隊電動導覽車' },
+  { label: 'Capacity', value: '5 位', detail: '每車最多 5 位旅客，可乘 5 位成人' },
+  { label: 'Guide', value: '同車', detail: '導覽員兼任司機' },
+  { label: 'Safety', value: '安全帶', detail: '車上備有安全帶' },
+  { label: 'Weather', value: '遮雨', detail: '雨天備有遮雨設備' },
+]
+
+const PRICING = [
+  {
+    people: '1–2 人',
+    amount: 'NT$600',
+    unit: '／車／小時',
+    note: '以整車計費，兩人同行價格相同。',
+    halfHour: '30 分鐘 NT$300／車',
+  },
+  {
+    people: '3–5 人',
+    amount: 'NT$200',
+    unit: '／人／小時',
+    note: '依實際參加人數計費，每車最多 5 位旅客。',
+    halfHour: '30 分鐘 NT$100／人',
   },
 ]
 
@@ -170,10 +192,11 @@ export default function Services({ setSelectedPlan }) {
               <div className="mt-auto pt-5 border-t border-ink-100 flex items-end justify-between">
                 <div>
                   <div className="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-1">
-                    From / 每人
+                    Suggested time
                   </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="font-display text-3xl text-ink-800">NT${p.price}</span>
+                    <span className="font-display text-2xl text-ink-800">{p.duration}</span>
+                    <span className="text-xs text-ink-400 ml-2">可再客製</span>
                   </div>
                 </div>
                 <button
@@ -188,6 +211,66 @@ export default function Services({ setSelectedPlan }) {
               </div>
             </article>
           ))}
+        </div>
+
+        {/* 車輛資訊 */}
+        <div className="border-y border-ink-200 py-12 mb-20">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            {VEHICLE_FACTS.map(item => (
+              <div key={item.label}>
+                <div className="font-mono text-[10px] tracking-widest uppercase text-brick-500 mb-2">
+                  {item.label}
+                </div>
+                <div className="font-serif text-2xl text-ink-800 mb-2">{item.value}</div>
+                <p className="text-sm text-ink-500 leading-relaxed">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 pt-6 border-t border-ink-100 text-sm text-ink-500 leading-relaxed">
+            折疊式輪椅可收納上車；如有輪椅、行動不便者或其他乘車需求，請在預約時先告知，我們會協助安排。
+          </p>
+        </div>
+
+        {/* 計費方式 */}
+        <div className="bg-ink-800 text-paper-50 p-8 md:p-12 mb-20">
+          <div className="grid md:grid-cols-12 gap-10">
+            <div className="md:col-span-4">
+              <div className="eyebrow-light mb-4">Pricing</div>
+              <h3 className="font-serif text-3xl md:text-4xl text-paper-50 leading-tight mb-5">
+                按時間計費，<br />路線由你決定。
+              </h3>
+              <p className="text-paper-100/70 text-sm leading-relaxed">
+                30 分鐘起訂，以 30 分鐘為增加單位，並按時間比例計費。
+                客製路線與參考路線皆採相同計費方式。
+              </p>
+            </div>
+
+            <div className="md:col-span-8">
+              <div className="grid sm:grid-cols-2 gap-px bg-paper-100/15 mb-8">
+                {PRICING.map(rate => (
+                  <div key={rate.people} className="bg-ink-800 p-6 md:p-8">
+                    <div className="font-mono text-[11px] tracking-widest uppercase text-brick-300 mb-4">
+                      {rate.people}
+                    </div>
+                    <div className="flex flex-wrap items-baseline gap-2 mb-3">
+                      <span className="font-display text-4xl text-paper-50">{rate.amount}</span>
+                      <span className="text-paper-100/65 text-sm">{rate.unit}</span>
+                    </div>
+                    <p className="text-paper-100/60 text-sm leading-relaxed">{rate.note}</p>
+                    <p className="font-mono text-[11px] tracking-wider text-brick-300 mt-4">{rate.halfHour}</p>
+                  </div>
+                ))}
+              </div>
+
+              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-4 text-sm text-paper-100/75 leading-relaxed">
+                <li className="flex gap-3"><span className="text-brick-300">—</span><span>超時依實際超出時間，按相同比例計費。</span></li>
+                <li className="flex gap-3"><span className="text-brick-300">—</span><span>購物、排隊、用餐及景點停留皆計入導覽時間。</span></li>
+                <li className="flex gap-3"><span className="text-brick-300">—</span><span>餐飲、商品、門票及其他個人消費由旅客自行負擔。</span></li>
+                <li className="flex gap-3"><span className="text-brick-300">—</span><span>包車、企業或學校團體請透過 LINE 或電話洽詢報價。</span></li>
+                <li className="flex gap-3 sm:col-span-2"><span className="text-brick-300">—</span><span>加入官方 LINE 好友並透過 LINE 預約，可享導覽費 95 折。</span></li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <div className="border-t border-ink-200 pt-12">
@@ -213,7 +296,7 @@ export default function Services({ setSelectedPlan }) {
         </div>
 
         <p className="mt-16 pt-6 border-t border-ink-100 text-xs text-ink-400 tracking-wider">
-          * 客製需求優先・以上為參考路線・全程預約制・沒有固定班次・確認後依約定時間出發・加入官方 LINE 享 95 折。
+          * 客製需求優先・以上為參考路線・全程預約制・沒有固定班次・確認後依約定時間出發。
         </p>
       </div>
     </section>

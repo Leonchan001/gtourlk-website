@@ -22,7 +22,7 @@ const VALUES = [
   {
     no: '04',
     title: '全齡友善',
-    body: '親子、長者、行動不便者都能輕鬆暢遊，無障礙也照顧到。',
+    body: '親子、長者與行動不便者都能輕鬆暢遊，折疊式輪椅可收納上車。',
   },
   {
     no: '05',
@@ -46,7 +46,7 @@ export default function About() {
             <div className="photo-frame aspect-[4/3] bg-ink-700">
               <img
                 src={ABOUT_PHOTO_LARGE}
-                alt="導鹿GtourLK電動三輪車停靠鹿港老街，在地導覽員帶旅客遊覽古蹟"
+                alt="導鹿 GtourLK 電動四輪導覽車停靠鹿港老街，在地導覽員帶旅客遊覽古蹟"
                 loading="lazy"
                 width="1400"
                 height="1050"
@@ -82,9 +82,9 @@ export default function About() {
 
             <div className="space-y-5 text-paper-100/85 leading-relaxed">
               <p>
-                「導鹿 GtourLK」是鹿港在地的電動觀光三輪車・四輪車租賃品牌。
+                「導鹿 GtourLK」是鹿港在地的電動四輪觀光導覽品牌。
                 我們由一群熱愛這片土地的解說員組成，
-                騎著全新節能環保電動車，帶您探索鹿港小鎮、米其林旅遊指南推薦的 3 星景點。
+                由導覽員兼任司機、與旅客同車，帶您探索鹿港小鎮與米其林旅遊指南推薦的 3 星景點。
               </p>
               <p>
                 一種旅遊方式、一種生活態度。我們相信慢慢走、細細聽，

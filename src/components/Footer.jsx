@@ -78,7 +78,7 @@ export default function Footer() {
         {/* 版權列 */}
         <div className="mt-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-[11px] tracking-wider">
           <div className="text-paper-100/40">
-            © {new Date().getFullYear()} 導鹿 GtourLK　·　鹿港三輪車觀光導覽　·　All rights reserved.
+            © {new Date().getFullYear()} 導鹿 GtourLK　·　鹿港四輪電動車觀光導覽　·　All rights reserved.
           </div>
           <div className="text-paper-100/30 font-mono uppercase">
             Lukang · Changhua · Taiwan

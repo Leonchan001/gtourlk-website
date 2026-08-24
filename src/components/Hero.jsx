@@ -8,7 +8,7 @@ export default function Hero() {
       {/* 主視覺照片 */}
       <img
         src={HERO_PHOTO}
-        alt="導鹿GtourLK電動三輪車停靠於鹿港桂花巷藝術村入口，夕陽金光打在古鎮街道"
+        alt="導鹿 GtourLK 電動四輪導覽車停靠於鹿港桂花巷藝術村入口"
         className="absolute inset-0 w-full h-full object-cover object-center"
         loading="eager"
         fetchPriority="high"
@@ -45,8 +45,8 @@ export default function Hero() {
 
           {/* 副標 */}
           <p className="text-paper-100/90 text-[15px] md:text-lg max-w-xl leading-relaxed mt-6 md:mt-8 mb-9 md:mb-10 drop-shadow-[0_1px_12px_rgba(0,0,0,0.4)]">
-            搭乘節能電動三輪車，跟著在地導覽員走訪龍山寺、天后宮與九曲巷，
-            一場以米其林指南景點為線的鹿港深度散策。
+            搭乘節能電動四輪導覽車，由同車的在地導覽員兼任司機，
+            依你想去的景點安排一場專屬的鹿港深度散策。
           </p>
 
           <div className="mb-7 -mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 border border-paper-50/35 bg-ink-900/35 px-4 py-2 text-paper-50 backdrop-blur-sm">
@@ -71,7 +71,7 @@ export default function Hero() {
         <div className="mt-14 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
           <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={`／${BUSINESS.reviewCount} 則五星評論`} href={BUSINESS.googleReviewsUrl} />
           <Fact eyebrow="Flexible" big="60—150" small="分鐘・可依需求安排" />
-          <Fact eyebrow="Vehicle" big="EV" small="全車隊節能電動車" />
+          <Fact eyebrow="Vehicle" big="4W EV" small="四輪電動導覽車・最多 5 人" />
           <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
         </div>
       </div>
