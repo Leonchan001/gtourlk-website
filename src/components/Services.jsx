@@ -223,7 +223,7 @@ export default function Services({ setSelectedPlan }) {
               alt="導鹿四輪導覽車客製化導覽價格資訊圖。1至2人每車每小時600元；3至5人每人每小時200元；30分鐘起訂，每30分鐘增加，按時間比例計費，每車最多5人。"
               loading="lazy"
               width="1200"
-              height="2800"
+              height="3200"
               className="block w-full h-auto"
             />
           </figure>
