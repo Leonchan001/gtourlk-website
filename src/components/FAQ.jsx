@@ -33,6 +33,15 @@ const FAQS = [
     q: '客製路線或超時怎麼計費？',
     a: '客製路線與參考路線都按時間計費，超時則依實際超出的時間按相同比例計費。告訴我們想去的景點與可用時間，我們會協助安排適合的順序；包車、企業或學校團體請加 LINE 或來電洽詢報價。',
   },
+  {
+    q: '開車到鹿港，建議停在哪裡？',
+    a: '平日可優先參考鹿港生態公園停車場；假日或想停近老街，可參考鹿草路周邊計次停車場。停車費、開放狀況與剩餘車位請以現場公告為準；也可以在預約時提供抵達日期與時間，由導覽員依當天情況協助建議。',
+    links: [
+      { label: '鹿港生態公園停車場', href: 'https://maps.app.goo.gl/uJGCK9J4ChXUjpac6?g_st=ipc' },
+      { label: '鹿草路周邊停車場 ①', href: 'https://maps.app.goo.gl/fwrffz76TUuaJ8k27?g_st=il' },
+      { label: '鹿草路周邊停車場 ②', href: 'https://maps.app.goo.gl/DNX4gSzyz7e6JAty6?g_st=il' },
+    ],
+  },
 ]
 
 export default function FAQ() {
@@ -49,7 +58,7 @@ export default function FAQ() {
           <div className="md:col-span-9">
             <h2 className="section-title max-w-xl">
               出發前，<br />
-              你可能想問的<span className="font-display italic"> 八個問題</span>。
+              你可能想問的<span className="font-display italic"> 常見問題</span>。
             </h2>
           </div>
         </div>
@@ -84,6 +93,21 @@ export default function FAQ() {
                   <p className="pb-6 text-ink-600 leading-relaxed text-[15px]">
                     {item.a}
                   </p>
+                  {item.links && (
+                    <div className="-mt-3 pb-6 flex flex-wrap gap-x-5 gap-y-3">
+                      {item.links.map(link => (
+                        <a
+                          key={link.href}
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 border-b border-ink-300 pb-1 text-sm text-ink-700 hover:border-brick-500 hover:text-brick-500"
+                        >
+                          {link.label}<span aria-hidden="true">↗</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

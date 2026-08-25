@@ -17,7 +17,7 @@ export default function Footer() {
             </div>
             <p className="text-sm leading-relaxed max-w-md">
               鹿港在地的電動觀光導覽品牌，
-              提供米其林級的鹿港深度散策。
+              帶你走訪米其林綠色指南推薦景點。
               一群熱愛鹿港的解說員，用行動讀寫這座古鎮。
             </p>
             <div className="mt-6 md:mt-8 flex flex-wrap items-center gap-4">
