@@ -78,23 +78,6 @@ const VEHICLE_FACTS = [
   { label: 'Weather', value: '遮雨', detail: '雨天備有遮雨設備' },
 ]
 
-const PRICING = [
-  {
-    people: '1–2 人',
-    amount: 'NT$600',
-    unit: '／車／小時',
-    note: '以整車計費，兩人同行價格相同。',
-    halfHour: '30 分鐘 NT$300／車',
-  },
-  {
-    people: '3–5 人',
-    amount: 'NT$200',
-    unit: '／人／小時',
-    note: '依實際參加人數計費，每車最多 5 位旅客。',
-    halfHour: '30 分鐘 NT$100／人',
-  },
-]
-
 export default function Services({ setSelectedPlan }) {
   function handleBook(plan) {
     setSelectedPlan(plan)
@@ -231,47 +214,27 @@ export default function Services({ setSelectedPlan }) {
           </p>
         </div>
 
-        {/* 計費方式 */}
-        <div className="bg-ink-800 text-paper-50 p-8 md:p-12 mb-20">
-          <div className="grid md:grid-cols-12 gap-10">
-            <div className="md:col-span-4">
-              <div className="eyebrow-light mb-4">Pricing</div>
-              <h3 className="font-serif text-3xl md:text-4xl text-paper-50 leading-tight mb-5">
-                按時間計費，<br />路線由你決定。
-              </h3>
-              <p className="text-paper-100/70 text-sm leading-relaxed">
-                30 分鐘起訂，以 30 分鐘為增加單位，並按時間比例計費。
-                客製路線與參考路線皆採相同計費方式。
-              </p>
-            </div>
+        {/* 手機優先的導覽價格資訊圖；文字版保留給搜尋引擎與螢幕閱讀器。 */}
+        <section id="pricing" className="mb-20 scroll-mt-24" aria-labelledby="pricing-title">
+          <h3 id="pricing-title" className="sr-only">導鹿四輪導覽車客製化導覽價格</h3>
+          <figure className="mx-auto max-w-4xl bg-paper-50">
+            <img
+              src="./tour-pricing-mobile.jpg"
+              alt="導鹿四輪導覽車客製化導覽價格資訊圖。1至2人每車每小時600元；3至5人每人每小時200元；30分鐘起訂，每30分鐘增加，按時間比例計費，每車最多5人。"
+              loading="lazy"
+              width="1200"
+              height="2800"
+              className="block w-full h-auto"
+            />
+          </figure>
 
-            <div className="md:col-span-8">
-              <div className="grid sm:grid-cols-2 gap-px bg-paper-100/15 mb-8">
-                {PRICING.map(rate => (
-                  <div key={rate.people} className="bg-ink-800 p-6 md:p-8">
-                    <div className="font-mono text-[11px] tracking-widest uppercase text-brick-300 mb-4">
-                      {rate.people}
-                    </div>
-                    <div className="flex flex-wrap items-baseline gap-2 mb-3">
-                      <span className="font-display text-4xl text-paper-50">{rate.amount}</span>
-                      <span className="text-paper-100/65 text-sm">{rate.unit}</span>
-                    </div>
-                    <p className="text-paper-100/60 text-sm leading-relaxed">{rate.note}</p>
-                    <p className="font-mono text-[11px] tracking-wider text-brick-300 mt-4">{rate.halfHour}</p>
-                  </div>
-                ))}
-              </div>
-
-              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-4 text-sm text-paper-100/75 leading-relaxed">
-                <li className="flex gap-3"><span className="text-brick-300">—</span><span>超時依實際超出時間，按相同比例計費。</span></li>
-                <li className="flex gap-3"><span className="text-brick-300">—</span><span>購物、排隊、用餐及景點停留皆計入導覽時間。</span></li>
-                <li className="flex gap-3"><span className="text-brick-300">—</span><span>餐飲、商品、門票及其他個人消費由旅客自行負擔。</span></li>
-                <li className="flex gap-3"><span className="text-brick-300">—</span><span>包車、企業或學校團體請透過 LINE 或電話洽詢報價。</span></li>
-                <li className="flex gap-3 sm:col-span-2"><span className="text-brick-300">—</span><span>加入官方 LINE 好友並透過 LINE 預約，可享導覽費 95 折。</span></li>
-              </ul>
-            </div>
+          <div className="sr-only">
+            <p>預約想要的導覽時間，指定必去的景點或店家，其餘行程由熟悉鹿港的導覽員安排。沒有特定想法也沒關係，我們會依現場情況規劃合適內容。</p>
+            <p>1至2人為新台幣600元每車每小時；3至5人為新台幣200元每人每小時。30分鐘起訂，以30分鐘為增加單位，按時間比例計費，每車最多搭乘5人。</p>
+            <p>購物、排隊、用餐及景點停留皆計入導覽時間。餐飲、商品、門票及其他個人消費需自行負擔。上、下車地點限四輪導覽車可通行範圍。</p>
+            <p>預約請提供日期、時間、人數、導覽時長、上車與下車地點、必去景點或店家、姓名及電話。</p>
           </div>
-        </div>
+        </section>
 
         <div className="border-t border-ink-200 pt-12">
           <div className="grid md:grid-cols-12 gap-8">
