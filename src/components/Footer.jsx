@@ -4,15 +4,15 @@ import { BUSINESS } from '../data/business'
 export default function Footer() {
   return (
     <footer className="bg-ink-900 text-paper-100/70">
-      <div className="max-w-7xl mx-auto px-6 pt-20 pb-10">
-        <div className="grid md:grid-cols-12 gap-10 pb-14 border-b border-paper-100/10">
+      <div className="max-w-7xl mx-auto px-6 pt-14 md:pt-20 pb-8 md:pb-10">
+        <div className="grid md:grid-cols-12 gap-8 md:gap-10 pb-10 md:pb-14 border-b border-paper-100/10">
 
           {/* 品牌區 */}
           <div className="md:col-span-5">
             <div className="font-display text-3xl text-paper-50 tracking-wide mb-1">
               GtourLK
             </div>
-            <div className="font-serif text-sm tracking-[0.25em] text-paper-200 mb-6">
+            <div className="font-serif text-sm tracking-[0.25em] text-paper-200 mb-4 md:mb-6">
               導 · 鹿
             </div>
             <p className="text-sm leading-relaxed max-w-md">
@@ -20,7 +20,7 @@ export default function Footer() {
               提供米其林級的鹿港深度散策。
               一群熱愛鹿港的解說員，用行動讀寫這座古鎮。
             </p>
-            <div className="mt-8 flex items-center gap-4">
+            <div className="mt-6 md:mt-8 flex flex-wrap items-center gap-4">
               {[
                 ['Facebook', 'https://www.facebook.com/p/%E5%B0%8E%E9%B9%BFgtourlk-%E9%B9%BF%E6%B8%AF%E4%B8%89%E8%BC%AA%E8%BB%8A%E8%A7%80%E5%85%89%E5%B0%8E%E8%A6%BD-61566567161745/'],
                 ['Instagram', 'https://www.instagram.com/gtourlk'],
@@ -37,7 +37,7 @@ export default function Footer() {
           {/* 站內導航 */}
           <div className="md:col-span-3">
             <h4 className="eyebrow-light mb-5">Sitemap</h4>
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-2 gap-y-3 md:block md:space-y-3">
               {[
                 ['#experience', '路線參考'],
                 ['#reviews',    '旅人評價'],
@@ -63,7 +63,7 @@ export default function Footer() {
               <li className="text-paper-100/70">LINE 　@lk167</li>
             </ul>
 
-            <div className="mt-5 pt-5 border-t border-paper-100/10 space-y-2">
+            <div className="mt-4 md:mt-5 pt-4 md:pt-5 border-t border-paper-100/10 space-y-2">
               {BUSINESS.phones.map(p => (
                 <a key={p.tel} href={`tel:${p.tel}`}
                   className="flex items-center justify-between text-sm hover:text-paper-50 transition-colors">
@@ -76,7 +76,7 @@ export default function Footer() {
         </div>
 
         {/* 版權列 */}
-        <div className="mt-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-[11px] tracking-wider">
+        <div className="mt-8 md:mt-10 flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 text-[11px] tracking-wider">
           <div className="text-paper-100/40">
             © {new Date().getFullYear()} 導鹿 GtourLK　·　鹿港四輪電動車觀光導覽　·　All rights reserved.
           </div>

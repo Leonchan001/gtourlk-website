@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import Pricing from './Pricing'
+
 const PLANS = [
   {
     no: '01',
@@ -79,13 +82,16 @@ const VEHICLE_FACTS = [
 ]
 
 export default function Services({ setSelectedPlan }) {
+  const [activePlanIndex, setActivePlanIndex] = useState(1)
+  const activePlan = PLANS[activePlanIndex]
+
   function handleBook(plan) {
     setSelectedPlan(plan)
     document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
-    <section id="experience" className="py-24 md:py-32 bg-paper-50">
+    <section id="experience" className="py-20 md:py-32 bg-paper-50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
           <div className="md:col-span-3">
@@ -105,7 +111,91 @@ export default function Services({ setSelectedPlan }) {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-x-6 gap-y-12 mb-24">
+        <Pricing onBook={handleBook} />
+
+        <div className="grid md:grid-cols-12 gap-8 mb-10 md:mb-12">
+          <div className="md:col-span-3">
+            <div className="eyebrow mb-3">Route Inspirations</div>
+            <div className="rule-thick w-12" />
+          </div>
+          <div className="md:col-span-9 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+            <h3 className="font-serif text-3xl md:text-4xl text-ink-800 leading-tight">
+              沒有必去清單，<br />也能安心出發。
+            </h3>
+            <p className="text-ink-500 leading-relaxed max-w-lg">
+              下方三種是時間與景點的安排靈感，不是固定套裝行程；你可以只選時間，再交給導覽員依現場狀況規劃。
+            </p>
+          </div>
+        </div>
+
+        <div className="md:hidden mb-16">
+          <div className="grid grid-cols-3 gap-2 mb-4" role="tablist" aria-label="選擇參考路線時間">
+            {PLANS.map((plan, index) => (
+              <button
+                key={plan.no}
+                type="button"
+                role="tab"
+                aria-selected={activePlanIndex === index}
+                aria-controls="mobile-route-panel"
+                onClick={() => setActivePlanIndex(index)}
+                className={`min-h-14 border px-2 py-2 text-center transition-colors ${
+                  activePlanIndex === index
+                    ? 'border-ink-800 bg-ink-800 text-paper-50'
+                    : 'border-ink-200 bg-paper-50 text-ink-600'
+                }`}
+              >
+                <span className="block font-display text-xl leading-none">{plan.duration.replace(' 分鐘', '')}</span>
+                <span className="block mt-1 text-[10px] tracking-wider">分鐘</span>
+              </button>
+            ))}
+          </div>
+
+          <article id="mobile-route-panel" role="tabpanel" className="border border-ink-200 bg-white">
+            <button
+              type="button"
+              onClick={() => handleBook(activePlan)}
+              className="relative block w-full aspect-[16/10] overflow-hidden text-left bg-ink-800"
+              aria-label={`以${activePlan.title}參考路線開始安排`}
+            >
+              <img
+                src={activePlan.photo}
+                alt={activePlan.photoAlt}
+                loading="lazy"
+                width="1200"
+                height="750"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <span className="absolute inset-0 bg-gradient-to-t from-ink-900/90 via-ink-900/20 to-transparent" />
+              <span className="absolute inset-x-0 bottom-0 p-5 text-paper-50">
+                <span className="font-mono text-[10px] tracking-widest text-brick-100">N°{activePlan.no} · {activePlan.duration}</span>
+                <span className="mt-2 block font-serif text-2xl">{activePlan.title}</span>
+                <span className="mt-1 block font-display italic text-paper-100">{activePlan.tagline}</span>
+              </span>
+            </button>
+
+            <div className="p-5">
+              <div className="mb-5 grid gap-2 text-sm text-ink-600">
+                {activePlan.features.slice(0, 3).map((feature, index) => (
+                  <div key={index} className="flex gap-3">
+                    <span className="text-brick-500">—</span>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleBook(activePlan)}
+                className="btn-primary w-full min-h-12"
+              >
+                用 {activePlan.duration} 開始安排
+                <span aria-hidden="true">→</span>
+              </button>
+              <p className="mt-3 text-center text-xs text-ink-400">這只是安排靈感，景點與停留時間都能調整</p>
+            </div>
+          </article>
+        </div>
+
+        <div className="hidden md:grid md:grid-cols-3 gap-x-6 gap-y-12 mb-24">
           {PLANS.map(p => (
             <article key={p.no} className="group flex flex-col">
               <a
@@ -145,7 +235,7 @@ export default function Services({ setSelectedPlan }) {
                 {p.featured && (
                   <div className="absolute top-4 right-4 bg-paper-50 px-3 py-1.5">
                     <span className="font-mono text-[10px] tracking-widest uppercase text-brick-500">
-                      Most Booked
+                      熱門時長
                     </span>
                   </div>
                 )}
@@ -186,7 +276,7 @@ export default function Services({ setSelectedPlan }) {
                   onClick={() => handleBook(p)}
                   className="text-sm tracking-wider text-ink-700 hover:text-brick-500 inline-flex items-center gap-2 border-b border-ink-700 hover:border-brick-500 pb-1"
                 >
-                  以此路線洽詢
+                  用這個時間開始安排
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -197,8 +287,8 @@ export default function Services({ setSelectedPlan }) {
         </div>
 
         {/* 車輛資訊 */}
-        <div className="border-y border-ink-200 py-12 mb-20">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="border-y border-ink-200 py-10 md:py-12 mb-16 md:mb-20">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-5 gap-y-8">
             {VEHICLE_FACTS.map(item => (
               <div key={item.label}>
                 <div className="font-mono text-[10px] tracking-widest uppercase text-brick-500 mb-2">
@@ -213,28 +303,6 @@ export default function Services({ setSelectedPlan }) {
             折疊式輪椅可收納上車；如有輪椅、行動不便者或其他乘車需求，請在預約時先告知，我們會協助安排。
           </p>
         </div>
-
-        {/* 手機優先的導覽價格資訊圖；文字版保留給搜尋引擎與螢幕閱讀器。 */}
-        <section id="pricing" className="mb-20 scroll-mt-24" aria-labelledby="pricing-title">
-          <h3 id="pricing-title" className="sr-only">導鹿四輪導覽車客製化導覽價格</h3>
-          <figure className="mx-auto max-w-4xl bg-paper-50">
-            <img
-              src="./tour-pricing-mobile.jpg"
-              alt="導鹿四輪導覽車客製化導覽價格資訊圖。1至2人每車每小時600元；3至5人每人每小時200元；30分鐘起訂，每30分鐘增加，按時間比例計費；每車可搭5人，6人以上安排多台車。"
-              loading="lazy"
-              width="1200"
-              height="3200"
-              className="block w-full h-auto"
-            />
-          </figure>
-
-          <div className="sr-only">
-            <p>預約想要的導覽時間，指定必去的景點或店家，其餘行程由熟悉鹿港的導覽員安排。沒有特定想法也沒關係，我們會依現場情況規劃合適內容。</p>
-            <p>1至2人為新台幣600元每車每小時；3至5人為新台幣200元每人每小時。30分鐘起訂，以30分鐘為增加單位，按時間比例計費。每車可搭5人，6人以上依總人數安排多台車。</p>
-            <p>購物、排隊、用餐及景點停留皆計入導覽時間。餐飲、商品、門票及其他個人消費需自行負擔。上、下車地點限四輪導覽車可通行範圍。</p>
-            <p>預約請提供日期、時間、人數、導覽時長、上車與下車地點、必去景點或店家、姓名及電話。</p>
-          </div>
-        </section>
 
         <div className="border-t border-ink-200 pt-12">
           <div className="grid md:grid-cols-12 gap-8">

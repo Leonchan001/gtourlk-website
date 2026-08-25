@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import logoImg from '/gtourlk-logo.png'
+import logoImg from '/gtourlk-logo-header.png'
 import { BUSINESS } from '../data/business'
 
 const NAV = [

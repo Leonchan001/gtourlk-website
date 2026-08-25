@@ -36,11 +36,11 @@ const REVIEWS = [
 
 export default function SocialProof() {
   return (
-    <section id="reviews" className="py-24 md:py-32 bg-paper-100 texture-paper">
+    <section id="reviews" className="py-20 md:py-32 bg-paper-100 texture-paper">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* 章節標題 */}
-        <div className="grid md:grid-cols-12 gap-8 mb-20">
+        <div className="grid md:grid-cols-12 gap-8 mb-12 md:mb-20">
           <div className="md:col-span-3">
             <div className="eyebrow mb-3">N°03 — Reviews</div>
             <div className="rule-thick w-12" />
@@ -59,12 +59,12 @@ export default function SocialProof() {
         </div>
 
         {/* 大型 pull quote — 編輯式重點引言 */}
-        <figure className="grid md:grid-cols-12 gap-8 items-start mb-20 pb-20 border-b border-ink-200">
+        <figure className="grid md:grid-cols-12 gap-5 md:gap-8 items-start mb-12 pb-12 md:mb-20 md:pb-20 border-b border-ink-200">
           <div className="md:col-span-1">
             <span className="font-display text-7xl text-brick-500 leading-none block">“</span>
           </div>
           <div className="md:col-span-11">
-            <blockquote className="font-serif text-2xl md:text-3xl lg:text-[36px] text-ink-800 leading-[1.5] tracking-[-0.005em]">
+            <blockquote className="font-serif text-xl md:text-3xl lg:text-[36px] text-ink-800 leading-[1.6] tracking-[-0.005em]">
               {PULL.text}
             </blockquote>
             <figcaption className="mt-8 flex items-center gap-4 text-ink-500">
@@ -80,7 +80,7 @@ export default function SocialProof() {
         {/* 四則小評論 — 兩欄排版 */}
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-12">
           {REVIEWS.map((r, i) => (
-            <article key={i} className="group">
+            <article key={i} className={`group ${i > 1 ? 'hidden md:block' : ''}`}>
               <div className="flex items-baseline justify-between mb-4">
                 <div className="flex items-baseline gap-3">
                   <span className="font-mono text-xs tracking-widest text-ink-300">
@@ -106,7 +106,7 @@ export default function SocialProof() {
         </div>
 
         {/* 看更多 — 編輯式底線連結 */}
-        <div className="mt-20 pt-10 border-t border-ink-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="mt-12 md:mt-20 pt-8 md:pt-10 border-t border-ink-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="eyebrow mb-2">Verified · 彰化友善店家認證</div>
             <p className="text-ink-500">評分與評論數以 Google 商家頁面顯示為準・截至 2026 年 8 月</p>
