@@ -71,7 +71,7 @@ export default function Hero() {
         <div className="mt-14 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
           <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={`／${BUSINESS.reviewCount} 則五星評論`} href={BUSINESS.googleReviewsUrl} />
           <Fact eyebrow="Flexible" big="60—150" small="分鐘・可依需求安排" />
-          <Fact eyebrow="Vehicle" big="4W EV" small="四輪電動導覽車・最多 5 人" />
+          <Fact eyebrow="Vehicle" big="4W EV" small="四輪電動導覽車・每車 5 人" />
           <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
         </div>
       </div>

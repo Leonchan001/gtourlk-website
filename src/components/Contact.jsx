@@ -3,7 +3,7 @@ import { BUSINESS } from '../data/business'
 
 const BOOKING_STEPS = [
   { no: '01', title: '日期與時間', body: '告訴我們希望出發的日期、時間與預計導覽多久。' },
-  { no: '02', title: '同行人數', body: '提供成人與兒童人數；每車最多 5 位旅客，可乘 5 位成人。' },
+  { no: '02', title: '同行人數', body: '請提供總人數；每車可搭 5 位成人，6 人以上會依人數安排多台車。' },
   { no: '03', title: '景點與需求', body: '告訴我們想去的景點，以及折疊輪椅或其他乘車需求。' },
 ]
 

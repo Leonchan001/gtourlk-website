@@ -11,7 +11,7 @@ const PLANS = [
     features: [
       '天后宮 + 鹿港老街精華段',
       '在地導覽員專業講解',
-      '節能電動四輪導覽車・最多 5 位旅客',
+      '節能電動四輪導覽車・每車 5 位旅客・多人可安排多車',
       '免費停車場資訊提供',
     ],
   },
@@ -72,7 +72,7 @@ const EXTRAS = [
 
 const VEHICLE_FACTS = [
   { label: 'Vehicle', value: '四輪', detail: '全車隊電動導覽車' },
-  { label: 'Capacity', value: '5 位', detail: '每車最多 5 位旅客，可乘 5 位成人' },
+  { label: 'Capacity', value: '每車 5 位', detail: '6 人以上依總人數安排多台車' },
   { label: 'Guide', value: '同車', detail: '導覽員兼任司機' },
   { label: 'Safety', value: '安全帶', detail: '車上備有安全帶' },
   { label: 'Weather', value: '遮雨', detail: '雨天備有遮雨設備' },
@@ -220,7 +220,7 @@ export default function Services({ setSelectedPlan }) {
           <figure className="mx-auto max-w-4xl bg-paper-50">
             <img
               src="./tour-pricing-mobile.jpg"
-              alt="導鹿四輪導覽車客製化導覽價格資訊圖。1至2人每車每小時600元；3至5人每人每小時200元；30分鐘起訂，每30分鐘增加，按時間比例計費，每車最多5人。"
+              alt="導鹿四輪導覽車客製化導覽價格資訊圖。1至2人每車每小時600元；3至5人每人每小時200元；30分鐘起訂，每30分鐘增加，按時間比例計費；每車可搭5人，6人以上安排多台車。"
               loading="lazy"
               width="1200"
               height="3200"
@@ -230,7 +230,7 @@ export default function Services({ setSelectedPlan }) {
 
           <div className="sr-only">
             <p>預約想要的導覽時間，指定必去的景點或店家，其餘行程由熟悉鹿港的導覽員安排。沒有特定想法也沒關係，我們會依現場情況規劃合適內容。</p>
-            <p>1至2人為新台幣600元每車每小時；3至5人為新台幣200元每人每小時。30分鐘起訂，以30分鐘為增加單位，按時間比例計費，每車最多搭乘5人。</p>
+            <p>1至2人為新台幣600元每車每小時；3至5人為新台幣200元每人每小時。30分鐘起訂，以30分鐘為增加單位，按時間比例計費。每車可搭5人，6人以上依總人數安排多台車。</p>
             <p>購物、排隊、用餐及景點停留皆計入導覽時間。餐飲、商品、門票及其他個人消費需自行負擔。上、下車地點限四輪導覽車可通行範圍。</p>
             <p>預約請提供日期、時間、人數、導覽時長、上車與下車地點、必去景點或店家、姓名及電話。</p>
           </div>
