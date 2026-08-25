@@ -4,7 +4,7 @@ const HERO_PHOTO = './hero-main.jpg'
 
 export default function Hero() {
   return (
-    <section id="top" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-ink-800">
+    <section id="top" className="relative min-h-[100svh] w-full overflow-hidden bg-ink-800 md:h-[100svh] md:min-h-[640px]">
       {/* 主視覺照片 */}
       <img
         src={HERO_PHOTO}
@@ -23,10 +23,10 @@ export default function Hero() {
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink-900/70 to-transparent" />
 
       {/* 內容 — 預留固定 header 高度 (~95px)，避免標題被頂到 nav 後面 */}
-      <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-end pt-32 md:pt-36 pb-16 md:pb-24">
+      <div className="hero-content relative min-h-[100svh] max-w-7xl mx-auto px-6 flex flex-col pt-24 pb-12 md:h-full md:min-h-0 md:justify-end md:pt-36 md:pb-24">
         <div className="max-w-3xl">
           {/* 編號 + 副標 */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="hero-kicker flex items-center gap-4 mb-4 md:mb-6">
             <span className="font-mono text-[10px] md:text-[11px] tracking-[0.28em] uppercase text-brick-300">
               N°01
             </span>
@@ -37,19 +37,19 @@ export default function Hero() {
           </div>
 
           {/* 主標題 — 大字襯線，字級調整避免在大螢幕擠壓內容 */}
-          <h1 className="font-serif text-paper-50 text-[38px] sm:text-[48px] md:text-[58px] lg:text-[68px] leading-[1.06] mb-2 drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)]">
+          <h1 className="hero-headline font-serif text-paper-50 text-[36px] sm:text-[48px] md:text-[58px] lg:text-[68px] leading-[1.08] mb-2 drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)]">
             穿過巷弄，<br className="md:hidden" />
             走進鹿港的<br />
             <span className="font-display italic text-paper-100">百年時間</span>
           </h1>
 
           {/* 副標 */}
-          <p className="text-paper-100/90 text-[15px] md:text-lg max-w-xl leading-relaxed mt-6 md:mt-8 mb-9 md:mb-10 drop-shadow-[0_1px_12px_rgba(0,0,0,0.4)]">
+          <p className="hero-description text-paper-100/90 text-[15px] md:text-lg max-w-xl leading-relaxed mt-5 md:mt-8 mb-7 md:mb-10 drop-shadow-[0_1px_12px_rgba(0,0,0,0.4)]">
             搭乘節能電動四輪導覽車，由同車的在地導覽員兼任司機，
             依你想去的景點安排一場專屬的鹿港深度散策。
           </p>
 
-          <div className="mb-7 -mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 border border-paper-50/35 bg-ink-900/35 px-4 py-2 text-paper-50 backdrop-blur-sm">
+          <div className="hero-reservation mb-6 md:mb-7 -mt-2 md:-mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 border border-paper-50/35 bg-ink-900/35 px-4 py-2 text-paper-50 backdrop-blur-sm">
             <span className="font-mono text-[10px] tracking-widest uppercase text-brick-300">By Reservation</span>
             <span className="text-sm">全程預約制・沒有固定班次・依約定時間出發</span>
           </div>
@@ -68,7 +68,7 @@ export default function Hero() {
         </div>
 
         {/* 底部資訊條 — 信任元素 */}
-        <div className="mt-14 pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl">
+        <div className="hero-facts mt-10 md:mt-14 pt-6 md:pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-6 md:gap-6 max-w-4xl">
           <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={`／${BUSINESS.reviewCount} 則五星評論`} href={BUSINESS.googleReviewsUrl} />
           <Fact eyebrow="Flexible" big="60—150" small="分鐘・可依需求安排" />
           <Fact eyebrow="Vehicle" big="4W EV" small="四輪電動導覽車・每車 5 人" />
@@ -87,8 +87,8 @@ function Fact({ eyebrow, big, small, href }) {
         {eyebrow}
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="font-display text-paper-50 text-3xl md:text-4xl leading-none">{big}</span>
-        <span className="text-paper-100/70 text-xs">{small}</span>
+        <span className="font-display text-paper-50 text-2xl md:text-4xl leading-none">{big}</span>
+        <span className="text-paper-100/70 text-[11px] md:text-xs leading-snug">{small}</span>
       </div>
     </div>
   )

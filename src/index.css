@@ -40,6 +40,36 @@
   }
 }
 
+/* 手機瀏覽器工具列會壓縮可用高度；首屏自然增高並壓縮短螢幕間距。 */
+@media (max-width: 767px) and (max-height: 700px) {
+  .hero-content {
+    padding-top: 5.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .hero-kicker {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-headline {
+    font-size: 2rem;
+  }
+
+  .hero-description {
+    margin-top: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-reservation {
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-facts {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+  }
+}
+
 @layer components {
   /* 主要 CTA — 磚紅實心，方角，沉穩 */
   .btn-primary {
