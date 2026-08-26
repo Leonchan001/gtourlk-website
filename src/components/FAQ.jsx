@@ -1,6 +1,15 @@
 import { useState } from 'react'
+import { TOUR_DURATION_PROMPT, TOUR_PLANS, TOUR_PRICING } from '../data/tours'
+
+const ROUTE_SUMMARY = TOUR_PLANS
+  .map(plan => `${plan.duration}｜${plan.stops.join('、')}`)
+  .join('\n')
 
 const FAQS = [
+  {
+    q: '60、90、150 分鐘通常能安排哪些景點？',
+    a: `以下是沒有指定地點時的常見參考：\n${ROUTE_SUMMARY}\n\n這些不是固定路線，也不代表每個景點都會全部走完。你指定的必去景點會優先保留，其餘由導覽員依上下車地點、路況、排隊與停留時間安排。`,
+  },
   {
     q: '是固定班次、定時發車嗎？',
     a: '不是。我們全程採預約制，沒有固定班次或固定發車時間。請先透過 LINE 或電話告訴我們希望的日期與時間，確認預約後，導覽員會依雙方約定時間出發。',
@@ -23,7 +32,7 @@ const FAQS = [
   },
   {
     q: '費用怎麼收？',
-    a: '1–2 人為 NT$600／車／小時；3 人以上為 NT$200／人／小時。每車可坐 5 位成人，6 人以上會安排多台車，但仍依總人數計費，例如 6 人 60 分鐘為 NT$1,200。30 分鐘起訂，以 30 分鐘為增加單位並按時間比例計費。加入官方 LINE 好友並透過 LINE 預約，可享導覽費 95 折；包車、企業或學校團體請洽詢專案報價。',
+    a: `${TOUR_PRICING.minimumMinutes} 分鐘起訂，可選 ${TOUR_DURATION_PROMPT} 分鐘。1–2 人為 NT$${TOUR_PRICING.oneToTwoHourly}／車／小時；3 人以上為 NT$${TOUR_PRICING.threePlusHourlyPerPerson}／人／小時。每車可坐 ${TOUR_PRICING.guestsPerVehicle} 位成人，6 人以上會安排多台車，但仍依總人數計費，例如 6 人 60 分鐘為 NT$1,200。加入官方 LINE 好友並透過 LINE 預約，可享導覽費 95 折；包車、企業或學校團體請洽詢專案報價。`,
   },
   {
     q: '可以中途停下來買東西或拍照嗎？',
@@ -31,7 +40,7 @@ const FAQS = [
   },
   {
     q: '客製路線或超時怎麼計費？',
-    a: '客製路線與參考路線都按時間計費，超時則依實際超出的時間按相同比例計費。告訴我們想去的景點與可用時間，我們會協助安排適合的順序；包車、企業或學校團體請加 LINE 或來電洽詢報價。',
+    a: '預約時請從 60、90、150 分鐘選擇；客製路線與參考安排都按時間計費。若現場希望延長，需先由導覽員確認後續時段與加價金額，確認後再繼續；超時費用依實際增加的時間按相同比例計算。包車、企業或學校團體請加 LINE 或來電洽詢報價。',
   },
   {
     q: '開車到鹿港，建議停在哪裡？',
@@ -45,7 +54,7 @@ const FAQS = [
 ]
 
 export default function FAQ() {
-  const [open, setOpen] = useState(null)
+  const [open, setOpen] = useState(0)
 
   return (
     <section id="faq" className="py-24 md:py-32 bg-paper-50">
@@ -90,7 +99,7 @@ export default function FAQ() {
                 style={{ gridTemplateRows: open === i ? '1fr' : '0fr' }}
               >
                 <div className="overflow-hidden">
-                  <p className="pb-6 text-ink-600 leading-relaxed text-[15px]">
+                  <p className="whitespace-pre-line pb-6 text-ink-600 leading-relaxed text-[15px]">
                     {item.a}
                   </p>
                   {item.links && (

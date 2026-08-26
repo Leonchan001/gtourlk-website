@@ -1,27 +1,26 @@
 import { useMemo, useState } from 'react'
-
-const DURATIONS = [30, 60, 90, 120, 150]
+import { TOUR_DURATIONS, TOUR_PRICING } from '../data/tours'
 
 function currency(amount) {
-  return new Intl.NumberFormat('zh-TW', {
-    style: 'currency',
-    currency: 'TWD',
+  return `NT$${new Intl.NumberFormat('zh-TW', {
     maximumFractionDigits: 0,
-  }).format(amount)
+  }).format(amount)}`
 }
 
 export default function Pricing({ onBook }) {
-  const [people, setPeople] = useState(6)
+  const [people, setPeople] = useState(2)
   const [duration, setDuration] = useState(60)
 
   const estimate = useMemo(() => {
     const hours = duration / 60
-    const vehicles = Math.ceil(people / 5)
-    const total = people <= 2 ? 600 * hours : 200 * people * hours
-    const linePrice = Math.round(total * 0.95)
+    const vehicles = Math.ceil(people / TOUR_PRICING.guestsPerVehicle)
+    const total = people <= 2
+      ? TOUR_PRICING.oneToTwoHourly * hours
+      : TOUR_PRICING.threePlusHourlyPerPerson * people * hours
+    const linePrice = Math.round(total * TOUR_PRICING.lineDiscountRate)
     const formula = people <= 2
-      ? `每車 NT$600 × ${hours} 小時`
-      : `${people} 人 × 每人 NT$200 × ${hours} 小時`
+      ? `每車 NT$${TOUR_PRICING.oneToTwoHourly} × ${hours} 小時`
+      : `${people} 人 × 每人 NT$${TOUR_PRICING.threePlusHourlyPerPerson} × ${hours} 小時`
 
     return { total, linePrice, vehicles, formula }
   }, [people, duration])
@@ -44,14 +43,14 @@ export default function Pricing({ onBook }) {
               Clear & Flexible Pricing
             </div>
             <h3 id="pricing-title" className="font-serif text-4xl md:text-5xl text-[#0d2c4c] leading-[1.18] mb-5">
-              只決定時間，<br />不綁死路線。
+              三種時間，<br />價格清楚透明。
             </h3>
             <p className="text-ink-500 text-base md:text-lg leading-relaxed max-w-md">
-              指定想去的景點或店家，剩餘時間交給熟悉鹿港的導覽員安排；沒有想法也沒關係。
+              60 分鐘起訂，可選 60、90 或 150 分鐘。指定想去的景點或店家，其餘交給熟悉鹿港的導覽員安排。
             </p>
 
             <div className="mt-7 flex flex-wrap gap-2 text-sm text-[#0d2c4c]">
-              {['30 分鐘起訂', '每 30 分鐘增加', '按比例計費'].map(item => (
+              {['60 分鐘起訂', '60／90／150 分鐘', '路線可客製'].map(item => (
                 <span key={item} className="rounded-full border border-[#0d2c4c]/15 bg-white/70 px-3.5 py-2">
                   {item}
                 </span>
@@ -66,7 +65,7 @@ export default function Pricing({ onBook }) {
                 <span className="block mt-1 text-xs text-ink-400">整車計費</span>
               </div>
               <strong className="block font-display text-[2rem] sm:text-5xl md:text-6xl font-normal leading-none text-[#0d2c4c] whitespace-nowrap">
-                NT$600
+                {currency(TOUR_PRICING.oneToTwoHourly)}
               </strong>
               <p className="mt-2 text-sm text-ink-500">每車／小時</p>
             </article>
@@ -77,7 +76,7 @@ export default function Pricing({ onBook }) {
                 <span className="block mt-1 text-xs text-ink-400">依總人數計費</span>
               </div>
               <strong className="block font-display text-[2rem] sm:text-5xl md:text-6xl font-normal leading-none text-brick-600 whitespace-nowrap">
-                NT$200
+                {currency(TOUR_PRICING.threePlusHourlyPerPerson)}
               </strong>
               <p className="mt-2 text-sm text-ink-500">每人／小時</p>
             </article>
@@ -85,7 +84,7 @@ export default function Pricing({ onBook }) {
             <div style={{ gridColumn: '1 / -1' }} className="grid grid-cols-2 overflow-hidden rounded-sm border border-[#c9dce8] bg-[#eaf4f8] text-[#0d2c4c]">
               <div className="px-4 sm:px-5 py-4 border-r border-[#c9dce8]">
                 <div className="font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-[#0d2c4c]/50 mb-1">Capacity</div>
-                <div className="text-sm md:text-base font-medium">每車可坐 5 人</div>
+                <div className="text-sm md:text-base font-medium">每車可坐 {TOUR_PRICING.guestsPerVehicle} 人</div>
               </div>
               <div className="px-4 sm:px-5 py-4">
                 <div className="font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-[#0d2c4c]/50 mb-1">More Guests</div>
@@ -99,7 +98,7 @@ export default function Pricing({ onBook }) {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-7">
             <div>
               <div className="font-mono text-[10px] tracking-[0.25em] uppercase text-brick-600 mb-2">Quick Estimate</div>
-              <h4 className="font-serif text-2xl md:text-3xl text-[#0d2c4c]">三步驟，立即看懂費用</h4>
+              <h4 className="font-serif text-2xl md:text-3xl text-[#0d2c4c]">選人數、選時間，立即看懂費用</h4>
             </div>
             <p className="text-sm text-ink-400">試算不會送出預約，可放心操作</p>
           </div>
@@ -138,11 +137,11 @@ export default function Pricing({ onBook }) {
                 <div>
                   <div className="flex items-center gap-3 text-base font-medium text-[#0d2c4c] mb-3">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eaf4f8] text-xs text-[#0d2c4c]">✓</span>
-                    系統安排車輛
+                    預估所需車輛
                   </div>
                   <div className="h-14 rounded-sm border border-[#c9dce8] bg-[#f5fafc] flex items-center justify-between px-5 text-[#0d2c4c]">
-                    <span className="text-sm">每車 5 人</span>
-                    <strong className="text-xl tabular-nums">需要 {estimate.vehicles} 台</strong>
+                    <span className="text-sm">每車 {TOUR_PRICING.guestsPerVehicle} 人</span>
+                    <strong className="text-xl tabular-nums">約需 {estimate.vehicles} 台</strong>
                   </div>
                 </div>
               </div>
@@ -152,20 +151,21 @@ export default function Pricing({ onBook }) {
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0d2c4c] text-xs text-white">02</span>
                   選擇導覽時間
                 </legend>
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                  {DURATIONS.map(minutes => (
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  {TOUR_DURATIONS.map(option => (
                     <button
-                      key={minutes}
+                      key={option.minutes}
                       type="button"
-                      onClick={() => setDuration(minutes)}
-                      className={`min-h-14 rounded-sm border px-2 py-3 text-sm sm:text-base font-medium transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-brick-500 ${
-                        duration === minutes
+                      onClick={() => setDuration(option.minutes)}
+                      className={`min-h-[72px] rounded-sm border px-2 py-3 font-medium transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-brick-500 ${
+                        duration === option.minutes
                           ? 'bg-[#0d2c4c] text-white border-[#0d2c4c] shadow-[0_6px_16px_rgba(13,44,76,0.18)]'
                           : 'border-ink-100 bg-white text-ink-600 hover:border-[#0d2c4c]/40 hover:bg-[#f5fafc]'
                       }`}
-                      aria-pressed={duration === minutes}
+                      aria-pressed={duration === option.minutes}
                     >
-                      {minutes} 分
+                      <span className="block font-display text-2xl leading-none">{option.minutes}</span>
+                      <span className="mt-1 block text-[11px] tracking-wider">分鐘 · {option.label}</span>
                     </button>
                   ))}
                 </div>

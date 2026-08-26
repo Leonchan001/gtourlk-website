@@ -1,20 +1,19 @@
 import { useMemo, useState } from 'react'
 import QRCode from 'react-qr-code'
 import { BUSINESS } from '../data/business'
+import { TOUR_DURATION_PROMPT } from '../data/tours'
 
 const BOOKING_STEPS = [
-  { no: '01', title: '日期與時間', body: '希望出發的日期、時間與導覽多久。' },
+  { no: '01', title: '日期與時間', body: '希望出發的日期、時間，以及 60／90／150 分鐘三選一。' },
   { no: '02', title: '同行人數', body: '提供總人數，系統會協助安排車輛。' },
   { no: '03', title: '景點與需求', body: '必去地點、上下車處與乘車需求。' },
 ]
 
 function formatMoney(amount) {
   if (!amount) return null
-  return new Intl.NumberFormat('zh-TW', {
-    style: 'currency',
-    currency: 'TWD',
+  return `NT$${new Intl.NumberFormat('zh-TW', {
     maximumFractionDigits: 0,
-  }).format(amount)
+  }).format(amount)}`
 }
 
 export default function Contact({ selectedPlan, clearPlan }) {
@@ -22,10 +21,13 @@ export default function Contact({ selectedPlan, clearPlan }) {
 
   const bookingText = useMemo(() => {
     const people = selectedPlan?.people ? `${selectedPlan.people} 人` : '（請填寫）'
-    const duration = selectedPlan?.duration || '（請填寫）'
+    const duration = selectedPlan?.duration || `${TOUR_DURATION_PROMPT} 分鐘（請擇一）`
     const vehicleLine = selectedPlan?.vehicles ? `\n預計車輛：${selectedPlan.vehicles} 台` : ''
     const priceLine = selectedPlan?.linePrice
       ? `\nLINE 預約參考價：${formatMoney(selectedPlan.linePrice)}`
+      : ''
+    const routeLine = selectedPlan?.stops?.length
+      ? `\n參考景點：${selectedPlan.stops.join('、')}`
       : ''
 
     return `您好，我想預約導鹿四輪導覽車：
@@ -36,10 +38,10 @@ export default function Contact({ selectedPlan, clearPlan }) {
 電話：
 人數：${people}
 導覽時長：${duration}${vehicleLine}
-參考安排：${selectedPlan?.title || '客製化導覽'}${priceLine}
+參考安排：${selectedPlan?.title || '客製化導覽'}${routeLine}${priceLine}
 上車地點：
 下車地點：
-必去景點或店家：
+必去景點或店家：（沒有想法可填「交給導覽員安排」）
 其他需求：
 
 麻煩協助確認時段與實際費用，謝謝。`
@@ -69,7 +71,7 @@ export default function Contact({ selectedPlan, clearPlan }) {
               <span className="font-display italic">隨你方便。</span>
             </h2>
             <p className="lead mt-6 max-w-xl">
-              全程採預約制。準備好日期、時間、人數與想去的景點，我們會協助完成安排；假日與連假建議提早三日聯繫。
+              全程採預約制。準備好日期、出發時間、人數，並從 60、90、150 分鐘選一種；有必去景點就一起告訴我們。假日與連假建議提早三日聯繫。
             </p>
           </div>
         </div>

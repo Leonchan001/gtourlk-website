@@ -6,8 +6,9 @@
   html {
     scroll-behavior: smooth;
   }
-  section[id] {
-    scroll-margin-top: 96px;
+  section[id],
+  #routes {
+    scroll-margin-top: 88px;
   }
   body {
     @apply font-sans text-ink-700 bg-paper-50 antialiased;
@@ -25,6 +26,13 @@
   /* 細緻的水平分隔線 — 編輯式風格 */
   hr {
     @apply border-ink-100;
+  }
+}
+
+@media (min-width: 768px) {
+  section[id],
+  #routes {
+    scroll-margin-top: 120px;
   }
 }
 

@@ -1,59 +1,6 @@
 import { useState } from 'react'
 import Pricing from './Pricing'
-
-const PLANS = [
-  {
-    no: '01',
-    title: '老街輕旅',
-    en: 'Lukang Old Street Tour',
-    duration: '60 分鐘',
-    photo: './photos/lukang-old-street-night.jpg',
-    photoAlt: '鹿港老街小巷夜景，紅燈籠串連紅磚老屋',
-    coverSub: 'Old Street',
-    tagline: '快速感受鹿港的氣味與光影。',
-    features: [
-      '天后宮 + 鹿港老街精華段',
-      '在地導覽員專業講解',
-      '節能電動四輪導覽車・每車 5 位旅客・多人可安排多車',
-      '停車資訊與導航協助',
-    ],
-  },
-  {
-    no: '02',
-    title: '深度文化',
-    en: 'Heritage Culture Tour',
-    duration: '90 分鐘',
-    featured: true,
-    photo: './photos/lukang-rooftops-aerial.jpg',
-    photoAlt: '鹿港老街紅瓦屋頂空拍俯瞰，旅客穿梭於九曲巷弄',
-    coverSub: 'Heritage',
-    tagline: '穿過摸乳巷、九曲巷，讀一座古鎮。',
-    features: [
-      '龍山寺・天后宮・桂花巷',
-      '摸乳巷、九曲巷典故詳解',
-      '米其林綠色指南推薦景點',
-      '在地小吃與伴手禮推薦',
-      '景點與停留時間皆可討論',
-    ],
-  },
-  {
-    no: '03',
-    title: '米其林綠色指南',
-    en: 'Michelin Green Guide Tour',
-    duration: '150 分鐘',
-    photo: './photos/lukang-koo-house.jpg',
-    photoAlt: '鹿港辜家大宅 — 巴洛克建築，米其林綠色指南推薦景點',
-    coverSub: 'Lukang ★★★',
-    tagline: '北鹿港、南鹿港，一次走完。',
-    features: [
-      '米其林綠色指南推薦景點全覽',
-      '北鹿港 + 南鹿港全方位',
-      '百年古蹟深度走讀',
-      '攝影最佳路線規劃',
-      '長者・親子友善・可收納折疊輪椅',
-    ],
-  },
-]
+import { TOUR_PLANS } from '../data/tours'
 
 const EXTRAS = [
   {
@@ -82,8 +29,8 @@ const VEHICLE_FACTS = [
 ]
 
 export default function Services({ setSelectedPlan }) {
-  const [activePlanIndex, setActivePlanIndex] = useState(1)
-  const activePlan = PLANS[activePlanIndex]
+  const [activePlanIndex, setActivePlanIndex] = useState(0)
+  const activePlan = TOUR_PLANS[activePlanIndex]
 
   function handleBook(plan) {
     setSelectedPlan(plan)
@@ -93,7 +40,7 @@ export default function Services({ setSelectedPlan }) {
   return (
     <section id="experience" className="py-20 md:py-32 bg-paper-50">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
+        <div className="grid md:grid-cols-12 gap-8 mb-12 md:mb-16">
           <div className="md:col-span-3">
             <div className="eyebrow mb-3">N°02 — Experiences</div>
             <div className="rule-thick w-12" />
@@ -111,26 +58,24 @@ export default function Services({ setSelectedPlan }) {
           </div>
         </div>
 
-        <Pricing onBook={handleBook} />
-
-        <div className="grid md:grid-cols-12 gap-8 mb-10 md:mb-12">
+        <div id="routes" className="grid scroll-mt-24 md:grid-cols-12 gap-8 mb-10 md:mb-12">
           <div className="md:col-span-3">
             <div className="eyebrow mb-3">Route Inspirations</div>
             <div className="rule-thick w-12" />
           </div>
           <div className="md:col-span-9 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
             <h3 className="font-serif text-3xl md:text-4xl text-ink-800 leading-tight">
-              沒有必去清單，<br />也能安心出發。
+              60、90、150 分鐘，<br />大約能看哪些景點？
             </h3>
             <p className="text-ink-500 leading-relaxed max-w-lg">
-              下方三種是時間與景點的安排靈感，不是固定套裝行程；你可以只選時間，再交給導覽員依現場狀況規劃。
+              下方是常見安排，讓你快速選擇時間；不是固定行程。你指定的景點會優先保留，其餘由導覽員依上下車地點、停留時間與當日路況安排。
             </p>
           </div>
         </div>
 
-        <div className="md:hidden mb-16">
+        <div className="md:hidden mb-8">
           <div className="grid grid-cols-3 gap-2 mb-4" role="tablist" aria-label="選擇參考路線時間">
-            {PLANS.map((plan, index) => (
+            {TOUR_PLANS.map((plan, index) => (
               <button
                 key={plan.no}
                 type="button"
@@ -145,7 +90,7 @@ export default function Services({ setSelectedPlan }) {
                 }`}
               >
                 <span className="block font-display text-xl leading-none">{plan.duration.replace(' 分鐘', '')}</span>
-                <span className="block mt-1 text-[10px] tracking-wider">分鐘</span>
+                <span className="block mt-1 text-[10px] tracking-wider">分鐘 · {plan.durationLabel}</span>
               </button>
             ))}
           </div>
@@ -174,14 +119,17 @@ export default function Services({ setSelectedPlan }) {
             </button>
 
             <div className="p-5">
-              <div className="mb-5 grid gap-2 text-sm text-ink-600">
-                {activePlan.features.slice(0, 3).map((feature, index) => (
-                  <div key={index} className="flex gap-3">
-                    <span className="text-brick-500">—</span>
-                    <span>{feature}</span>
-                  </div>
+              <div className="mb-2 font-mono text-[10px] tracking-widest uppercase text-brick-600">參考景點</div>
+              <div className="mb-5 flex flex-wrap gap-2" aria-label={`${activePlan.duration}參考景點`}>
+                {activePlan.stops.map(stop => (
+                  <span key={stop} className="border border-ink-100 bg-paper-50 px-3 py-2 text-sm text-ink-700">
+                    {stop}
+                  </span>
                 ))}
               </div>
+              <p className="mb-5 border-l-2 border-brick-400 pl-3 text-sm leading-relaxed text-ink-500">
+                適合：{activePlan.fit}
+              </p>
               <button
                 type="button"
                 onClick={() => handleBook(activePlan)}
@@ -190,13 +138,13 @@ export default function Services({ setSelectedPlan }) {
                 用 {activePlan.duration} 開始安排
                 <span aria-hidden="true">→</span>
               </button>
-              <p className="mt-3 text-center text-xs text-ink-400">這只是安排靈感，景點與停留時間都能調整</p>
+              <p className="mt-3 text-center text-xs leading-relaxed text-ink-400">參考景點不代表全部走完；實際內容會依你的需求與停留時間調整</p>
             </div>
           </article>
         </div>
 
-        <div className="hidden md:grid md:grid-cols-3 gap-x-6 gap-y-12 mb-24">
-          {PLANS.map(p => (
+        <div className="hidden md:grid md:grid-cols-3 gap-x-6 gap-y-12 mb-8">
+          {TOUR_PLANS.map(p => (
             <article key={p.no} className="group flex flex-col">
               <a
                 href="#contact"
@@ -253,14 +201,17 @@ export default function Services({ setSelectedPlan }) {
 
               <p className="font-display italic text-ink-500 mb-5">{p.tagline}</p>
 
-              <ul className="space-y-2.5 mb-6 text-sm text-ink-600">
-                {p.features.map((f, j) => (
-                  <li key={j} className="flex gap-3">
-                    <span className="text-brick-500 mt-1">—</span>
-                    <span>{f}</span>
+              <div className="mb-3 font-mono text-[10px] tracking-widest uppercase text-brick-600">參考景點</div>
+              <ul className="flex flex-wrap gap-2 mb-5 text-sm text-ink-700" aria-label={`${p.duration}參考景點`}>
+                {p.stops.map(stop => (
+                  <li key={stop} className="border border-ink-100 bg-white px-3 py-2">
+                    {stop}
                   </li>
                 ))}
               </ul>
+              <p className="mb-6 border-l-2 border-brick-400 pl-3 text-sm leading-relaxed text-ink-500">
+                適合：{p.fit}
+              </p>
 
               <div className="mt-auto pt-5 border-t border-ink-100 flex items-end justify-between">
                 <div>
@@ -285,6 +236,13 @@ export default function Services({ setSelectedPlan }) {
             </article>
           ))}
         </div>
+
+        <div className="mb-24 border border-[#d9c5b7] bg-[#fffaf5] px-5 py-4 text-sm leading-relaxed text-ink-600 md:px-7 md:py-5">
+          <strong className="text-ink-800">這些是參考，不是固定行程。</strong>
+          <span> 實際能安排的景點數量，會受上下車位置、購物、排隊、拍照與各景點停留時間影響；預約時告訴我們必去地點即可。</span>
+        </div>
+
+        <Pricing onBook={handleBook} />
 
         {/* 車輛資訊 */}
         <div className="border-y border-ink-200 py-10 md:py-12 mb-16 md:mb-20">

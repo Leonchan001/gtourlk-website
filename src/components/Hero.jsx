@@ -11,7 +11,7 @@ export default function Hero() {
         alt="導鹿 GtourLK 電動四輪導覽車停靠於鹿港桂花巷藝術村入口"
         className="absolute inset-0 w-full h-full object-cover object-center"
         loading="eager"
-        fetchPriority="high"
+        fetchpriority="high"
         decoding="sync"
         width="2048"
         height="1536"
@@ -60,8 +60,8 @@ export default function Hero() {
               立即預約導覽
               <Arrow />
             </a>
-            <a href="#experience" className="text-paper-50 text-sm tracking-wider hover:text-paper-200 inline-flex items-center gap-2 px-2 py-3.5 border-b border-paper-50/40">
-              查看參考路線
+            <a href="#routes" className="text-paper-50 text-sm tracking-wider hover:text-paper-200 inline-flex items-center gap-2 px-2 py-3.5 border-b border-paper-50/40">
+              查看 60・90・150 分鐘景點
               <Arrow light />
             </a>
           </div>
@@ -70,7 +70,7 @@ export default function Hero() {
         {/* 底部資訊條 — 信任元素 */}
         <div className="hero-facts mt-10 md:mt-14 pt-6 md:pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-6 md:gap-6 max-w-4xl">
           <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={`／${BUSINESS.reviewCount} 則五星評論`} href={BUSINESS.googleReviewsUrl} />
-          <Fact eyebrow="Flexible" big="60—150" small="分鐘・可依需求安排" />
+          <Fact eyebrow="Duration" big="3 種" small="60／90／150 分鐘" />
           <Fact eyebrow="Vehicle" big="4W EV" small="四輪電動導覽車・每車 5 人" />
           <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
         </div>
