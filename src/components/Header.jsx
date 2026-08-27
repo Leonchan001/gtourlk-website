@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react'
 import logoImg from '/gtourlk-logo-header.png'
 import { BUSINESS } from '../data/business'
-
-const NAV = [
-  { href: '#routes', label: '時間與景點', en: 'Experiences' },
-  { href: '#reviews',    label: '旅人評價', en: 'Reviews' },
-  { href: '#about',      label: '關於我們', en: 'About' },
-  { href: '#faq',        label: '常見問題', en: 'FAQ' },
-  { href: '#contact',    label: '預約聯絡', en: 'Contact' },
-]
+import LanguageSwitcher from './LanguageSwitcher'
+import { useLanguage } from '../i18n'
 
 export default function Header() {
+  const { copy } = useLanguage()
+  const { header } = copy
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -32,14 +28,14 @@ export default function Header() {
   return (
     <header className="fixed top-0 inset-x-0 z-40">
       {/* 上方細線資訊條 — 三隻電話 */}
-      <div className={`hidden md:block border-b transition-colors duration-300 ${
+      <div className={`hidden lg:block border-b transition-colors duration-300 ${
         scrolled ? 'bg-paper-50 border-ink-100' : 'bg-ink-800/40 backdrop-blur-sm border-white/10'
       }`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-2 text-[12px]">
           <div className={`flex items-center gap-5 ${scrolled ? 'text-ink-400' : 'text-paper-100/80'}`}>
             <span className="font-mono tracking-widest uppercase">Lukang · Changhua · Taiwan</span>
             <span className={`h-3 w-px ${scrolled ? 'bg-ink-200' : 'bg-paper-100/30'}`} />
-            <span>全程預約制・沒有固定發車班次</span>
+            <span>{header.reservationNote}</span>
           </div>
           <div className={`flex items-center gap-4 ${scrolled ? 'text-ink-500' : 'text-paper-100/90'}`}>
             {BUSINESS.phones.map((p, i) => (
@@ -51,7 +47,7 @@ export default function Header() {
                 }`}
               >
                 <span className="font-mono tracking-wider">{p.display}</span>
-                <span className="text-[10px] opacity-60">{p.label}</span>
+                <span className="text-[10px] opacity-60">{header.phoneLabels[i]}</span>
               </a>
             ))}
           </div>
@@ -65,16 +61,16 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-4">
           {/* Logo 區 */}
           <a href="#top" className="flex items-center gap-3">
-            <img src={logoImg} alt="導鹿 GtourLK" width="40" height="40" className="h-10 w-auto" />
+            <img src={logoImg} alt={header.logoAlt} width="40" height="40" className="h-10 w-auto" />
             <div className={`leading-tight ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}>
               <div className="font-display text-lg tracking-wide">GtourLK</div>
-              <div className="font-serif text-[11px] tracking-[0.2em] opacity-70">導 · 鹿</div>
+              <div lang="zh-Hant" className="font-serif text-[11px] tracking-[0.2em] opacity-70">導 · 鹿</div>
             </div>
           </a>
 
           {/* 桌機導航 */}
-          <nav className="hidden md:flex items-center gap-9">
-            {NAV.map(item => (
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
+            {header.nav.map(item => (
               <a
                 key={item.href}
                 href={item.href}
@@ -85,6 +81,7 @@ export default function Header() {
                 <span>{item.label}</span>
               </a>
             ))}
+            <LanguageSwitcher light={!scrolled} />
             <a
               href="#contact"
               className={`text-sm font-medium tracking-wider px-5 py-2.5 transition-colors ${
@@ -93,15 +90,15 @@ export default function Header() {
                   : 'border border-paper-50 text-paper-50 hover:bg-paper-50 hover:text-ink-800'
               }`}
             >
-              立即預約
+              {header.bookNow}
             </a>
           </nav>
 
           {/* 手機選單按鈕 */}
           <button
-            className={`md:hidden p-2 -mr-2 ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}
+            className={`lg:hidden p-2 -mr-2 ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="選單"
+            aria-label={menuOpen ? header.closeMenu : header.menu}
             aria-expanded={menuOpen}
             aria-controls="mobile-navigation"
           >
@@ -115,9 +112,13 @@ export default function Header() {
 
       {/* 手機選單 */}
       {menuOpen && (
-        <div id="mobile-navigation" className="md:hidden bg-paper-50 border-b border-ink-100">
+        <div id="mobile-navigation" className="lg:hidden max-h-[calc(100svh-72px)] overflow-y-auto bg-paper-50 border-b border-ink-100">
           <div className="px-6 py-6 flex flex-col">
-            {NAV.map((item, i) => (
+            <div className="flex items-center justify-between border-b border-ink-100 pb-4">
+              <span className="text-sm text-ink-400">{copy.languageSwitcher}</span>
+              <LanguageSwitcher compact />
+            </div>
+            {header.nav.map((item, i) => (
               <a
                 key={item.href}
                 href={item.href}
@@ -126,7 +127,7 @@ export default function Header() {
               >
                 <span className="text-ink-800 text-base">{item.label}</span>
                 <span className="font-mono text-[10px] tracking-widest uppercase text-ink-300">
-                  0{i + 1} · {item.en}
+                  0{i + 1} · {item.eyebrow}
                 </span>
               </a>
             ))}
@@ -135,7 +136,7 @@ export default function Header() {
               {BUSINESS.phones.map(p => (
                 <a key={p.tel} href={`tel:${p.tel}`}
                   className="flex items-center justify-between py-2 text-ink-600">
-                  <span className="text-[11px] uppercase tracking-widest text-ink-400">{p.label}</span>
+                  <span className="text-[11px] uppercase tracking-widest text-ink-400">{header.phoneLabels[BUSINESS.phones.indexOf(p)]}</span>
                   <span className="font-mono">{p.display}</span>
                 </a>
               ))}
@@ -146,7 +147,7 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
               className="btn-primary mt-6 w-full"
             >
-              立即預約導覽
+              {header.bookTour}
             </a>
           </div>
         </div>

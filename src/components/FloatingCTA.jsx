@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react'
 import { BUSINESS } from '../data/business'
+import { useLanguage } from '../i18n'
 
 export default function FloatingCTA() {
+  const { lang } = useLanguage()
+  const bookingLabel = lang === 'en' ? 'Book on LINE' : 'LINE 預約'
+  const callLabel = lang === 'en'
+    ? `Call ${BUSINESS.phones[0].display}`
+    : `撥打 ${BUSINESS.phones[0].display}`
   const [show, setShow] = useState(false)
   const [nearContact, setNearContact] = useState(false)
 
@@ -31,14 +37,14 @@ export default function FloatingCTA() {
         className="md:hidden fixed bottom-4 right-4 z-50 inline-flex min-h-12 items-center gap-3 rounded-full bg-brick-500 px-5 py-3 text-paper-50 shadow-xl"
       >
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-paper-50 text-xs font-bold text-brick-600">L</span>
-        <span className="text-sm font-medium tracking-wider">LINE 預約</span>
+        <span className="text-sm font-medium tracking-wider">{bookingLabel}</span>
         <span aria-hidden="true">→</span>
       </a>
 
       <div className="hidden md:flex fixed bottom-6 right-6 z-50 items-center gap-2">
         <a
           href={`tel:${BUSINESS.phones[0].tel}`}
-          aria-label={`撥打 ${BUSINESS.phones[0].display}`}
+          aria-label={callLabel}
           className="w-12 h-12 bg-paper-50 border border-ink-200 hover:border-brick-500 text-ink-700 hover:text-brick-500 shadow-lg transition-colors flex items-center justify-center"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -51,7 +57,7 @@ export default function FloatingCTA() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-3 bg-ink-800 hover:bg-ink-900 text-paper-50 pl-5 pr-4 py-3 shadow-lg transition-colors"
         >
-          <span className="text-sm tracking-wider">LINE 預約</span>
+          <span className="text-sm tracking-wider">{bookingLabel}</span>
           <span className="font-mono text-[10px] tracking-widest text-paper-200/70 uppercase">{BUSINESS.lineId}</span>
         </a>
       </div>

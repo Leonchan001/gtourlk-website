@@ -1,17 +1,20 @@
 import { BUSINESS } from '../data/business'
+import { useLanguage } from '../i18n'
 
-const HERO_PHOTO = './hero-main.jpg'
+const HERO_PHOTO = '/hero-main.jpg'
 
 export default function Hero() {
+  const { copy, isEnglish } = useLanguage()
+  const { hero } = copy
   return (
     <section id="top" className="relative min-h-[100svh] w-full overflow-hidden bg-ink-800 md:h-[100svh] md:min-h-[640px]">
       {/* 主視覺照片 */}
       <img
         src={HERO_PHOTO}
-        alt="導鹿 GtourLK 電動四輪導覽車停靠於鹿港桂花巷藝術村入口"
+        alt={hero.imageAlt}
         className="absolute inset-0 w-full h-full object-cover object-center"
         loading="eager"
-        fetchpriority="high"
+        fetchPriority="high"
         decoding="sync"
         width="2048"
         height="1536"
@@ -32,36 +35,35 @@ export default function Hero() {
             </span>
             <span className="h-px w-10 md:w-16 bg-brick-300/70" />
             <span className="font-mono text-[10px] md:text-[11px] tracking-[0.28em] uppercase text-paper-200/80">
-              Lukang Heritage Tour
+              {hero.eyebrow}
             </span>
           </div>
 
           {/* 主標題 — 大字襯線，字級調整避免在大螢幕擠壓內容 */}
           <h1 className="hero-headline font-serif text-paper-50 text-[36px] sm:text-[48px] md:text-[58px] lg:text-[68px] leading-[1.08] mb-2 drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)]">
-            穿過巷弄，<br className="md:hidden" />
-            走進鹿港的<br />
-            <span className="font-display italic text-paper-100">百年時間</span>
+            {hero.line1}<br className="md:hidden" />{isEnglish ? ' ' : null}
+            {hero.line2}<br />
+            <span className="font-display italic text-paper-100">{hero.accent}</span>
           </h1>
 
           {/* 副標 */}
           <p className="hero-description text-paper-100/90 text-[15px] md:text-lg max-w-xl leading-relaxed mt-5 md:mt-8 mb-7 md:mb-10 drop-shadow-[0_1px_12px_rgba(0,0,0,0.4)]">
-            搭乘節能電動四輪導覽車，由同車的在地導覽員兼任司機，
-            依你想去的景點安排一場專屬的鹿港深度散策。
+            {hero.description}
           </p>
 
           <div className="hero-reservation mb-6 md:mb-7 -mt-2 md:-mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 border border-paper-50/35 bg-ink-900/35 px-4 py-2 text-paper-50 backdrop-blur-sm">
             <span className="font-mono text-[10px] tracking-widest uppercase text-brick-300">By Reservation</span>
-            <span className="text-sm">全程預約制・沒有固定班次・依約定時間出發</span>
+            <span className="text-sm">{hero.reservation}</span>
           </div>
 
           {/* CTA */}
           <div className="flex flex-wrap items-center gap-4">
             <a href="#contact" className="btn-light">
-              立即預約導覽
+              {hero.primaryCta}
               <Arrow />
             </a>
             <a href="#routes" className="text-paper-50 text-sm tracking-wider hover:text-paper-200 inline-flex items-center gap-2 px-2 py-3.5 border-b border-paper-50/40">
-              查看 60・90・150 分鐘景點
+              {hero.secondaryCta}
               <Arrow light />
             </a>
           </div>
@@ -69,10 +71,10 @@ export default function Hero() {
 
         {/* 底部資訊條 — 信任元素 */}
         <div className="hero-facts mt-10 md:mt-14 pt-6 md:pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-6 md:gap-6 max-w-4xl">
-          <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={`／${BUSINESS.reviewCount} 則五星評論`} href={BUSINESS.googleReviewsUrl} />
-          <Fact eyebrow="Duration" big="3 種" small="60／90／150 分鐘" />
-          <Fact eyebrow="Vehicle" big="4W EV" small="四輪電動導覽車・每車 5 人" />
-          <Fact eyebrow="Since" big="2024.11" small="鹿港在地經營" />
+          <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={hero.facts.reviews(BUSINESS.reviewCount)} href={BUSINESS.googleReviewsUrl} ariaLabel={hero.reviewsAria(BUSINESS.reviewCount)} />
+          <Fact eyebrow="Duration" big={hero.facts.durationBig} small={hero.facts.durationSmall} />
+          <Fact eyebrow="Vehicle" big="4W EV" small={hero.facts.vehicleSmall} />
+          <Fact eyebrow="Since" big="2024.11" small={hero.facts.sinceSmall} />
         </div>
       </div>
 
@@ -80,7 +82,7 @@ export default function Hero() {
   )
 }
 
-function Fact({ eyebrow, big, small, href }) {
+function Fact({ eyebrow, big, small, href, ariaLabel }) {
   const content = (
     <div>
       <div className="font-mono text-[10px] tracking-widest uppercase text-paper-200/60 mb-2">
@@ -100,7 +102,7 @@ function Fact({ eyebrow, big, small, href }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`查看導鹿的 ${BUSINESS.reviewCount} 則 Google 評論`}
+      aria-label={ariaLabel}
       className="block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-paper-50 hover:opacity-80 transition-opacity"
     >
       {content}

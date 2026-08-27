@@ -1,7 +1,26 @@
 // 頁尾 — 編輯式低調風
 import { BUSINESS } from '../data/business'
+import { useLanguage } from '../i18n'
+
+const FOOTER_COPY = {
+  zh: {
+    brand: '鹿港在地的電動觀光導覽品牌，帶你走訪米其林綠色指南推薦景點。一群熱愛鹿港的解說員，用行動讀寫這座古鎮。',
+    address: '彰化縣鹿港鎮永寧街 236 號',
+    hours: '預約制・彈性安排出發時間',
+    copyright: year => `© ${year} 導鹿 GtourLK　·　鹿港四輪電動車觀光導覽　·　All rights reserved.`,
+  },
+  en: {
+    brand: 'A locally rooted electric sightseeing brand in Lukang, bringing you to Michelin Green Guide–recommended attractions with guides who love this old town and bring its stories to life.',
+    address: 'No. 236, Yongning St., Lukang Township, Changhua County, Taiwan',
+    hours: 'By reservation · flexible departure times by arrangement',
+    copyright: year => `© ${year} GtourLK · Electric four-wheel sightseeing tours in Lukang · All rights reserved.`,
+  },
+}
 
 export default function Footer() {
+  const { lang, copy: siteCopy } = useLanguage()
+  const copy = FOOTER_COPY[lang]
+
   return (
     <footer className="bg-ink-900 text-paper-100/70">
       <div className="max-w-7xl mx-auto px-6 pt-14 md:pt-20 pb-8 md:pb-10">
@@ -12,13 +31,11 @@ export default function Footer() {
             <div className="font-display text-3xl text-paper-50 tracking-wide mb-1">
               GtourLK
             </div>
-            <div className="font-serif text-sm tracking-[0.25em] text-paper-200 mb-4 md:mb-6">
+            <div lang="zh-Hant" className="font-serif text-sm tracking-[0.25em] text-paper-200 mb-4 md:mb-6">
               導 · 鹿
             </div>
             <p className="text-sm leading-relaxed max-w-md">
-              鹿港在地的電動觀光導覽品牌，
-              帶你走訪米其林綠色指南推薦景點。
-              一群熱愛鹿港的解說員，用行動讀寫這座古鎮。
+              {copy.brand}
             </p>
             <div className="mt-6 md:mt-8 flex flex-wrap items-center gap-4">
               {[
@@ -38,16 +55,10 @@ export default function Footer() {
           <div className="md:col-span-3">
             <h4 className="eyebrow-light mb-5">Sitemap</h4>
             <ul className="grid grid-cols-2 gap-y-3 md:block md:space-y-3">
-              {[
-                ['#routes', '時間與景點'],
-                ['#reviews',    '旅人評價'],
-                ['#about',      '關於我們'],
-                ['#faq',        '常見問題'],
-                ['#contact',    '預約聯絡'],
-              ].map(([href, label]) => (
-                <li key={href}>
-                  <a href={href} className="text-sm hover:text-paper-50 transition-colors">
-                    {label}
+              {siteCopy.header.nav.map(item => (
+                <li key={item.href}>
+                  <a href={item.href} className="text-sm hover:text-paper-50 transition-colors">
+                    {item.label}
                   </a>
                 </li>
               ))}
@@ -58,16 +69,16 @@ export default function Footer() {
           <div className="md:col-span-4">
             <h4 className="eyebrow-light mb-5">Contact</h4>
             <ul className="space-y-3 text-sm">
-              <li className="text-paper-100/70">彰化縣鹿港鎮永寧街 236 號</li>
-              <li className="text-paper-100/70">預約制・彈性安排出發時間</li>
+              <li className="text-paper-100/70">{copy.address}</li>
+              <li className="text-paper-100/70">{copy.hours}</li>
               <li className="text-paper-100/70">LINE 　@lk167</li>
             </ul>
 
             <div className="mt-4 md:mt-5 pt-4 md:pt-5 border-t border-paper-100/10 space-y-2">
-              {BUSINESS.phones.map(p => (
+              {BUSINESS.phones.map((p, index) => (
                 <a key={p.tel} href={`tel:${p.tel}`}
                   className="flex items-center justify-between text-sm hover:text-paper-50 transition-colors">
-                  <span className="text-paper-100/50 text-[11px] uppercase tracking-widest">{p.label}</span>
+                  <span className="text-paper-100/50 text-[11px] uppercase tracking-widest">{siteCopy.header.phoneLabels[index]}</span>
                   <span className="font-mono">{p.display}</span>
                 </a>
               ))}
@@ -78,7 +89,7 @@ export default function Footer() {
         {/* 版權列 */}
         <div className="mt-8 md:mt-10 flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 text-[11px] tracking-wider">
           <div className="text-paper-100/40">
-            © {new Date().getFullYear()} 導鹿 GtourLK　·　鹿港四輪電動車觀光導覽　·　All rights reserved.
+            {copy.copyright(new Date().getFullYear())}
           </div>
           <div className="text-paper-100/30 font-mono uppercase">
             Lukang · Changhua · Taiwan

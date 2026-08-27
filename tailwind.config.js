@@ -45,7 +45,7 @@ export default {
         // 中文標題 — 思源宋體
         serif: ['"Noto Serif TC"', 'Georgia', 'serif'],
         // 中文內文 — 思源黑體
-        sans: ['"Noto Sans TC"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Inter"', '"Noto Sans TC"', 'system-ui', '-apple-system', 'sans-serif'],
         // 英文 / 數字標題 — 古典襯線
         display: ['"Cormorant Garamond"', '"Noto Serif TC"', 'serif'],
         // 標籤 / 編號 — 等寬無襯線，用於 01 / 02 編號
