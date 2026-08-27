@@ -1,5 +1,6 @@
 import { BUSINESS } from '../data/business'
 import { useLanguage } from '../i18n'
+import LanguageSwitcher from './LanguageSwitcher'
 
 const HERO_PHOTO = '/hero-main.jpg'
 
@@ -27,6 +28,10 @@ export default function Hero() {
 
       {/* 內容 — 預留固定 header 高度 (~95px)，避免標題被頂到 nav 後面 */}
       <div className="hero-content relative min-h-[100svh] max-w-7xl mx-auto px-6 flex flex-col pt-24 pb-12 md:h-full md:min-h-0 md:justify-end md:pt-36 md:pb-24">
+        <div className="hero-language mb-6 self-start md:absolute md:right-6 md:top-24 md:mb-0 lg:top-32">
+          <LanguageSwitcher prominent />
+        </div>
+
         <div className="max-w-3xl">
           {/* 編號 + 副標 */}
           <div className="hero-kicker flex items-center gap-4 mb-4 md:mb-6">
