@@ -96,7 +96,7 @@ export default function Pricing({ onBook }) {
   const copy = PRICING_COPY[lang]
   const tourDurations = getTourDurations(lang)
   const [people, setPeople] = useState(2)
-  const [duration, setDuration] = useState(60)
+  const [duration, setDuration] = useState(90)
 
   const estimate = useMemo(() => {
     const hours = duration / 60
