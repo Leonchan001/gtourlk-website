@@ -98,7 +98,7 @@ export default function Services({ setSelectedPlan }) {
   const { lang } = useLanguage()
   const copy = SERVICES_COPY[lang]
   const tourPlans = getTourPlans(lang)
-  const [activePlanIndex, setActivePlanIndex] = useState(0)
+  const [activePlanIndex, setActivePlanIndex] = useState(1)
   const activePlan = tourPlans[activePlanIndex]
 
   function handleBook(plan) {
