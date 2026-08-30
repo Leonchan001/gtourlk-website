@@ -8,6 +8,7 @@ import FAQ from './components/FAQ'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import FloatingCTA from './components/FloatingCTA'
+import CampaignSpotlight, { CampaignNotice } from './components/CampaignSpotlight'
 
 export default function App() {
   const [selectedPlan, setSelectedPlan] = useState(null)
@@ -38,7 +39,9 @@ export default function App() {
       <Header />
       <main>
         <Hero />
+        <CampaignNotice />
         <Services setSelectedPlan={setSelectedPlan} />
+        <CampaignSpotlight />
         <SocialProof />
         <About />
         <FAQ />
