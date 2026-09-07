@@ -1,54 +1,112 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Header from './components/Header'
 import Hero from './components/Hero'
-import Services from './components/Services'
+import BrandStatement from './components/BrandStatement'
+import RouteExplorer from './components/RouteExplorer'
+import ExperienceStory from './components/ExperienceStory'
 import SocialProof from './components/SocialProof'
+import Pricing from './components/Pricing'
 import About from './components/About'
-import FAQ from './components/FAQ'
 import Contact from './components/Contact'
+import FAQ from './components/FAQ'
 import Footer from './components/Footer'
 import FloatingCTA from './components/FloatingCTA'
-import CampaignSpotlight, { CampaignNotice } from './components/CampaignSpotlight'
+import CampaignSpotlight from './components/CampaignSpotlight'
+import { INITIAL_TRIP, getSights } from './data/booking'
+import { useLanguage } from './i18n'
+
+function readSavedTrip() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('gtourlk.trip') || 'null')
+    if (!saved || typeof saved !== 'object') return INITIAL_TRIP
+    const known = getSights('zh').map((sight) => sight.id)
+    const text = (value, max) =>
+      typeof value === 'string' ? value.slice(0, max) : ''
+    return {
+      ...INITIAL_TRIP,
+      date: /^\d{4}-\d{2}-\d{2}$/.test(saved.date) ? saved.date : '',
+      departure: /^\d{2}:\d{2}$/.test(saved.departure) ? saved.departure : '',
+      people:
+        Number.isInteger(saved.people) &&
+        saved.people >= 1 &&
+        saved.people <= 50
+          ? saved.people
+          : 2,
+      minutes: [60, 90, 150].includes(saved.minutes) ? saved.minutes : 90,
+      stops: Array.isArray(saved.stops)
+        ? saved.stops.filter((id) => known.includes(id))
+        : [],
+      guideChoice: saved.guideChoice !== false,
+      pickup: text(saved.pickup, 200),
+      notes: text(saved.notes, 1000),
+    }
+  } catch {
+    return INITIAL_TRIP
+  }
+}
 
 export default function App() {
-  const [selectedPlan, setSelectedPlan] = useState(null)
-
+  const { lang } = useLanguage()
+  // Match the static HTML first; restore this tab's draft after hydration.
+  const [trip, setTrip] = useState(INITIAL_TRIP)
+  const [draftReady, setDraftReady] = useState(false)
   useEffect(() => {
-    function scrollToHash() {
-      const id = decodeURIComponent(window.location.hash.slice(1))
-      if (!id) return
-
-      window.requestAnimationFrame(() => {
-        document.getElementById(id)?.scrollIntoView({ block: 'start' })
-      })
-    }
-
-    scrollToHash()
-    const retry = window.setTimeout(scrollToHash, 800)
-    window.addEventListener('load', scrollToHash)
-    window.addEventListener('hashchange', scrollToHash)
-    return () => {
-      window.clearTimeout(retry)
-      window.removeEventListener('load', scrollToHash)
-      window.removeEventListener('hashchange', scrollToHash)
-    }
+    setTrip(readSavedTrip())
+    setDraftReady(true)
   }, [])
-
+  useEffect(() => {
+    if (!draftReady) return
+    try {
+      sessionStorage.setItem('gtourlk.trip', JSON.stringify(trip))
+    } catch {
+      /* The form still works without browser storage. */
+    }
+  }, [trip, draftReady])
+  const updateTrip = useCallback(
+    (update) => setTrip((previous) => ({ ...previous, ...update })),
+    [],
+  )
+  const onPlan = () => {
+    document.getElementById('contact')?.scrollIntoView({ block: 'start' })
+    document.getElementById('booking-title')?.focus({ preventScroll: true })
+  }
+  useEffect(() => {
+    const scrollToHash = () => {
+      let id
+      try {
+        id = decodeURIComponent(window.location.hash.slice(1))
+      } catch {
+        return
+      }
+      if (id)
+        requestAnimationFrame(() =>
+          document.getElementById(id)?.scrollIntoView({ block: 'start' }),
+        )
+    }
+    scrollToHash()
+    window.addEventListener('hashchange', scrollToHash)
+    return () => window.removeEventListener('hashchange', scrollToHash)
+  }, [])
   return (
-    <div className="min-h-screen bg-paper-50 text-ink-700">
+    <>
+      <a className="skip-link" href="#main-content">
+        {lang === 'zh' ? '跳到主要內容' : 'Skip to content'}
+      </a>
       <Header />
-      <main>
+      <main id="main-content" tabIndex="-1">
         <Hero />
-        <CampaignNotice />
-        <Services setSelectedPlan={setSelectedPlan} />
         <CampaignSpotlight />
+        <BrandStatement />
+        <RouteExplorer trip={trip} updateTrip={updateTrip} onPlan={onPlan} />
+        <ExperienceStory />
         <SocialProof />
+        <Pricing trip={trip} updateTrip={updateTrip} onBook={onPlan} />
         <About />
+        <Contact trip={trip} updateTrip={updateTrip} />
         <FAQ />
-        <Contact selectedPlan={selectedPlan} clearPlan={() => setSelectedPlan(null)} />
       </main>
       <Footer />
       <FloatingCTA />
-    </div>
+    </>
   )
 }

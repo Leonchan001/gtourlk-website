@@ -1,125 +1,50 @@
 import { BUSINESS } from '../data/business'
+import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
-import LanguageSwitcher from './LanguageSwitcher'
-
-const HERO_PHOTO = '/hero-main.jpg'
-
+import Photo from './Photo'
 export default function Hero() {
-  const { copy, isEnglish } = useLanguage()
-  const { hero } = copy
+  const { lang } = useLanguage()
+  const copy = EXPERIENCE_COPY[lang].hero
   return (
-    <section id="top" className="relative min-h-[100svh] w-full overflow-hidden bg-ink-800 md:h-[100svh] md:min-h-[640px]">
-      {/* 主視覺照片 */}
-      <img
-        src={HERO_PHOTO}
-        alt={hero.imageAlt}
-        className="absolute inset-0 w-full h-full object-cover object-center"
-        loading="eager"
-        fetchPriority="high"
-        decoding="sync"
-        width="2048"
-        height="1536"
-      />
-
-      {/* 漸層遮罩 — 雙層強化，確保字體在任何背景上皆清晰 */}
-      <div className="absolute inset-0 bg-gradient-to-t from-ink-900/95 via-ink-900/60 to-ink-900/15" />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink-900/75 via-ink-900/20 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ink-900/70 to-transparent" />
-
-      {/* 內容 — 預留固定 header 高度 (~95px)，避免標題被頂到 nav 後面 */}
-      <div className="hero-content relative min-h-[100svh] max-w-7xl mx-auto px-6 flex flex-col pt-24 pb-12 md:h-full md:min-h-0 md:justify-end md:pt-36 md:pb-24">
-        <div className="hero-language mb-6 self-start md:absolute md:right-6 md:top-24 md:mb-0 lg:top-32">
-          <LanguageSwitcher prominent />
-        </div>
-
-        <div className="max-w-3xl">
-          {/* 編號 + 副標 */}
-          <div className="hero-kicker flex items-center gap-4 mb-4 md:mb-6">
-            <span className="font-mono text-[10px] md:text-[11px] tracking-[0.28em] uppercase text-brick-300">
-              N°01
+    <section id="top" className="hero" aria-labelledby="hero-title">
+      <div className="hero-copy">
+        <p className="eyebrow">{copy.kicker}</p>
+        <h1 id="hero-title">
+          {copy.lines.map((line, index) => (
+            <span className={index === 2 ? 'hero-accent' : ''} key={line}>
+              {line}
             </span>
-            <span className="h-px w-10 md:w-16 bg-brick-300/70" />
-            <span className="font-mono text-[10px] md:text-[11px] tracking-[0.28em] uppercase text-paper-200/80">
-              {hero.eyebrow}
-            </span>
-          </div>
-
-          {/* 主標題 — 大字襯線，字級調整避免在大螢幕擠壓內容 */}
-          <h1 className="hero-headline font-serif text-paper-50 text-[36px] sm:text-[48px] md:text-[58px] lg:text-[68px] leading-[1.08] mb-2 drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)]">
-            {hero.line1}<br className="md:hidden" />{isEnglish ? ' ' : null}
-            {hero.line2}<br />
-            <span className="font-display italic text-paper-100">{hero.accent}</span>
-          </h1>
-
-          {/* 副標 */}
-          <p className="hero-description text-paper-100/90 text-[15px] md:text-lg max-w-xl leading-relaxed mt-5 md:mt-8 mb-7 md:mb-10 drop-shadow-[0_1px_12px_rgba(0,0,0,0.4)]">
-            {hero.description}
-          </p>
-
-          <div className="hero-reservation mb-6 md:mb-7 -mt-2 md:-mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 border border-paper-50/35 bg-ink-900/35 px-4 py-2 text-paper-50 backdrop-blur-sm">
-            <span className="font-mono text-[10px] tracking-widest uppercase text-brick-300">By Reservation</span>
-            <span className="text-sm">{hero.reservation}</span>
-          </div>
-
-          {/* CTA */}
-          <div className="flex flex-wrap items-center gap-4">
-            <a href="#contact" className="btn-light">
-              {hero.primaryCta}
-              <Arrow />
-            </a>
-            <a href="#routes" className="text-paper-50 text-sm tracking-wider hover:text-paper-200 inline-flex items-center gap-2 px-2 py-3.5 border-b border-paper-50/40">
-              {hero.secondaryCta}
-              <Arrow light />
-            </a>
-          </div>
+          ))}
+        </h1>
+        <p className="hero-intro">{copy.intro}</p>
+        <div className="hero-actions">
+          <a href="#contact" className="button button-light">
+            {copy.book}
+            <span aria-hidden="true">↗</span>
+          </a>
+          <a href="#routes" className="hero-explore">
+            {copy.explore}
+            <span aria-hidden="true">↓</span>
+          </a>
         </div>
-
-        {/* 底部資訊條 — 信任元素 */}
-        <div className="hero-facts mt-10 md:mt-14 pt-6 md:pt-8 border-t border-paper-50/15 grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-6 md:gap-6 max-w-4xl">
-          <Fact eyebrow="Google" big={BUSINESS.reviewRating} small={hero.facts.reviews(BUSINESS.reviewCount)} href={BUSINESS.googleReviewsUrl} ariaLabel={hero.reviewsAria(BUSINESS.reviewCount)} />
-          <Fact eyebrow="Duration" big={hero.facts.durationBig} small={hero.facts.durationSmall} />
-          <Fact eyebrow="Vehicle" big="4W EV" small={hero.facts.vehicleSmall} />
-          <Fact eyebrow="Since" big="2024.11" small={hero.facts.sinceSmall} />
+        <p className="hero-reservation">{copy.note}</p>
+        <div className="hero-metadata">
+          <a href={BUSINESS.googleReviewsUrl} target="_blank" rel="noreferrer">
+            {BUSINESS.reviewRating} <span aria-hidden="true">★</span> Google /{' '}
+            {BUSINESS.reviewCount} reviews
+          </a>
+          <span>{copy.metadata}</span>
         </div>
       </div>
-
+      <figure className="hero-figure">
+        <Photo slot="hero" priority sizes="(min-width: 1024px) 58vw, 100vw" />
+        <figcaption>{copy.photo}</figcaption>
+        <span className="hero-location" aria-hidden="true">
+          LUKANG
+          <br />
+          <i>鹿港</i>
+        </span>
+      </figure>
     </section>
-  )
-}
-
-function Fact({ eyebrow, big, small, href, ariaLabel }) {
-  const content = (
-    <div>
-      <div className="font-mono text-[10px] tracking-widest uppercase text-paper-200/60 mb-2">
-        {eyebrow}
-      </div>
-      <div className="flex items-baseline gap-2">
-        <span className="font-display text-paper-50 text-2xl md:text-4xl leading-none">{big}</span>
-        <span className="text-paper-100/70 text-[11px] md:text-xs leading-snug">{small}</span>
-      </div>
-    </div>
-  )
-
-  if (!href) return content
-
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={ariaLabel}
-      className="block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-paper-50 hover:opacity-80 transition-opacity"
-    >
-      {content}
-    </a>
-  )
-}
-
-function Arrow({ light }) {
-  return (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-        d="M17 8l4 4m0 0l-4 4m4-4H3" />
-    </svg>
   )
 }

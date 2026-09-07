@@ -1,156 +1,105 @@
-import { useState, useEffect } from 'react'
-import logoImg from '/gtourlk-logo-header.png'
-import { BUSINESS } from '../data/business'
-import LanguageSwitcher from './LanguageSwitcher'
+import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../i18n'
-
+import LanguageSwitcher from './LanguageSwitcher'
 export default function Header() {
-  const { copy } = useLanguage()
-  const { header } = copy
+  const { copy, lang } = useLanguage()
+  const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-
+  const toggle = useRef(null)
+  const header = useRef(null)
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', onScroll)
+    const onScroll = () => setScrolled(window.scrollY > 30)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
   useEffect(() => {
-    if (!menuOpen) return undefined
-    const onKeyDown = event => {
-      if (event.key === 'Escape') setMenuOpen(false)
+    if (!open) return
+    const onKey = (event) => {
+      if (event.key === 'Escape') {
+        setOpen(false)
+        toggle.current?.focus()
+      }
     }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [menuOpen])
-
+    const onPointer = (event) => {
+      if (!header.current?.contains(event.target)) setOpen(false)
+    }
+    const onResize = () => {
+      if (window.innerWidth >= 1024) setOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('pointerdown', onPointer)
+    window.addEventListener('resize', onResize)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('pointerdown', onPointer)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [open])
   return (
-    <header className="fixed top-0 inset-x-0 z-40">
-      {/* 上方細線資訊條 — 三隻電話 */}
-      <div className={`hidden lg:block border-b transition-colors duration-300 ${
-        scrolled ? 'bg-paper-50 border-ink-100' : 'bg-ink-800/40 backdrop-blur-sm border-white/10'
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-2 text-[12px]">
-          <div className={`flex items-center gap-5 ${scrolled ? 'text-ink-400' : 'text-paper-100/80'}`}>
-            <span className="font-mono tracking-widest uppercase">Lukang · Changhua · Taiwan</span>
-            <span className={`h-3 w-px ${scrolled ? 'bg-ink-200' : 'bg-paper-100/30'}`} />
-            <span>{header.reservationNote}</span>
-          </div>
-          <div className={`flex items-center gap-4 ${scrolled ? 'text-ink-500' : 'text-paper-100/90'}`}>
-            {BUSINESS.phones.map((p, i) => (
-              <a
-                key={p.tel}
-                href={`tel:${p.tel}`}
-                className={`group flex items-center gap-1.5 hover:text-brick-400 transition-colors ${
-                  i > 0 ? 'pl-4 border-l border-current/20' : ''
-                }`}
-              >
-                <span className="font-mono tracking-wider">{p.display}</span>
-                <span className="text-[10px] opacity-60">{header.phoneLabels[i]}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 主導航列 */}
-      <div className={`transition-colors duration-300 ${
-        scrolled ? 'bg-paper-50 border-b border-ink-100' : 'bg-transparent'
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between py-4">
-          {/* Logo 區 */}
-          <a href="#top" className="flex items-center gap-3">
-            <img src={logoImg} alt={header.logoAlt} width="40" height="40" className="h-10 w-auto" />
-            <div className={`leading-tight ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}>
-              <div className="font-display text-lg tracking-wide">GtourLK</div>
-              <div lang="zh-Hant" className="font-serif text-[11px] tracking-[0.2em] opacity-70">導 · 鹿</div>
-            </div>
-          </a>
-
-          {/* 桌機導航 */}
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
-            {header.nav.map(item => (
-              <a
-                key={item.href}
-                href={item.href}
-                className={`group text-sm transition-colors ${
-                  scrolled ? 'text-ink-600 hover:text-brick-500' : 'text-paper-50 hover:text-paper-200'
-                }`}
-              >
-                <span>{item.label}</span>
-              </a>
-            ))}
-            <LanguageSwitcher light={!scrolled} />
-            <a
-              href="#contact"
-              className={`text-sm font-medium tracking-wider px-5 py-2.5 transition-colors ${
-                scrolled
-                  ? 'bg-brick-500 text-paper-50 hover:bg-brick-600'
-                  : 'border border-paper-50 text-paper-50 hover:bg-paper-50 hover:text-ink-800'
-              }`}
-            >
-              {header.bookNow}
+    <header
+      ref={header}
+      className={`site-header ${scrolled || open ? 'is-solid' : ''}`}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+      }}
+    >
+      <div className="header-inner">
+        <a
+          href="#top"
+          className="brand-lockup"
+          aria-label={
+            lang === 'zh' ? 'GtourLK 導 鹿 首頁' : 'GtourLK 導 鹿 home'
+          }
+        >
+          <img src="/media/logo-header.webp" width="34" height="40" alt="" />
+          <span>
+            GtourLK<small lang="zh-Hant">導 鹿</small>
+          </span>
+        </a>
+        <nav
+          className="desktop-nav"
+          aria-label={lang === 'zh' ? '主要導覽' : 'Main navigation'}
+        >
+          {copy.header.nav.map((item) => (
+            <a key={item.href} href={item.href}>
+              {item.label}
             </a>
-          </nav>
-
-          {/* 手機選單按鈕 */}
+          ))}
+        </nav>
+        <div className="header-tools">
+          <LanguageSwitcher />
+          <a className="header-book" href="#contact">
+            {lang === 'zh' ? '預約導覽' : 'Plan a visit'}{' '}
+            <span aria-hidden="true">↗</span>
+          </a>
           <button
-            className={`lg:hidden p-2 -mr-2 ${scrolled ? 'text-ink-800' : 'text-paper-50'}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? header.closeMenu : header.menu}
-            aria-expanded={menuOpen}
+            ref={toggle}
+            className="menu-toggle"
+            type="button"
+            aria-expanded={open}
             aria-controls="mobile-navigation"
+            aria-label={open ? copy.header.closeMenu : copy.header.menu}
+            onClick={() => setOpen(!open)}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path aria-hidden="true" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 7h16M4 12h16M4 17h16"} />
-            </svg>
+            {open ? '×' : <span className="menu-lines" aria-hidden="true" />}
           </button>
         </div>
       </div>
-
-      {/* 手機選單 */}
-      {menuOpen && (
-        <div id="mobile-navigation" className="lg:hidden max-h-[calc(100svh-72px)] overflow-y-auto bg-paper-50 border-b border-ink-100">
-          <div className="px-6 py-6 flex flex-col">
-            <div className="flex items-center justify-between border-b border-ink-100 pb-4">
-              <span className="text-sm text-ink-400">{copy.languageSwitcher}</span>
-              <LanguageSwitcher compact />
-            </div>
-            {header.nav.map((item, i) => (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className="flex items-baseline justify-between py-4 border-b border-ink-100 group"
-              >
-                <span className="text-ink-800 text-base">{item.label}</span>
-                <span className="font-mono text-[10px] tracking-widest uppercase text-ink-300">
-                  0{i + 1} · {item.eyebrow}
-                </span>
-              </a>
-            ))}
-
-            <div className="mt-6 space-y-2">
-              {BUSINESS.phones.map(p => (
-                <a key={p.tel} href={`tel:${p.tel}`}
-                  className="flex items-center justify-between py-2 text-ink-600">
-                  <span className="text-[11px] uppercase tracking-widest text-ink-400">{header.phoneLabels[BUSINESS.phones.indexOf(p)]}</span>
-                  <span className="font-mono">{p.display}</span>
-                </a>
-              ))}
-            </div>
-
-            <a
-              href="#contact"
-              onClick={() => setMenuOpen(false)}
-              className="btn-primary mt-6 w-full"
-            >
-              {header.bookTour}
+      {open && (
+        <nav
+          className="mobile-nav"
+          id="mobile-navigation"
+          aria-label={lang === 'zh' ? '手機導覽' : 'Mobile navigation'}
+        >
+          {copy.header.nav.map((item, i) => (
+            <a key={item.href} href={item.href} onClick={() => setOpen(false)}>
+              <small>0{i + 1}</small>
+              {item.label}
+              <span aria-hidden="true">↗</span>
             </a>
-          </div>
-        </div>
+          ))}
+        </nav>
       )}
     </header>
   )

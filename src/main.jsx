@@ -4,10 +4,16 @@ import App from './App.jsx'
 import './index.css'
 import { LanguageProvider } from './i18n.jsx'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const root = document.getElementById('root')
+const app = (
   <React.StrictMode>
-    <LanguageProvider>
+    <LanguageProvider
+      renderedAt={Number(root.dataset.renderedAt) || Date.now()}
+    >
       <App />
     </LanguageProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )
+
+if (root.hasChildNodes()) ReactDOM.hydrateRoot(root, app)
+else ReactDOM.createRoot(root).render(app)

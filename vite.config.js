@@ -6,8 +6,9 @@ export default defineConfig({
   plugins: [react()],
   base: process.env.VITE_BASE_PATH || '/',
   server: {
+    watch: { ignored: ['**/.tooling/**', '**/artifacts/**'] },
     port: parseInt(process.env.PORT) || 5173,
-    host: true
+    host: true,
   },
   build: {
     outDir: 'dist',
@@ -18,5 +19,5 @@ export default defineConfig({
         en: resolve(process.cwd(), 'en/index.html'),
       },
     },
-  }
+  },
 })
