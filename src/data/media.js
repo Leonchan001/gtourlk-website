@@ -22,6 +22,14 @@ function photo(src, width, height, zh, en, position = 'center') {
   }
 }
 export const MEDIA = {
+  heroDesktop: photo(
+    '/hero-portrait.jpg',
+    1440,
+    1800,
+    '導鹿四輪電動導覽車停在桂花巷藝術村入口',
+    'GtourLK electric tour vehicle at Osmanthus Alley Art Village',
+    'center 72%',
+  ),
   hero: photo(
     '/hero-main.jpg',
     1400,
@@ -76,6 +84,22 @@ export const MEDIA = {
   guestExperience: null,
   familyExperience: null,
   seniorExperience: null,
-  templeDetail: null,
+  templeDetail: photo(
+    '/photos/tourism-longshan-caisson.jpg',
+    1500,
+    1004,
+    '鹿港龍山寺的藻井、木構與彩繪，2009 年攝影',
+    'Caisson ceiling, timberwork and painted details at Lukang Longshan Temple, photographed in 2009',
+  ),
   vehicleDetail: null,
+}
+
+// Attribution must travel with any reuse of the corresponding photograph.
+export const MEDIA_CREDITS = {
+  templeDetail: {
+    source: 'https://media.taiwan.net.tw/zh-tw/portal/media/collection/24283_ph_20091129',
+    license: 'https://data.gov.tw/license',
+    zh: '龍山寺藻井（2009）｜攝影：林璟辰・製作單位：交通部觀光署',
+    en: 'Longshan caisson (2009) · Photographer: 林璟辰 · Tourism Administration, MOTC',
+  },
 }

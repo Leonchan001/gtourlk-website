@@ -16,31 +16,38 @@ Source: Changhua County Government's records on the Taiwan Tourism Administratio
 | 摸乳巷 | 24.0517 | 120.4323 | [000134](https://media.taiwan.net.tw/zh-tw/portal/travel/details/attraction_376470000a_000134) |
 | 鹿港龍山寺 | 24.05038 | 120.4349 | [000079](https://media.taiwan.net.tw/zh-tw/portal/travel/details/attraction_376470000a_000079) |
 
-「南北鹿港經典古蹟」is a regional description in the existing 150-minute plan. It deliberately has **no coordinate or point marker**. Selecting it highlights the north–south connection. No new sellable sights, opening hours, admission fees or guaranteed visits were inferred from these sources.
+「南北鹿港經典古蹟」is a regional description in the existing 150-minute plan. It deliberately has **no coordinate or point marker**. It is regional context, without a drawn route connection. No new sellable sights, opening hours, admission fees or guaranteed visits were inferred from these sources.
 
-## Street geometry and license
+## Active street geometry and license (2026-09-12)
 
-© [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/).
+© OpenStreetMap contributors, ODbL 1.0: https://www.openstreetmap.org/copyright . Current data: `src/data/townAtlasRoads.js`, 31 named ways / 209 WGS84 nodes, retrieved 2026-09-11 from https://www.openstreetmap.org/api/0.6/map?bbox=120.4305,24.0495,120.4375,24.0602 . Original response: artifacts/atlas-osm-20260911.xml. The OSM-derived coordinate dataset remains available under ODbL; application code is not relicensed.
 
-Retrieved through the public OSM map API, bounding box `120.4305,24.0495,120.4375,24.0602`. Selected named ways: 中山路、民權路、民族路、三民路、館前街、菜園路、金盛巷、龍山街. The delivered offline extraction is in `src/data/atlasStreets.js`; each entry retains its OSM way ID. This OSM-derived coordinate dataset is made available under ODbL. Website/application code is not relicensed by this notice.
+Three principal roads (中山路、民權路、三民路), cultural lanes (瑤林街、埔頭街、桂花巷藝術村、金盛巷、九曲巷、摸乳巷), quieter context streets (文開路、民族路、館前街、菜園路、龍山街). Complete node coordinates are retained for selected ways. No invented links or road curves. Streets are clipped by the viewport, not extended by hand. The older atlasStreets.js remains a legacy extract, not the active renderer.
 
-No random buildings, synthetic road curves, guessed watercourses, unverified historic coastline or external map tiles. Some smaller lanes are not present in this street extraction and are not invented. No live OSM/API requests occur when a guest opens the site. On-page attribution and source links remain visible.
+## Active projection and responsive layout
 
-## Projection and interpretation
+`townProject` in src/data/townAtlas.js is a local equirectangular projection:
 
-Both streets and sights use exactly the same axis-aligned transform:
+- x = 70 + (longitude − 120.431) × 56000 × cos(24.055°)
+- y = 50 + (24.0598 − latitude) × 56000
+- Mobile adds 60 to x for framing only; it does not change geographic proportions.
+- Desktop viewBox 480 × 680, matching CSS aspect ratio 12 / 17. Mobile viewBox 600 × 680, matching 15 / 17. Neither stretches SVG axes. Compass north is up, east right.
 
-```
-x = 70 + (longitude - 120.431) × 80000
-y = 45 + (24.0598 - latitude) × 43000
-```
+All roads and geographic anchors use the same function. The previous expanded-longitude projection in atlas.js is retained for legacy helpers/tests only, not this renderer. There is no navigation scale or promised vehicle access.
 
-Coordinates are rounded to 0.1 SVG units in a `600 × 500` viewBox. North remains up and east remains right. The east–west axis is deliberately expanded relative to north–south; mobile uses a shorter canvas. **Not to scale.** No distance scale is shown because distances would be misleading.
+TOWN_LABELS stores distinct desktop/mobile callout arrangements keyed by sight ID. Fine dashed leaders end beside text, with one common offset rule per layout. Actual anchor coordinates never move to solve collisions. Four monochrome drawings are place callouts, not geographic building footprints.
 
-Printed-number callouts are displaced for touch spacing. Fine leaders terminate at the unchanged geographic anchors. All seven callouts remain visible; included sights use brick and other sights muted ink. Selecting an out-of-duration sight does not silently change the plan: it is explicitly labelled as a customization inquiry.
+## Architectural observations
 
-Route connections are editorial links between sights, **not road-following driving directions**, a promised order, or a guarantee that an electric vehicle can enter any particular lane. The real street network is a separate, quieter layer. Existing `src/data/tours.js` remains the commercial source of truth: the 90-minute list does not include Osmanthus Alley even though the 60-minute list does. The atlas preserves that difference, rather than inventing nested packages. The 150-minute option expands east to Koo House and spans north–south.
+- Tianhou: layered eaves, raised roof ends, central columns/entrance observed at https://tourism.chcg.gov.tw/upload/27/2023103114161448720.jpg (official attraction 000091).
+- Longshan: broad low five-door hall, recessed entrances and side arches observed at https://tourism.chcg.gov.tw/upload/27/2023051611271545195.jpg (official attraction 000079).
+- Koo House: twin domed towers / central facade, repository public/photos/lukang-koo-house.jpg.
+- Osmanthus Alley: low eaves / window bays, repository public/photos/lukang-art-village.jpg.
 
-## Maintenance
+Sketches are original simplified SVG geometry, not photo copies or architectural surveys. Official temple photos are reference only, not new public photo assets. Longshan's previous standalone caisson icon has been removed from the map.
 
-Update coordinates only with a cited official source, then project both road and sight data consistently. Do not move geographic anchors to resolve collisions: adjust `label` positions instead. Run `npm test`, including mobile callout separation tests, after every map data/layout change.
+## Interaction and maintenance
+
+Brick highlights exactly the reference membership in tours.js; other landmarks remain muted and browsable. No route paths, arrowheads, fixed start or promised stop sequence. Selecting a place only changes the description; it does not add a booking preference or change duration. Seven physical places have callouts; the north/south regional entry deliberately has no fabricated coordinate.
+
+Verification: scripts/town-atlas.test.mjs covers geographic aspect, shared projection, authentic lane IDs/presence, four drawing types, distinct mobile placement and exact plan membership. scripts/town-atlas-qa.mjs covers both languages, ten widths, three times, all seven buttons, actual clicks, keyboard duration tabs, 44px targets, separation/containment, aspect-ratio and page errors. Human visual review remains necessary for new labels/drawings.

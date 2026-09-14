@@ -33,7 +33,7 @@ const TOUR_DEFINITIONS = [
     coverSub: 'Heritage',
     zh: {
       duration: '90 分鐘',
-      durationLabel: '熱門',
+      durationLabel: '經典',
       title: '文化深遊',
       coverTitle: 'Heritage Culture Tour',
       photoAlt: '鹿港老街紅瓦屋頂空拍俯瞰，旅客穿梭於九曲巷弄',
@@ -43,7 +43,7 @@ const TOUR_DEFINITIONS = [
     },
     en: {
       duration: '90 minutes',
-      durationLabel: 'Popular',
+      durationLabel: 'Classic',
       title: 'Heritage Immersion',
       coverTitle: 'Lukang Heritage Tour',
       photoAlt: 'An aerial view of Lukang’s red-tiled roofs and visitors winding through its historic lanes',

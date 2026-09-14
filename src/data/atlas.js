@@ -1,4 +1,52 @@
 import { getTourPlans } from './tours.js'
+import { PREFERENCE_META } from './preferences.js'
+
+// Cumulative editorial layers, separate from the operator's reference lists.
+// Read north → lanes → eastern mansion. Not road geometry or pickup locations.
+/** @type {Array<{minutes: 60 | 90 | 150, stops: string[]}>} */
+export const ATLAS_LAYERS = [
+  { minutes: 60, stops: ['鹿港天后宮', '桂花巷藝術村', '鹿港老街'] },
+  { minutes: 90, stops: ['鹿港老街', '九曲巷', '摸乳巷', '鹿港龍山寺'] },
+  { minutes: 150, stops: ['九曲巷', '辜家大宅'] },
+]
+export function explorationStops(minutes) {
+  return ATLAS_STOPS.filter((stop) => PREFERENCE_META[stop.id].tier <= minutes)
+}
+export function layerPath(layer) {
+  return layer.stops
+    .map(
+      (id, i) =>
+        `${i ? 'L' : 'M'}${project(ATLAS_STOPS.find((stop) => stop.id === id).coordinates).join(',')}`,
+    )
+    .join(' ')
+}
+export const ATLAS_EXPERIENCE = {
+  zh: {
+    value: {
+      60: '從天后宮到老街，先讀北鹿港。',
+      90: '再往南，加入巷弄與龍山寺的故事。',
+      150: '再看宅邸，為南北鹿港多留些時間。',
+    },
+    book: (minutes) => `以 ${minutes} 分鐘開始安排`,
+    select: '換一個景點看看',
+    start: '讀圖起點',
+    journey: '北鹿港 → 巷弄 → 南鹿港／宅邸',
+    reading: '閱讀方向示意；集合地點與實際順序另行確認。',
+  },
+  en: {
+    value: {
+      60: 'Begin in the north: Tianhou and the old streets.',
+      90: 'Continue south: lanes and Longshan stories.',
+      150: 'Add the mansion; allow more time across town.',
+    },
+    book: (minutes) => `Start planning ${minutes} minutes`,
+    select: 'Choose a place to read about',
+    start: 'Read from here',
+    journey: 'North → lanes → south / mansion',
+    reading:
+      'Reading direction only; meeting point and stop order are confirmed separately.',
+  },
+}
 
 // WGS84 representative locations published by Changhua County / Taiwan Tourism
 // Administration. Labels are displaced for legibility; geographic anchors are not.
@@ -182,10 +230,10 @@ export const ATLAS_COPY = {
     included: '本時長參考景點',
     outside: '範圍外景點・可詢問客製',
     area: '探索範圍',
-    note: '依真實座標編繪・非等比例・連線非行車路線',
+    note: '依真實座標編繪・非導航・建築線稿非等比例',
     sources: '地圖資料與閱讀方式',
     sourceNote:
-      '景點位置：彰化縣政府／交通部觀光署。街道底圖：OpenStreetMap contributors（ODbL）。北上南下、東右西左；標籤引線指向座標。老街等線性景點以代表位置標示。磚紅連線僅表達探索範圍，不供導航，也不代表乘車可進入每條巷弄。',
+      '景點位置：彰化縣政府／交通部觀光署。街道底圖：OpenStreetMap contributors（ODbL）。北上南下、東右西左；細虛線連接地名與地理座標。老街等線性景點以代表位置標示。較粗實線為主要道路，細實線為街巷。磚紅表示本時長參考景點，淡墨為其他景點。四個建築線稿依天后宮、龍山寺五門殿、桂花巷與辜家大宅實景簡化，非建物範圍或導航標誌；不代表乘車可進入每條巷弄。',
     viewSource: '景點資料',
     captions: {
       60: '北鹿港・老街與信仰',
@@ -200,10 +248,10 @@ export const ATLAS_COPY = {
     included: 'Suggested for this duration',
     outside: 'Beyond this selection · ask your guide',
     area: 'Area to explore',
-    note: 'Real locations · not to scale · connections are not roads',
+    note: 'Real locations · not navigation · architectural sketches not to scale',
     sources: 'Map sources & how to read',
     sourceNote:
-      'Sight locations: Changhua County / Taiwan Tourism Administration. Streets: OpenStreetMap contributors (ODbL). North is up, east is right. Leaders connect labels to geographic anchors. Linear sights such as Old Street use representative points. Brick-coloured connections show the scope of a visit, not navigation, driving access or a promised itinerary.',
+      'Sight locations: Changhua County / Taiwan Tourism Administration. Streets: OpenStreetMap contributors (ODbL). North is up, east is right. Fine dashed leaders connect names to geographic anchors. Thick solid lines are main roads; thinner solid lines are lanes. Brick highlights this duration’s reference sights; muted ink shows other places. Four architectural sketches follow Tianhou, Longshan’s five-door hall, Osmanthus Alley and Koo House photographs. They are not building footprints, navigation or vehicle-access promises.',
     viewSource: 'Sight source',
     captions: {
       60: 'Northern Lukang · old streets & faith',

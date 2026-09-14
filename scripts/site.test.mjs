@@ -5,6 +5,7 @@ import { MEDIA } from '../src/data/media.js'
 import { BUSINESS } from '../src/data/business.js'
 import { TOUR_PRICING } from '../src/data/tours.js'
 import { isCampaignActive, CAMPAIGN_END } from '../src/data/campaign.js'
+import { EXPERIENCE_COPY } from '../src/data/experienceCopy.js'
 
 for (const [lang, file, canonical] of [
   ['zh', 'index.html', 'https://gtourlk.com.tw/'],
@@ -48,6 +49,30 @@ for (const [lang, file, canonical] of [
       2,
     )
   })
+  test(
+    `${lang}: V3 inquiry context and duration guidance are prerendered`,
+    {
+      skip: !fs.existsSync(`dist/${file}`),
+    },
+    () => {
+      const html = fs.readFileSync(`dist/${file}`, 'utf8')
+      const copy = EXPERIENCE_COPY[lang]
+      for (const text of [
+      copy.booking.defaultRoute,
+        copy.booking.priceNote,
+        copy.pricing.discount,
+      ]) {
+        assert.ok(html.includes(text), text)
+      }
+      assert.ok(!html.includes('class="booking-sights"'))
+      assert.ok(!html.includes('id="price-duration-hint"'))
+      assert.ok(!html.includes('id="price-guests"'))
+      assert.ok(html.includes('id="booking-duration-hint"'))
+      assert.ok(
+        html.indexOf('class="copy-status"') > html.indexOf(copy.booking.line),
+      )
+    },
+  )
 }
 
 test('all responsive photo sources and originals exist', () => {

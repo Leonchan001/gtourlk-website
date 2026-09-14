@@ -1,5 +1,6 @@
+/* Lukang town atlas: fixed projection, no stretch, no route-order graphics. */
 .atlas-module {
-  margin-top: 48px;
+  margin-top: 40px;
 }
 .atlas-duration {
   display: grid;
@@ -7,22 +8,22 @@
   border-bottom: 1px solid var(--border);
 }
 .atlas-duration button {
-  min-height: 76px;
   display: flex;
-  gap: 20px;
   align-items: baseline;
-  padding: 12px 16px 18px 0;
+  gap: 16px;
+  min-height: 76px;
+  padding: 12px 0;
   text-align: left;
   border-bottom: 2px solid transparent;
 }
 .atlas-duration button > span:first-child {
-  font: 46px/1 var(--display);
+  font: 44px/1 var(--display);
 }
 .atlas-duration small {
   font:
-    11px/1 ui-monospace,
+    10px/1 ui-monospace,
     monospace;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 .atlas-duration-name {
   font-size: 13px;
@@ -30,13 +31,14 @@
 }
 .atlas-duration button[aria-selected='true'] {
   color: var(--accent);
-  border-color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 .atlas-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
   gap: clamp(32px, 5vw, 80px);
-  padding-top: 28px;
+  padding-top: 24px;
+  align-items: center;
 }
 .atlas-map-column {
   min-width: 0;
@@ -46,269 +48,210 @@
 .atlas-edition {
   display: flex;
   justify-content: space-between;
-  padding: 14px 18px;
-  color: var(--muted);
+  padding: 14px 20px;
   font:
     10px/1.5 ui-monospace,
     monospace;
-  letter-spacing: 0.13em;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid var(--border);
 }
 .atlas-canvas {
-  position: relative;
   width: 100%;
-  aspect-ratio: 6/5;
+  aspect-ratio: 12 / 17;
+  position: relative;
   isolation: isolate;
+  overflow: hidden;
 }
 .atlas-canvas > svg {
-  width: 100%;
-  height: 100%;
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 .atlas-streets {
   fill: none;
-  stroke: #d5cbbc;
-  stroke-width: 1.5;
+  stroke: #d6cdbf;
+  stroke-width: 1;
   stroke-linejoin: round;
 }
-.atlas-main-street {
-  stroke: #c8bba9;
-  stroke-width: 4;
+.atlas-road-main {
+  stroke: #b8aa96;
+  stroke-width: 3.2;
+}
+.atlas-road-lane {
+  stroke: #958773;
+  stroke-width: 2;
+}
+.atlas-road-context {
+  stroke: #ded6ca;
+  stroke-width: 1;
+}
+.atlas-geometry-mobile {
+  display: none;
 }
 .atlas-road-names {
-  fill: #857969;
+  fill: #776d60;
   font: 12px var(--sans);
   letter-spacing: 0.15em;
 }
-.atlas-base-routes {
-  fill: none;
-  stroke: #d8c4b9;
-  stroke-width: 1;
-  stroke-dasharray: 3 5;
-}
-.atlas-route {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2;
-  stroke-dasharray: 1;
-  animation: atlas-draw 650ms var(--ease) both;
-}
-.atlas-selected-segment {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 5;
-  stroke-dasharray: 3 6;
-  stroke-linecap: round;
-}
 .atlas-anchor {
-  fill: #a89a87;
-  cursor: pointer;
+  fill: #a69b8d;
+  color: #938777;
+  transition:
+    color 200ms,
+    fill 200ms;
 }
 .atlas-anchor.is-included {
   fill: var(--accent);
+  color: var(--accent);
 }
 .atlas-leader {
   fill: none;
-  stroke: #ad9d86;
-  stroke-width: 1;
-}
-.atlas-anchor.is-selected .atlas-leader {
-  stroke: var(--accent);
-  stroke-width: 2;
+  stroke: #827568;
+  stroke-width: 0.8;
+  stroke-dasharray: 2 3;
 }
 .atlas-location-ring {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 1;
+  stroke-width: 1.3;
 }
-.atlas-area-selected .atlas-route {
-  stroke-width: 4;
+.atlas-building {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
-.atlas-north,
+.atlas-north {
+  position: absolute;
+  top: 5%;
+  right: 7%;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  pointer-events: none;
+}
+.atlas-north span {
+  font:
+    11px ui-monospace,
+    monospace;
+}
+.atlas-north strong {
+  font: 18px var(--serif);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+}
+.atlas-north small {
+  font:
+    9px ui-monospace,
+    monospace;
+  letter-spacing: 0.08em;
+}
 .atlas-south {
   position: absolute;
-  font: 10px/1.6 var(--sans);
-  letter-spacing: 0.1em;
+  bottom: 8%;
+  left: 6%;
+  font: 13px var(--serif);
   color: var(--muted);
   pointer-events: none;
 }
-.atlas-north {
-  top: 4%;
-  right: 5%;
-}
-.atlas-north > span {
-  display: block;
-  margin-top: 6px;
-}
-.atlas-south {
-  bottom: 3%;
-  left: 5%;
-}
 .atlas-map-stop {
   position: absolute;
+  left: var(--label-x);
+  top: var(--label-y);
   transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
   min-height: 44px;
-  min-width: 44px;
-  padding: 2px 6px;
-  font: 13px/1.25 var(--serif);
+  min-width: 84px;
+  padding: 0 4px;
+  font: 14px/1.3 var(--serif);
+  color: #6b6258;
   white-space: nowrap;
-  color: #756b5e;
-  background: var(--background);
-  border-bottom: 1px solid transparent;
-  transition:
-    color var(--micro),
-    border-color var(--micro);
 }
-.atlas-landmark {
-  display: inline-grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  font:
-    11px/1 ui-monospace,
-    monospace;
-  border-block: 1px solid currentColor;
-}
-.atlas-landmark-temple {
-  border-top: 3px double;
-}
-.atlas-landmark-house {
-  border: 1px solid;
+.atlas-map-stop span {
+  text-shadow:
+    0 0 4px var(--background),
+    0 0 8px var(--background),
+    0 0 8px var(--background);
 }
 .atlas-map-stop.is-included {
   color: var(--accent);
 }
 .atlas-map-stop[aria-pressed='true'] {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
   font-weight: 700;
-  z-index: 2;
 }
-.atlas-map-stop[aria-pressed='true'] .atlas-landmark {
-  background: var(--accent);
-  color: var(--background);
-  border-color: var(--accent);
+.atlas-map-stop[aria-pressed='true'] span::before {
+  content: '•';
+  margin-right: 5px;
 }
 .atlas-map-stop:focus-visible {
-  z-index: 3;
-  outline-offset: 1px;
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
 }
 .atlas-legend {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
   border-top: 1px solid var(--border);
-  padding: 12px 16px;
-  color: var(--muted);
+  padding: 10px 16px;
   font-size: 11px;
+  color: var(--muted);
 }
-.atlas-legend i {
-  display: inline-block;
-  width: 18px;
-  height: 2px;
-  background: var(--accent);
-  margin: 0 8px 3px 0;
-}
-.atlas-hint {
-  font-size: 10px;
+.atlas-mobile-value {
+  display: none;
 }
 .atlas-editorial {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 .atlas-plan-intro h3 {
   font-size: 36px;
-  margin-bottom: 12px;
+  margin: 8px 0 12px;
 }
-.atlas-plan-intro > p:not(.eyebrow) {
+.atlas-plan-intro p:not(.eyebrow) {
   font-size: 15px;
   line-height: 1.8;
 }
 .atlas-plan-intro .small-copy {
   margin-top: 16px;
 }
-.atlas-stop-strip {
-  position: relative;
-  display: flex;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #bca58f transparent;
-  gap: 6px;
-  padding: 4px 2px 8px;
+.atlas-place-picker {
+  display: block;
   margin-top: 24px;
-  min-width: 0;
 }
-.atlas-stop-strip button {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.atlas-place-picker select {
+  width: 100%;
   min-height: 44px;
+  padding: 8px 0;
+  border: 0;
   border-bottom: 1px solid var(--border);
-  padding: 8px 10px;
-  font-size: 13px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-.atlas-stop-strip button > span {
-  font:
-    10px ui-monospace,
-    monospace;
-}
-.atlas-stop-strip .is-included {
+  background: transparent;
   color: var(--text);
-  border-color: #a99782;
-}
-.atlas-stop-strip button[aria-pressed='true'] {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-.atlas-stop-strip button:focus-visible {
-  outline-offset: -2px;
-  outline-color: var(--text);
+  font: 16px var(--sans);
+  border-radius: 0;
 }
 .atlas-stop-detail {
-  min-height: 156px;
-  padding-top: 16px;
+  min-height: 118px;
+  padding-top: 14px;
 }
 .atlas-stop-status {
-  color: var(--accent);
   font-size: 11px;
+  color: var(--accent);
   margin-bottom: 6px;
-}
-.atlas-stop-detail h3 {
-  font-size: 23px;
-  line-height: 1.4;
-  margin-bottom: 10px;
 }
 .atlas-stop-detail > p:last-child {
   font-size: 14px;
-  line-height: 1.8;
+  line-height: 1.7;
   color: var(--muted);
 }
 .atlas-plan-cta {
-  align-self: flex-start;
   min-height: 44px;
 }
 .atlas-footnotes {
   border-top: 1px solid var(--border);
-  margin-top: 28px;
-  padding-top: 20px;
-  font-size: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
   color: var(--muted);
+  font-size: 12px;
   line-height: 1.9;
-}
-.atlas-footnotes details {
-  margin-top: 8px;
 }
 .atlas-footnotes summary {
   min-height: 44px;
@@ -320,8 +263,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0 20px;
-  padding: 0;
   list-style: none;
+  padding: 0;
 }
 .atlas-footnotes a {
   display: inline-flex;
@@ -336,143 +279,90 @@
 .atlas-source-credit a {
   min-height: 24px;
 }
-@keyframes atlas-draw {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-@media (max-width: 1023px) {
-  .atlas-duration button {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .atlas-hint {
-    display: none;
-  }
-  .atlas-plan-intro h3 {
-    font-size: 30px;
-  }
-  .atlas-map-stop {
-    font-size: 12px;
-    gap: 4px;
-  }
-}
 @media (max-width: 767px) {
   .atlas-module {
-    margin-top: 28px;
+    margin-top: 24px;
     scroll-margin-top: 72px;
   }
   .atlas-duration button {
+    display: block;
+    text-align: center;
     min-height: 52px;
     padding: 8px 0;
-    text-align: center;
-    display: block;
   }
   .atlas-duration button > span:first-child {
     font-size: 32px;
   }
-  .atlas-duration small {
-    font-size: 10px;
-  }
-  .atlas-duration-name {
+  .atlas-duration-name,
+  .atlas-edition,
+  .atlas-plan-intro,
+  .atlas-desktop-reading {
     display: none;
   }
   .atlas-layout {
     display: block;
     padding-top: 0;
   }
-  .atlas-edition {
-    display: none;
-  }
   .atlas-map-column {
     border-top: 0;
   }
   .atlas-canvas {
-    aspect-ratio: auto;
-    height: clamp(214px, 58vw, 250px);
+    max-width: 390px;
+    aspect-ratio: 15 / 17;
+    margin-inline: auto;
+  }
+  .atlas-geometry-desktop {
+    display: none;
+  }
+  .atlas-geometry-mobile {
+    display: block;
   }
   .atlas-map-stop {
-    flex-direction: column;
-    gap: 2px;
-    width: 76px;
-    padding: 2px;
-    font: 12px/1.15 var(--sans);
+    left: var(--mobile-label-x);
+    top: var(--mobile-label-y);
+    font: 12px/1.2 var(--sans);
+    min-width: 76px;
   }
-  .atlas-landmark {
-    width: 20px;
-    height: 18px;
-    font-size: 10px;
+  .atlas-north strong {
+    font-size: 12px;
   }
-  .atlas-north,
+  .atlas-north small {
+    font-size: 8px;
+  }
   .atlas-south {
-    font-size: 9px;
-  }
-  .atlas-north > span {
-    margin-top: 2px;
-  }
-  .atlas-road-names {
-    font-size: 16px;
+    font-size: 10px;
   }
   .atlas-legend {
-    padding: 4px 8px;
-    min-height: 26px;
+    padding: 5px 8px;
+    min-height: 32px;
     font-size: 10px;
   }
-  .atlas-plan-intro {
-    display: none;
+  .atlas-mobile-value {
+    display: block;
   }
-  .atlas-stop-strip {
-    margin-top: 0;
-    padding-block: 4px;
-    scrollbar-width: none;
+  .atlas-place-picker {
+    margin-top: 4px;
   }
-  .atlas-stop-strip::-webkit-scrollbar {
-    display: none;
-  }
-  .atlas-stop-strip button {
-    font-size: 12px;
-    padding: 8px;
+  .atlas-place-picker > span {
+    font-size: 11px;
   }
   .atlas-stop-detail {
-    min-height: 102px;
+    min-height: 76px;
     padding-top: 8px;
   }
   .atlas-stop-status {
     font-size: 10px;
-    margin-bottom: 4px;
-  }
-  .atlas-stop-detail h3 {
-    font-size: 18px;
-    margin-bottom: 4px;
   }
   .atlas-stop-detail > p:last-child {
-    font-size: 13px;
-    line-height: 1.65;
+    font-size: 12px;
+    line-height: 1.6;
   }
   .atlas-plan-cta {
-    margin-top: 4px;
     font-size: 13px;
-    min-height: 44px;
-  }
-  .atlas-footnotes {
-    margin-top: 16px;
-    padding-top: 12px;
-  }
-  html[lang='en'] .atlas-stop-detail {
-    min-height: 102px;
-  }
-  html[lang='en'] .atlas-stop-detail h3 {
-    font: 17px/1.2 var(--serif);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .atlas-route {
-    animation: none;
-  }
-  .atlas-map-stop {
+  .atlas-anchor {
     transition: none;
   }
 }

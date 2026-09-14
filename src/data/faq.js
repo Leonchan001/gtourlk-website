@@ -26,11 +26,11 @@ export function getFaqs(lang) {
       },
       {
         q: 'How far in advance should I book?',
-        a: 'Weekdays are generally flexible; last-minute requests are welcome when available. For weekends and holidays, contact us by LINE or phone at least three days ahead. There are no fixed timetables: departure is by confirmed reservation.',
+        a: 'Weekdays are generally flexible; last-minute requests are welcome when available. For weekends and holidays, we recommend contacting us by LINE or phone three days ahead. There are no fixed timetables: departure is by confirmed reservation.',
       },
       {
         q: 'Where do we meet, and where can I park?',
-        a: `Tell us your preferred pick-up and drop-off points. Your guide confirms the meeting time and place. Our studio is at ${BUSINESS.address.en}; contact us before arriving. On weekdays, consider Lukang Ecological Park Car Park; on weekends, consider the pay-per-entry car parks near Lucao Road. Fees and availability follow on-site notices.`,
+        a: `Tell us your preferred pick-up and drop-off points. Your guide confirms the meeting time and place. You can find us at ${BUSINESS.address.en}; contact us before arriving. On weekdays, consider Lukang Ecological Park Car Park; on weekends, consider the pay-per-entry car parks near Lucao Road. Fees and availability follow on-site notices.`,
         links: parkingLinks(lang),
       },
     ]

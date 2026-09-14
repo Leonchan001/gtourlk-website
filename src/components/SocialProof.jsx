@@ -37,10 +37,10 @@ export default function SocialProof() {
           <h2 id="reviews-title">{copy.title}</h2>
           {REVIEW_COPY[lang].reviews.slice(0, 3).map((review, i) => (
             <figure className={i === 0 ? 'review-lead' : ''} key={review.name}>
+              <p className="review-theme">{review.tag}</p>
               <blockquote>{review.excerpt}</blockquote>
               <figcaption>
                 <span>{review.name}</span>
-                <span>{review.tag}</span>
               </figcaption>
             </figure>
           ))}

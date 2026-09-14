@@ -56,6 +56,7 @@ try {
   for (const lang of ['zh', 'en'])
     for (const [width, height] of [
       [320, 568],
+      [360, 640],
       [375, 667],
       [390, 844],
       [430, 932],
@@ -109,18 +110,18 @@ try {
       for (const minutes of [60, 90, 150]) {
         await tap(`#route-tab-${minutes}`)
         paths.push(
-          await page.$eval('.atlas-route', (el) => el.getAttribute('d')),
+          await page.$$eval('.atlas-route', (els) =>
+            els.map((el) => el.getAttribute('d')).join('|'),
+          ),
         )
         for (let i = 1; i <= 7; i++) {
           await tap(`.atlas-map-stop:nth-of-type(${i})`)
           const state = await page.evaluate(() => {
-            const chip = document.querySelector(
-                '.atlas-stop-strip [aria-pressed=true]',
-              ),
+            const chip = document.querySelector('.atlas-place-picker select'),
               map = document.querySelector(
                 '.atlas-map-stop[aria-pressed=true]',
               ),
-              strip = document.querySelector('.atlas-stop-strip')
+              strip = document.querySelector('.atlas-place-picker')
             const c = chip.getBoundingClientRect(),
               s = strip.getBoundingClientRect()
             return {
@@ -128,8 +129,8 @@ try {
               height: document
                 .querySelector('#route-atlas')
                 .getBoundingClientRect().height,
-              chip: chip.textContent,
-              map: map.textContent,
+              chip: chip.selectedOptions[0].textContent,
+              map: map.getAttribute('aria-label'),
               visible: c.left >= s.left - 1 && c.right <= s.right + 1,
               overflow: document.documentElement.scrollWidth > innerWidth,
               floating: !!document.querySelector('.floating-booking'),
@@ -151,29 +152,14 @@ try {
           )
           assert.ok(!state.overflow && !state.floating)
         }
-        // A visible non-selected chip changes the map without a page scroll.
-        const chipIndex = await page.$$eval(
-          '.atlas-stop-strip button',
-          (els) => {
-            const s = els[0].parentElement.getBoundingClientRect()
-            return (
-              els.findIndex((el) => {
-                const r = el.getBoundingClientRect()
-                return (
-                  el.getAttribute('aria-pressed') !== 'true' &&
-                  r.left >= s.left &&
-                  r.right <= s.right
-                )
-              }) + 1
-            )
-          },
-        )
-        await tap(`.atlas-stop-strip button:nth-child(${chipIndex})`)
+        // The compact native picker replaces duplicate numbered horizontal chips.
+        await page.select('.atlas-place-picker select', '鹿港老街')
         const sync = await page.evaluate(() => ({
-          a: document.querySelector('.atlas-stop-strip [aria-pressed=true]')
-            .textContent,
-          b: document.querySelector('.atlas-map-stop[aria-pressed=true]')
-            ?.textContent,
+          a: document.querySelector('.atlas-place-picker select')
+            .selectedOptions[0].textContent,
+          b: document
+            .querySelector('.atlas-map-stop[aria-pressed=true]')
+            ?.getAttribute('aria-label'),
           y: scrollY,
         }))
         assert.equal(sync.a.replaceAll(/\s/g, ''), sync.b.replaceAll(/\s/g, ''))
@@ -181,10 +167,7 @@ try {
       }
       assert.equal(new Set(paths).size, 3)
       // The regional entry is deliberately not a fabricated map node.
-      await page.$eval('.atlas-stop-strip', (el) =>
-        el.scrollTo({ left: el.scrollWidth, behavior: 'instant' }),
-      )
-      await tap('.atlas-stop-strip button:last-child')
+      await page.select('.atlas-place-picker select', '南北鹿港經典古蹟')
       assert.equal(await page.$('.atlas-map-stop[aria-pressed=true]'), null)
       assert.ok(await page.$('.atlas-area-selected'))
       assert.ok(
@@ -215,9 +198,26 @@ try {
       )
       await page.screenshot({ path: `artifacts/cta-${lang}-${width}.png` })
       await tap('.floating-booking')
-      await page.waitForFunction(
-        () => !document.querySelector('.floating-booking'),
-      )
+      try {
+        await page.waitForFunction(
+          () => !document.querySelector('.floating-booking'),
+        )
+      } catch (error) {
+        await page.screenshot({
+          path: `artifacts/cta-failure-${lang}-${width}.png`,
+        })
+        console.error(
+          await page.evaluate(() => ({
+            url: location.href,
+            y: scrollY,
+            bookingTop: document
+              .querySelector('#contact')
+              .getBoundingClientRect().top,
+            viewport: innerHeight,
+          })),
+        )
+        throw error
+      }
       await align('#contact')
       assert.equal(
         await page.$('.floating-booking'),

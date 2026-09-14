@@ -14,6 +14,7 @@ import FloatingCTA from './components/FloatingCTA'
 import CampaignSpotlight from './components/CampaignSpotlight'
 import { INITIAL_TRIP, getSights } from './data/booking'
 import { useLanguage } from './i18n'
+import { cleanPriorities } from './data/preferences'
 
 function readSavedTrip() {
   try {
@@ -37,6 +38,13 @@ function readSavedTrip() {
         ? saved.stops.filter((id) => known.includes(id))
         : [],
       guideChoice: saved.guideChoice !== false,
+      priorities:
+        saved.guideChoice === false
+          ? cleanPriorities(
+              Array.isArray(saved.stops) ? saved.stops : [],
+              saved.priorities,
+            )
+          : [],
       pickup: text(saved.pickup, 200),
       notes: text(saved.notes, 1000),
     }
@@ -63,7 +71,16 @@ export default function App() {
     }
   }, [trip, draftReady])
   const updateTrip = useCallback(
-    (update) => setTrip((previous) => ({ ...previous, ...update })),
+    (update) =>
+      setTrip((previous) => {
+        const next = { ...previous, ...update }
+        return {
+          ...next,
+          priorities: next.guideChoice
+            ? []
+            : cleanPriorities(next.stops, next.priorities),
+        }
+      }),
     [],
   )
   const onPlan = () => {
@@ -100,7 +117,7 @@ export default function App() {
         <RouteExplorer trip={trip} updateTrip={updateTrip} onPlan={onPlan} />
         <ExperienceStory />
         <SocialProof />
-        <Pricing trip={trip} updateTrip={updateTrip} onBook={onPlan} />
+        <Pricing onBook={onPlan} />
         <About />
         <Contact trip={trip} updateTrip={updateTrip} />
         <FAQ />

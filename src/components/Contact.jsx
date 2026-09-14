@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { BUSINESS } from '../data/business'
-import { bookingSummary, estimateTour, getSights, money } from '../data/booking'
+import { bookingSummary, estimateTour, money } from '../data/booking'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
 import { DurationInput, GuestInput } from './TripControls'
+import './BookingPreferences.css'
 
 export default function Contact({ trip, updateTrip }) {
   const { lang, copy: siteCopy, clock } = useLanguage()
   const copy = EXPERIENCE_COPY[lang].booking
+  const priceCopy = EXPERIENCE_COPY[lang].pricing
   const [copyState, setCopyState] = useState('idle')
   const summaryField = useRef(null)
   const summaryDetails = useRef(null)
+  const lineAction = useRef(null)
   const summary = bookingSummary(trip, lang)
   const estimate = estimateTour(trip.people, trip.minutes)
   const today = new Intl.DateTimeFormat('en-CA', {
@@ -21,14 +24,20 @@ export default function Contact({ trip, updateTrip }) {
   }).format(new Date(clock))
   const badDate = Boolean(trip.date && trip.date < today)
   const valid = Boolean(estimate) && !badDate
-  const sights = getSights(lang)
+  // One visible price placement per breakpoint, from the same calculation.
+  const price = (placement) => (
+    <div className={`summary-price price-${placement}`} aria-live="polite" aria-atomic="true">
+      <span>{copy.estimate}</span>
+      <strong>{estimate ? money(estimate.linePrice) : '—'}</strong>
+      {estimate && <p className="summary-price-context">{priceCopy.discount}</p>}
+      <p className="summary-price-context">{copy.priceNote}</p>
+    </div>
+  )
   useEffect(() => setCopyState('idle'), [summary])
-  function toggleSight(id) {
-    const stops = trip.stops.includes(id)
-      ? trip.stops.filter((stop) => stop !== id)
-      : [...trip.stops, id]
-    updateTrip({ stops, guideChoice: !stops.length })
-  }
+  useEffect(() => {
+    if (copyState === 'copied')
+      lineAction.current?.focus({ preventScroll: true })
+  }, [copyState])
   async function copySummary() {
     try {
       await navigator.clipboard.writeText(summary)
@@ -68,6 +77,20 @@ export default function Contact({ trip, updateTrip }) {
             className="booking-form"
             onSubmit={(event) => event.preventDefault()}
           >
+            <div className="booking-count">
+              <GuestInput
+                id="booking-guests"
+                value={trip.people}
+                onChange={(people) => updateTrip({ people })}
+                error={!estimate ? copy.peopleError : ''}
+              />
+              <DurationInput
+                name="booking-duration"
+                value={trip.minutes}
+                onChange={(minutes) => updateTrip({ minutes })}
+              />
+            </div>
+            {price('mobile')}
             <div className="form-row">
               <div className="form-field">
                 <label className="field-label" htmlFor="trip-date">
@@ -108,76 +131,47 @@ export default function Contact({ trip, updateTrip }) {
                 />
               </div>
             </div>
-            <div className="booking-count">
-              <GuestInput
-                id="booking-guests"
-                value={trip.people}
-                onChange={(people) => updateTrip({ people })}
-                error={!estimate ? copy.peopleError : ''}
-              />
-              <DurationInput
-                name="booking-duration"
-                value={trip.minutes}
-                onChange={(minutes) => updateTrip({ minutes })}
-              />
-            </div>
-            <fieldset className="booking-sights">
-              <legend className="field-label">{copy.sights}</legend>
-              <label className="guide-choice">
+            <p className="small-copy">{copy.defaultRoute}</p>
+            <details className="booking-options">
+              <summary>
+                {lang === 'zh'
+                  ? '接送與其他需求（選填）'
+                  : 'Pick-up and other requests (optional)'}
+              </summary>
+              <div className="form-field">
+                <label htmlFor="trip-pickup" className="field-label">
+                  {copy.pickup}
+                </label>
                 <input
-                  type="checkbox"
-                  checked={trip.guideChoice}
+                  id="trip-pickup"
+                  type="text"
+                  maxLength={200}
+                  value={trip.pickup}
+                  placeholder={copy.pickupHint}
                   onChange={(event) =>
-                    updateTrip({
-                      guideChoice: event.target.checked,
-                      stops: event.target.checked ? [] : trip.stops,
-                    })
+                    updateTrip({ pickup: event.target.value })
                   }
                 />
-                <span>{copy.guide}</span>
-              </label>
-              <div className="sight-options">
-                {sights.map((sight) => (
-                  <label key={sight.id}>
-                    <input
-                      type="checkbox"
-                      checked={trip.stops.includes(sight.id)}
-                      onChange={() => toggleSight(sight.id)}
-                    />
-                    <span>{sight.label}</span>
-                  </label>
-                ))}
               </div>
-            </fieldset>
-            <div className="form-field">
-              <label htmlFor="trip-pickup" className="field-label">
-                {copy.pickup}
-              </label>
-              <input
-                id="trip-pickup"
-                type="text"
-                maxLength={200}
-                value={trip.pickup}
-                placeholder={copy.pickupHint}
-                onChange={(event) => updateTrip({ pickup: event.target.value })}
-              />
-            </div>
-            <div className="form-field">
-              <label htmlFor="trip-notes" className="field-label">
-                {copy.notes}
-              </label>
-              <textarea
-                id="trip-notes"
-                rows="3"
-                maxLength={1000}
-                value={trip.notes}
-                placeholder={copy.notesHint}
-                onChange={(event) => updateTrip({ notes: event.target.value })}
-              />
-            </div>
+              <div className="form-field">
+                <label htmlFor="trip-notes" className="field-label">
+                  {copy.notes}
+                </label>
+                <textarea
+                  id="trip-notes"
+                  rows="3"
+                  maxLength={1000}
+                  value={trip.notes}
+                  placeholder={copy.notesHint}
+                  onChange={(event) =>
+                    updateTrip({ notes: event.target.value })
+                  }
+                />
+              </div>
+            </details>
           </form>
           <aside className="booking-summary" aria-labelledby="summary-title">
-            <p className="eyebrow">GtourLK / Your itinerary</p>
+            <p className="eyebrow">GtourLK / Trip inquiry</p>
             <h3 id="summary-title">{copy.summary}</h3>
             <div className="summary-live" aria-live="polite" aria-atomic="true">
               <p className="summary-date">
@@ -188,29 +182,48 @@ export default function Contact({ trip, updateTrip }) {
                 {trip.people || '—'} {lang === 'zh' ? '位旅客' : 'guests'}
                 <span> / {trip.minutes} min</span>
               </p>
-              <p className="summary-sights">
-                {trip.guideChoice || !trip.stops.length
-                  ? copy.guide
-                  : sights
-                      .filter((sight) => trip.stops.includes(sight.id))
-                      .map((sight) => sight.label)
-                      .join(lang === 'zh' ? '、' : ', ')}
-              </p>
-              <div className="summary-price">
-                <span>{copy.estimate}</span>
-                <strong>{estimate ? money(estimate.linePrice) : '—'}</strong>
-              </div>
+              <p className="summary-sights">{copy.defaultRoute}</p>
+              {trip.notes && (
+                <p className="summary-sights">
+                  <span className="summary-field-name">{copy.notes}</span>
+                  {trip.notes}
+                </p>
+              )}
             </div>
+            {price('desktop')}
             <p className="small-copy">{copy.instruction}</p>
-            <button
-              className="button button-outline"
-              type="button"
-              disabled={!valid}
-              onClick={copySummary}
+            {copyState !== 'copied' ? (
+              <button
+                className="button"
+                type="button"
+                disabled={!valid}
+                onClick={copySummary}
+              >
+                {lang === 'zh' ? '1. 複製行程摘要' : '1. Copy trip summary'}
+                <span aria-hidden="true">⧉</span>
+              </button>
+            ) : (
+              <a
+                ref={lineAction}
+                href={BUSINESS.lineUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="button"
+              >
+                {lang === 'zh'
+                  ? '2. 開啟 LINE 貼上摘要'
+                  : '2. Open LINE and paste'}
+                <span aria-hidden="true">↗</span>
+              </a>
+            )}
+            <a
+              className="text-link"
+              href={BUSINESS.lineUrl}
+              target="_blank"
+              rel="noreferrer"
             >
-              {copy.copy}
-              <span aria-hidden="true">⧉</span>
-            </button>
+              {lang === 'zh' ? '不填行程，直接聊聊 ↗' : 'Just chat with us ↗'}
+            </a>
             <p className="copy-status" role="status">
               {copyState === 'copied'
                 ? copy.copied
@@ -218,15 +231,6 @@ export default function Contact({ trip, updateTrip }) {
                   ? copy.failed
                   : ''}
             </p>
-            <a
-              href={BUSINESS.lineUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="button"
-            >
-              {copy.line}
-              <span aria-hidden="true">↗</span>
-            </a>
             <p className="small-copy">{copy.confirm}</p>
             <details ref={summaryDetails} className="summary-details">
               <summary>{copy.preview}</summary>

@@ -1,6 +1,7 @@
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
 import Photo from './Photo'
+import { MEDIA_CREDITS } from '../data/media'
 
 export default function ExperienceStory() {
   const { lang } = useLanguage()
@@ -49,10 +50,18 @@ export default function ExperienceStory() {
         <div className="story-ending">
           <figure>
             <Photo
-              slot="lukangAtmosphere"
+              slot="templeDetail"
               sizes="(min-width: 768px) 480px, 90vw"
             />
-            <figcaption>{copy.evening}</figcaption>
+            <figcaption>
+              <a href={MEDIA_CREDITS.templeDetail.source} target="_blank" rel="noreferrer">
+                {MEDIA_CREDITS.templeDetail[lang]}
+              </a>
+              {' · '}
+              <a href={MEDIA_CREDITS.templeDetail.license} target="_blank" rel="noreferrer">
+                {lang === 'zh' ? '政府資料開放授權條款第 1 版' : 'Open Government Data License v1.0'}
+              </a>
+            </figcaption>
           </figure>
           <div>
             {step(3)}

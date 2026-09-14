@@ -54,7 +54,7 @@ test('booking summary carries all entered fields, exact discount and disclaimer'
     '10:30',
     '6 位',
     '150 分鐘',
-    '鹿港老街、鹿港龍山寺',
+    '導鹿預設路線',
     '停車場',
     '折疊輪椅',
     '2 台',
@@ -65,8 +65,7 @@ test('booking summary carries all entered fields, exact discount and disclaimer'
     assert.ok(zh.includes(text), text)
   const en = bookingSummary(trip, 'en')
   for (const text of [
-    'Lukang Old Street',
-    'Lukang Longshan Temple',
+    'GtourLK default route',
     'NT$2,850',
     'Campaign coupons are not included',
   ])
@@ -74,7 +73,7 @@ test('booking summary carries all entered fields, exact discount and disclaimer'
 })
 test('guide-choice summary has no fabricated stops or booking confirmation', () => {
   const summary = bookingSummary(INITIAL_TRIP, 'zh')
-  assert.ok(summary.includes('請導覽員幫我安排'))
+  assert.ok(summary.includes('導鹿預設路線'))
   assert.ok(summary.includes('日期：待確認'))
   assert.ok(summary.includes('麻煩協助確認'))
 })

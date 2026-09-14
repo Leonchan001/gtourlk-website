@@ -1,5 +1,7 @@
 # Redesign QA — 2026-09-06
 
+> 最新本機精修驗證：見 [V3_FINAL_REFINEMENT.md](V3_FINAL_REFINEMENT.md)（2026-09-14）。以下為歷史 QA；其中景點勾選及價格計算器互動不代表目前產品。
+
 ## 範圍
 
 Repository：Leonchan001/gtourlk-website；branch：redesign/world-class-v1。未修改 main、未發布正式站。測試以本機 Vite production preview 為主，沒有傳送 LINE 訊息或建立真實預約。

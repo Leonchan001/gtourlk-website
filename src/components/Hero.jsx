@@ -37,7 +37,7 @@ export default function Hero() {
         </div>
       </div>
       <figure className="hero-figure">
-        <Photo slot="hero" priority sizes="(min-width: 1024px) 58vw, 100vw" />
+        <Photo slot="hero" desktopSlot="heroDesktop" priority sizes="max(100vw, 747px)" />
         <figcaption>{copy.photo}</figcaption>
         <span className="hero-location" aria-hidden="true">
           LUKANG

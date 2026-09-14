@@ -1,4 +1,4 @@
-import { getTourDurations } from '../data/tours'
+import { getTourPlans } from '../data/tours'
 import { useLanguage } from '../i18n'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 
@@ -54,13 +54,15 @@ export function GuestInput({ value, onChange, id, error }) {
 }
 export function DurationInput({ value, onChange, name }) {
   const { lang } = useLanguage()
+  const plans = getTourPlans(lang)
+  const selected = plans.find((plan) => plan.minutes === value)
   return (
-    <fieldset className="duration-field">
+    <fieldset className="duration-field" aria-describedby={`${name}-hint`}>
       <legend className="field-label">
         {EXPERIENCE_COPY[lang].pricing.duration}
       </legend>
       <div className="duration-options">
-        {getTourDurations(lang).map((option) => (
+        {plans.map((option) => (
           <label key={option.minutes}>
             <input
               type="radio"
@@ -70,12 +72,17 @@ export function DurationInput({ value, onChange, name }) {
               onChange={() => onChange(option.minutes)}
             />
             <span>
-              {option.minutes}
-              <small>{lang === 'zh' ? ' 分鐘' : ' min'}</small>
+              <span className="duration-number">{option.minutes}
+                <small>{lang === 'zh' ? ' 分鐘' : ' min'}</small>
+              </span>
+              <small className="duration-choice-label">{option.durationLabel}</small>
             </span>
           </label>
         ))}
       </div>
+      <p className="duration-hint" id={`${name}-hint`} aria-live="polite">
+        {selected?.tagline}
+      </p>
     </fieldset>
   )
 }

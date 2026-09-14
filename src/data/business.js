@@ -6,7 +6,7 @@ export const BUSINESS = {
   },
   mapsUrl: 'https://maps.app.goo.gl/Ej2KZiMvKAzaCCxe7',
   reviewRating: '5.0',
-  reviewCount: 248,
+  reviewCount: 254,
   lineId: '@lk167',
   lineUrl: 'https://line.me/R/ti/p/@lk167',
   googleReviewsUrl:
