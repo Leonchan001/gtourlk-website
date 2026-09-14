@@ -6,7 +6,7 @@ export function getFaqs(lang) {
     return [
       {
         q: 'How much does a tour cost?',
-        a: `${price.minimumMinutes}-minute minimum; choose 60, 90 or 150 minutes. For 1–2 guests: NT$${price.oneToTwoHourly} per vehicle per hour. For 3 or more: NT$${price.threePlusHourlyPerPerson} per guest per hour, including groups using multiple vehicles. Add our official LINE account and book through LINE for 5% off. Private charters, companies and schools can ask for a tailored quote.`,
+        a: `${price.minimumMinutes}-minute minimum; choose 60, 90 or 150 minutes. For 1–2 guests: NT$${price.oneToTwoHourly} per vehicle per hour. For 3 or more: NT$${price.threePlusHourlyPerPerson} per guest per hour, including groups using multiple vehicles. Add our official LINE account and book through LINE for 5% off. Private charters, companies and schools can ask for a tailored quote. Payment: cash or bank transfer. Bank details are provided after confirmation.`,
       },
       {
         q: 'How many guests can ride?',
@@ -26,7 +26,11 @@ export function getFaqs(lang) {
       },
       {
         q: 'How far in advance should I book?',
-        a: 'Weekdays are generally flexible; last-minute requests are welcome when available. For weekends and holidays, we recommend contacting us by LINE or phone three days ahead. There are no fixed timetables: departure is by confirmed reservation.',
+        a: 'Advance booking is recommended. Call for last-minute requests; we can arrange a ride when a slot and vehicle are available. For weekends and holidays, we recommend contacting us by LINE or phone three days ahead. There are no fixed departures; we confirm the departure time with you.',
+      },
+      {
+        q: 'Do you offer local transport without a tour?',
+        a: 'Yes. Ask about local rides in Lukang, transport for older guests visiting hospitals or clinics, and regular, long-term rides at fixed times. Call for last-minute availability. Arrangements and fees depend on the time, pick-up and drop-off locations, and vehicle availability and condition. Ask on official LINE for a separate quote; the 60, 90 and 150-minute tour calculator does not apply to transport-only rides.',
       },
       {
         q: 'Where do we meet, and where can I park?',
@@ -37,7 +41,7 @@ export function getFaqs(lang) {
   return [
     {
       q: '費用怎麼收？',
-      a: `${price.minimumMinutes} 分鐘起訂，可選 60、90、150 分鐘。1–2 人為 NT$${price.oneToTwoHourly}／車／小時；3 人以上為 NT$${price.threePlusHourlyPerPerson}／人／小時，多車仍依總人數計費。加入官方 LINE 好友並透過 LINE 預約，享導覽費 95 折。包車、企業或學校團體可洽詢專案報價。`,
+      a: `${price.minimumMinutes} 分鐘起訂，可選 60、90、150 分鐘。1–2 人為 NT$${price.oneToTwoHourly}／車／小時；3 人以上為 NT$${price.threePlusHourlyPerPerson}／人／小時，多車仍依總人數計費。加入官方 LINE 好友並透過 LINE 預約，享導覽費 95 折。包車、企業或學校團體可洽詢專案報價。付款方式：現金或銀行轉帳；匯款資訊於確認後提供。`,
     },
     {
       q: '一台車可以坐幾個人？',
@@ -57,7 +61,11 @@ export function getFaqs(lang) {
     },
     {
       q: '需要提前多久預約？',
-      a: '平日安排彈性，有空檔時也歡迎臨時預約。假日與連假建議提早 3 天以 LINE 或電話聯繫，較容易安排希望的出發時間。我們全程採預約制，沒有固定班次，確認後依約定時間出發。',
+      a: '建議提前預約；臨時需求也歡迎來電，有空檔與車輛即可協助安排。假日與連假建議提早 3 天以 LINE 或電話聯繫，較容易安排希望的出發時間。沒有固定班次，出發時間由雙方確認。',
+    },
+    {
+      q: '有提供一般接送嗎？',
+      a: '有，鹿港在地接送、長輩醫療接駁、固定時段與長期接送皆可洽詢，臨時需求也歡迎來電詢問空檔。實際是否可安排與費用依時間、上下車地點及車況確認。請透過官方 LINE 個別詢價；單純接送不適用 60／90／150 分鐘導覽試算器。',
     },
     {
       q: '去哪裡上車？開車可以停哪裡？',

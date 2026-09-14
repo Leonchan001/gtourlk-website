@@ -1,4 +1,5 @@
 import { BUSINESS } from '../data/business'
+import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
 export default function Footer() {
   const { lang, copy, clock } = useLanguage()
@@ -43,9 +44,7 @@ export default function Footer() {
           <div className="footer-contact">
             <p>{BUSINESS.address[lang]}</p>
             <p>
-              {lang === 'zh'
-                ? '每日 08:00–19:00・全程預約制'
-                : 'Daily 08:00–19:00 · By reservation'}
+              {EXPERIENCE_COPY[lang].booking.hours}
             </p>
             <a href={BUSINESS.lineUrl} target="_blank" rel="noreferrer">
               LINE / {BUSINESS.lineId} ↗

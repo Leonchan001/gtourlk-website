@@ -127,7 +127,7 @@ test(
       ])
         assert.ok(html.includes(`id="${id}"`), id)
       assert.equal((html.match(/<h1\b/g) || []).length, 1)
-      assert.equal((html.match(/class="faq-item"/g) || []).length, 7)
+      assert.equal((html.match(/class="faq-item"/g) || []).length, 8)
     }
   },
 )

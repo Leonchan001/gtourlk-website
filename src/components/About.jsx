@@ -2,6 +2,7 @@ import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { MEDIA } from '../data/media'
 import { useLanguage } from '../i18n'
 import Photo from './Photo'
+import { BUSINESS } from '../data/business'
 export default function About() {
   const { lang } = useLanguage()
   const copy = EXPERIENCE_COPY[lang].people
@@ -32,6 +33,10 @@ export default function About() {
             <span>— GtourLK</span>
           </p>
           <p className="people-since">{copy.since}</p>
+          <p className="body-copy">{copy.transport}</p>
+          <a className="text-link" href={BUSINESS.lineUrl} target="_blank" rel="noreferrer">
+            {copy.transportCta} <span aria-hidden="true">↗</span>
+          </a>
           <details className="other-services">
             <summary>{copy.extras}</summary>
             <ul>
