@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
+import './editorial.css'
 import { LanguageProvider } from './i18n.jsx'
 
 const root = document.getElementById('root')

@@ -30,6 +30,10 @@ export default function BrandStatement() {
           </figure>
         </div>
       </div>
+      <figure className="brand-panorama page-width">
+        <Photo slot="townOverview" sizes="(min-width: 1440px) 1280px, 92vw" />
+        <figcaption><span>{lang === 'zh' ? '紅瓦之間，是鹿港仍在繼續的日常。' : 'Between the red rooftops, everyday Lukang continues.'}</span><span>24°03′ N / 120°26′ E</span></figcaption>
+      </figure>
     </section>
   )
 }

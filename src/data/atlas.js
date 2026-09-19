@@ -228,7 +228,7 @@ export const ATLAS_COPY = {
     south: '南鹿港',
     hint: '點選地圖或下方景點',
     included: '本時長參考景點',
-    outside: '範圍外景點・可詢問客製',
+    outside: '其他景點・可討論安排',
     area: '探索範圍',
     note: '依真實座標編繪・非導航・建築線稿非等比例',
     sources: '地圖資料與閱讀方式',

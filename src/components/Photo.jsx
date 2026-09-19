@@ -4,7 +4,7 @@ import { useLanguage } from '../i18n'
 export default function Photo({
   slot,
   className = '',
-  sizes = '(min-width: 1024px) 50vw, 100vw',
+  sizes = '(min-width: 768px) 50vw, 100vw',
   priority = false,
   desktopSlot,
 }) {
@@ -15,9 +15,9 @@ export default function Photo({
   return (
     <picture className={`photograph ${className}`}>
       {desktop && <>
-        <source media="(min-width: 1024px)" type="image/avif" srcSet={desktop.sources.avif} sizes="max(56vw, 80svh, 608px)" />
-        <source media="(min-width: 1024px)" type="image/webp" srcSet={desktop.sources.webp} sizes="max(56vw, 80svh, 608px)" />
-        <source media="(min-width: 1024px)" srcSet={desktop.src} />
+        <source media="(min-width: 768px)" type="image/avif" srcSet={desktop.sources.avif} sizes="max(53vw, 64svh, 520px)" />
+        <source media="(min-width: 768px)" type="image/webp" srcSet={desktop.sources.webp} sizes="max(53vw, 64svh, 520px)" />
+        <source media="(min-width: 768px)" srcSet={desktop.src} />
       </>}
       <source type="image/avif" srcSet={media.sources.avif} sizes={sizes} />
       <source type="image/webp" srcSet={media.sources.webp} sizes={sizes} />

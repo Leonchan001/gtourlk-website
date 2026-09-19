@@ -7,18 +7,20 @@ export default function Hero() {
   const copy = EXPERIENCE_COPY[lang].hero
   return (
     <section id="top" className="hero" aria-labelledby="hero-title">
+      <div className="hero-edition" aria-hidden="true"><span>THE LUKANG JOURNAL</span><span>{lang === 'zh' ? '在地的眼光・旅行的步調' : 'LOCAL STORIES, AT YOUR PACE'}</span><span>GTOURLK — EST. 2024</span></div>
       <div className="hero-copy">
         <p className="eyebrow">{copy.kicker}</p>
         <h1 id="hero-title">
           {copy.lines.map((line, index) => (
-            <span className={index === 2 ? 'hero-accent' : ''} key={line}>
+            <span className={index === copy.lines.length - 1 ? 'hero-accent' : ''} key={line}>
               {line}
             </span>
           ))}
         </h1>
+        <p className="hero-script" lang="en">The art of taking your time.</p>
         <p className="hero-intro">{copy.intro}</p>
         <div className="hero-actions">
-          <a href="#contact" className="button button-light">
+          <a href="#contact" className="button">
             {copy.book}
             <span aria-hidden="true">↗</span>
           </a>
@@ -37,7 +39,7 @@ export default function Hero() {
         </div>
       </div>
       <figure className="hero-figure">
-        <Photo slot="hero" desktopSlot="heroDesktop" priority sizes="max(100vw, 747px)" />
+        <Photo slot="hero" desktopSlot="heroDesktop" priority sizes="100vw" />
         <figcaption>{copy.photo}</figcaption>
         <span className="hero-location" aria-hidden="true">
           LUKANG
@@ -45,6 +47,11 @@ export default function Hero() {
           <i>鹿港</i>
         </span>
       </figure>
+      <div className="hero-folio" aria-hidden="true">
+        <span>LUKANG, TAIWAN</span>
+        <span>A town. A story. Your own pace.</span>
+        <span>01 — GtourLK</span>
+      </div>
     </section>
   )
 }

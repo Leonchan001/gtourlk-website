@@ -91,7 +91,9 @@ for (const [family, stem, text, directory] of families) {
   const range = [...text]
     .map((character) => `U+${character.codePointAt(0).toString(16)}`)
     .join(',')
-  css += `@font-face{font-family:"${family}";font-style:normal;font-weight:400 500;font-display:optional;src:url("/fonts/${stem}.${extension}") format("${extension === 'ttf' ? 'truetype' : 'woff2'}");unicode-range:${range}}\n`
+  // Opening text must settle on the complete bundled subset, even on a cold load.
+  const display = stem.endsWith('-opening') ? 'swap' : 'optional'
+  css += `@font-face{font-family:"${family}";font-style:normal;font-weight:400 500;font-display:${display};src:url("/fonts/${stem}.${extension}") format("${extension === 'ttf' ? 'truetype' : 'woff2'}");unicode-range:${range}}\n`
   const license = await fetch(
     `https://raw.githubusercontent.com/google/fonts/main/ofl/${directory}/OFL.txt`,
   )

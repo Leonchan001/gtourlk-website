@@ -1,8 +1,8 @@
 export const EXPERIENCE_COPY = {
   zh: {
     hero: {
-      kicker: '鹿港・私人四輪電動車導覽',
-      lines: ['穿過巷弄，', '走進鹿港的', '百年時間。'],
+      kicker: '在地人帶路・鹿港慢旅行',
+      lines: ['鹿港，', '值得慢慢來。'],
       intro: '和熟悉鹿港的人同車，從一條巷弄開始，聽見一座老城的故事。',
       book: '預約導覽',
       explore: '探索行程',
