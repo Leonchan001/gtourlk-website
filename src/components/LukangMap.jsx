@@ -2,7 +2,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ATLAS_STOPS } from '../data/atlas'
 import { MORE_PLACES } from '../data/morePlaces'
 import { TOWN_ROADS } from '../data/townAtlasRoads'
-import { TOWN_VIEW, TOWN_LABELS, TOWN_ROAD_LABELS, roadTier, townProject } from '../data/townAtlas'
+import { TOWN_VIEW, TOWN_LABELS, TOWN_ROAD_LABELS, PUBLIC_ANCHORS, roadTier, showBaseRoad, townProject, extraLabelPosition } from '../data/townAtlas'
+import { ATLAS_ITINERARIES } from '../data/atlasItineraries'
+import { placeCaption } from '../data/atlasLabelLayout'
 import './LukangMap.css'
 
 const useMapLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
@@ -57,21 +59,16 @@ function leaderEnd(x, y, box) {
   return ratio <= 1 ? null : [cx + dx / ratio, cy + dy / ratio]
 }
 
-export default function LukangMap({ lang, included, selectedId, onSelect }) {
+export default function LukangMap({ lang, minutes, included, selectedId, onSelect }) {
   const canvas = useRef(null)
   const labels = useRef({})
   const [labelBoxes, setLabelBoxes] = useState({})
   const [extraLabelWidth, setExtraLabelWidth] = useState(180)
+  const [extraPlacements, setExtraPlacements] = useState({})
   const extra = MORE_PLACES.find(stop => stop.id === selectedId)
-  const extraLayout = view => {
-    if (!extra) return null
-    // Wenwu's true point is near the lower-right corner. Keep its name inside
-    // the same map and away from Longshan's caption. The central-west callout
-    // space serves the closely grouped extension sights without hiding a name.
-    if (extra.id === '文武廟') return view === 'mobile' ? [190, 574] : [170, 611]
-    if (extra.id === '新祖宮') return view === 'mobile' ? [153, 211] : [97, 195]
-    return view === 'mobile' ? [185, 382] : [125, 412]
-  }
+  const extraName = extra && (lang === 'en' ? ({丁家大宅: 'Ding House', 和興青創基地: 'Hexing Hub', 謝家甕牆: 'Xie Urn Wall'}[extra.id] || extra.en.short) : extra.zh.short)
+  const itinerary = ATLAS_ITINERARIES[minutes] || ATLAS_ITINERARIES[90]
+  const extraLayout = view => extraPlacements[`${view}:${extra.id}:${lang}`] || extraLabelPosition(extra, view === 'mobile')
 
   useMapLayoutEffect(() => {
     const measure = () => {
@@ -84,6 +81,24 @@ export default function LukangMap({ lang, included, selectedId, onSelect }) {
         // assuming Chinese and English labels occupy the same SVG width.
         const width = labels.current[extra.id].parentElement.getBoundingClientRect().width
         setExtraLabelWidth(width)
+        const localBox = node => {
+          const r = node.getBoundingClientRect()
+          return {left:r.left-rect.left,right:r.right-rect.left,top:r.top-rect.top,bottom:r.bottom-rect.top}
+        }
+        const obstacles = [...canvas.current.querySelectorAll('.atlas-map-stop,.atlas-public-label,.atlas-region,.atlas-north,.atlas-building')].filter(node => node.getBoundingClientRect().width > 0).map(localBox)
+        const pixelPoint = coordinates => townProject(coordinates,view === 'mobile').map((v,i) => v / [w,h][i] * [rect.width,rect.height][i])
+        const lines = TOWN_ROADS.filter(road => roadTier(road.name) === 'main').flatMap(road => road.points.slice(1).map((p,i) => [pixelPoint(road.points[i]),pixelPoint(p)]))
+        // Existing short leaders are obstacles too, so extension leaders cannot
+        // cross them merely to find a free text box.
+        realStops.forEach(stop => {
+          if (!labels.current[stop.id]) return
+          const start = pixelPoint(stop.coordinates), end = leaderEnd(...start,localBox(labels.current[stop.id]))
+          if (end) lines.push([start,end])
+        })
+        const height = labels.current[extra.id].parentElement.getBoundingClientRect().height
+        const point = placeCaption({anchor:pixelPoint(extra.coordinates),size:[width,height],bounds:[rect.width,rect.height],obstacles,lines}).map((v,i)=>v/[rect.width,rect.height][i]*[w,h][i])
+        const key = `${view}:${extra.id}:${lang}`
+        setExtraPlacements(previous => previous[key]?.every((v,i)=>Math.abs(v-point[i])<.1) ? previous : {...previous,[key]:point})
       }
       const boxes = {}
       Object.entries(labels.current).forEach(([id, node]) => {
@@ -101,7 +116,7 @@ export default function LukangMap({ lang, included, selectedId, onSelect }) {
     breakpoint.addEventListener('change', measure)
     document.fonts?.ready.then(() => { if (mounted) measure() })
     return () => { mounted = false; observer.disconnect(); breakpoint.removeEventListener('change', measure) }
-  }, [lang, selectedId, extraLabelWidth])
+  }, [lang, selectedId, extraLabelWidth, extraPlacements])
 
   function leader(id, x, y, lx, ly, view) {
     const box = labelBoxes[view]?.[id] || { left: lx - 48, right: lx + 48, top: ly - 13, bottom: ly + 13 }
@@ -113,9 +128,12 @@ export default function LukangMap({ lang, included, selectedId, onSelect }) {
     const view = mobile ? 'mobile' : 'desktop'
     return <svg className={'atlas-geometry atlas-geometry-' + view} viewBox={'0 0 ' + TOWN_VIEW[view].join(' ')} aria-hidden="true" focusable="false">
       <g className="atlas-streets">
-        {['context', 'main', 'lane'].map(tier => <g key={tier} data-road-tier={tier}>
-          {TOWN_ROADS.filter(road => roadTier(road.name) === tier).map(road => <polyline key={road.id} data-way-id={road.id} data-road-name={road.name} className={'atlas-road-' + tier} points={road.points.map(point => townProject(point, mobile).join(',')).join(' ')} />)}
+        {['lane', 'main'].map(tier => <g key={tier} data-road-tier={tier}>
+          {TOWN_ROADS.filter(road => showBaseRoad(road.name) && roadTier(road.name) === tier).map(road => <polyline key={road.id} data-way-id={road.id} data-road-name={road.name} className={'atlas-road-' + tier} points={road.points.map(point => townProject(point, mobile).join(',')).join(' ')} />)}
         </g>)}
+      </g>
+      <g className="atlas-itinerary" data-minutes={minutes} key={minutes}>
+        {itinerary.legs.map(leg => <polyline key={leg.from + leg.to} data-from={leg.from} data-to={leg.to} points={leg.points.map(point => townProject(point, mobile).join(',')).join(' ')} />)}
       </g>
       <g className="atlas-road-names">{TOWN_ROAD_LABELS.map(road => {
         const [x, y] = townProject(road.coordinates, mobile)
@@ -124,18 +142,24 @@ export default function LukangMap({ lang, included, selectedId, onSelect }) {
       {realStops.map(stop => {
         const [x, y] = townProject(stop.coordinates, mobile)
         const label = TOWN_LABELS[stop.id], [lx, ly] = label[view]
-        const building = label[view + 'Building'] || [lx, ly - (mobile ? 66 : 48)]
+        const building = label[view + 'Building']
         return <g key={stop.id} data-sight-id={stop.id} onClick={() => onSelect(stop.id)} className={'atlas-anchor' + (included.includes(stop.id) ? ' is-included' : '') + (selectedId === stop.id ? ' is-selected' : '')}>
           {leader(stop.id, x, y, lx, ly, view)}
-          <circle className="atlas-hit-area" cx={x} cy={y} r={mobile ? 42 : 24} />
-          <circle className="atlas-location" data-lon={stop.coordinates[0]} data-lat={stop.coordinates[1]} cx={x} cy={y} r="4" />
+          <circle className="atlas-location" data-lon={stop.coordinates[0]} data-lat={stop.coordinates[1]} cx={x} cy={y} r={selectedId === stop.id ? 5.5 : 4} />
           {selectedId === stop.id && <circle className="atlas-location-ring" cx={x} cy={y} r="12" />}
-          {label.drawing && <g className="atlas-building" data-landmark={label.drawing} transform={`translate(${building[0]},${building[1]}) scale(${mobile ? 1.08 : .83})`}>
+          {building && <g className="atlas-building" data-landmark={label.drawing} transform={`translate(${building[0]},${building[1]}) scale(.64)`}>
             <rect className="atlas-hit-area" x="-72" y="-63" width="144" height="94" />
             <Drawing kind={label.drawing} />
           </g>}
         </g>
       })}
+      <g className="atlas-public-points">{PUBLIC_ANCHORS.filter(place => !(place.id === 'wenkai' && extra?.id === '文武廟')).map(place => {
+        const [x, y] = townProject(place.coordinates, mobile)
+        return <g key={place.id} transform={`translate(${x},${y})`} data-public-anchor={place.id}>
+          <rect x="-5" y="-5" width="10" height="10" rx="1" />
+          {place.icon === 'parking' ? <text textAnchor="middle" y="3">P</text> : <path d="M-3,3 V-1 M0,3 V-1 M3,3 V-1 M-4,-2 L0,-4 L4,-2" />}
+        </g>
+      })}</g>
       {extra && (() => {
         const [x, y] = townProject(extra.coordinates, mobile), [lx, ly] = extraLayout(view)
         return <g className="atlas-extra-selected" data-extra-place={extra.id}>
@@ -148,16 +172,21 @@ export default function LukangMap({ lang, included, selectedId, onSelect }) {
   }
 
   const labelStyle = (d, m) => ({ '--label-x': d[0] / TOWN_VIEW.desktop[0] * 100 + '%', '--label-y': d[1] / TOWN_VIEW.desktop[1] * 100 + '%', '--mobile-label-x': m[0] / TOWN_VIEW.mobile[0] * 100 + '%', '--mobile-label-y': m[1] / TOWN_VIEW.mobile[1] * 100 + '%' })
-  return <div ref={canvas} className="atlas-canvas" role="group" aria-label={lang === 'zh' ? '鹿港散策圖：點選地名閱讀介紹' : 'Lukang town atlas: choose a place to read its story'}>
+  return <div ref={canvas} id="atlas-town-map" className="atlas-canvas" role="group" aria-label={lang === 'zh' ? '鹿港散策圖：點選地名閱讀介紹' : 'Lukang town atlas: choose a place to read its story'}>
     {layer(false)}{layer(true)}
-    <div className="atlas-north" aria-hidden="true"><span className="atlas-compass">N<i /></span><strong>{lang === 'zh' ? '北鹿港' : 'NORTH'}</strong><small>LUKANG</small></div>
-    <span className="atlas-south" aria-hidden="true">{lang === 'zh' ? '南鹿港' : 'SOUTH LUKANG'} <span>↓</span></span>
+    <div className="atlas-north" aria-label={lang === 'zh' ? '北方朝上' : 'North is up'}><span>N</span><svg viewBox="0 0 20 38" aria-hidden="true"><path d="M10,35 V3 M4,12 L10,3 L16,12" /></svg></div>
+    <div className="atlas-region atlas-region-north" aria-hidden="true"><strong>{lang === 'zh' ? '北鹿港' : 'NORTH LUKANG'}</strong><small>{lang === 'zh' ? '信仰・商業・老街' : 'Faith · trade · old streets'}</small></div>
+    <div className="atlas-region atlas-region-south" aria-hidden="true"><strong>{lang === 'zh' ? '南鹿港' : 'SOUTH LUKANG'}</strong><small>{lang === 'zh' ? '古寺・書院・巷弄' : 'Temples · learning · lanes'}</small></div>
     {realStops.map(stop => {
       const label = TOWN_LABELS[stop.id]
-      return <button key={stop.id} type="button" className={'atlas-map-stop' + (included.includes(stop.id) ? ' is-included' : '')} style={labelStyle(label.desktop, label.mobile)} aria-label={stop[lang].name} aria-pressed={selectedId === stop.id} aria-controls="atlas-stop-detail" onClick={() => onSelect(stop.id)}>
-        <span ref={node => { labels.current[stop.id] = node }} className="atlas-label-chip">{!label.drawing && <LaneMark />}<span>{stop[lang].short}</span></span>
+      return <button key={stop.id} type="button" data-tier={label.tier} className={'atlas-map-stop' + (included.includes(stop.id) ? ' is-included' : '')} style={labelStyle(label.desktop, label.mobile)} aria-label={stop[lang].name} aria-pressed={selectedId === stop.id} aria-controls="atlas-stop-detail" onClick={() => onSelect(stop.id)}>
+        <span ref={node => { labels.current[stop.id] = node }} className="atlas-label-chip">{label.tier === 2 && label.drawing ? <LandmarkDrawing kind={label.drawing} /> : !label.drawing && <LaneMark />}<span>{stop[lang].short}</span></span>
       </button>
     })}
-    {extra && <span className="atlas-map-extra-label" style={{ ...labelStyle(extraLayout('desktop'), extraLayout('mobile')), '--extra-label-half-width': extraLabelWidth / 2 + 'px' }}><span ref={node => { labels.current[extra.id] = node }} className="atlas-label-chip">{extra[lang].short}</span></span>}
+    {PUBLIC_ANCHORS.filter(place => !(place.id === 'wenkai' && extra?.id === '文武廟')).map(place => {
+      const position = mobile => townProject(place.coordinates, mobile).map((v, i) => v + place.offset[i])
+      return <span key={place.id} className={'atlas-public-label atlas-public-' + place.id} style={labelStyle(position(false), position(true))}>{lang === 'en' && place.id === 'wenkai' ? 'Wenwu · Wenkai' : place[lang]}</span>
+    })}
+    {extra && <span className="atlas-map-extra-label" style={{ ...labelStyle(extraLayout('desktop'), extraLayout('mobile')), '--extra-label-half-width': extraLabelWidth / 2 + 'px' }}><span ref={node => { labels.current[extra.id] = node }} className="atlas-label-chip">{extraName}</span></span>}
   </div>
 }

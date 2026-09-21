@@ -10,17 +10,19 @@ import { TOWN_ROADS } from '../src/data/townAtlasRoads.js'
 import { ATLAS_STOPS, atlasStops } from '../src/data/atlas.js'
 import { getTourPlans } from '../src/data/tours.js'
 
-test('town projection preserves north/east and local distance proportions on both layouts', () => {
+test('town projection preserves axis direction with a documented editorial longitude compression', () => {
   const p = [120.433, 24.055],
     a = townProject(p),
     north = townProject([p[0], p[1] + 0.001]),
     east = townProject([p[0] + 0.001 / Math.cos((p[1] * Math.PI) / 180), p[1]])
   assert.ok(north[1] < a[1] && east[0] > a[0])
-  assert.ok(Math.abs((east[0] - a[0]) / (a[1] - north[1]) - 1) < 0.0001)
+  const ratio = (east[0] - a[0]) / (a[1] - north[1])
+  assert.ok(ratio > .6 && ratio < .75, 'modest horizontal compression, no rotation or shear')
+  assert.equal(north[0], a[0]); assert.equal(east[1], a[1])
   for (const stop of ATLAS_STOPS.filter((s) => s.coordinates)) {
     const d = townProject(stop.coordinates),
       m = townProject(stop.coordinates, true)
-    assert.ok(Math.abs(m[0] - d[0] - 60) < 1e-8)
+    assert.ok(Math.abs(d[0] - m[0] - 40) < 1e-8)
     assert.equal(m[1], d[1])
   }
   assert.ok(TOWN_VIEW.desktop[1] > TOWN_VIEW.desktop[0])
@@ -47,7 +49,7 @@ test('real old-town lanes and the three main roads are present with unique OSM i
   }
   assert.equal(roadTier('中山路'), 'main')
   assert.equal(roadTier('瑤林街(鹿港老街)'), 'lane')
-  assert.equal(roadTier('館前街'), 'context')
+  assert.equal(roadTier('館前街'), 'lane')
 })
 test('four distinct landmark drawings and genuinely rearranged mobile labels', () => {
   assert.deepEqual(
@@ -60,7 +62,7 @@ test('four distinct landmark drawings and genuinely rearranged mobile labels', (
   assert.equal(Object.keys(TOWN_LABELS).length, 7)
   assert.ok(
     Object.values(TOWN_LABELS).filter(
-      (l) => l.mobile[0] !== l.desktop[0] + 60 || l.mobile[1] !== l.desktop[1],
+      (l) => l.mobile[0] !== l.desktop[0] - 40 || l.mobile[1] !== l.desktop[1],
     ).length >= 4,
   )
   for (const l of Object.values(TOWN_LABELS))

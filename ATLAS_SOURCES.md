@@ -18,24 +18,22 @@ Source: Changhua County Government's records on the Taiwan Tourism Administratio
 
 「南北鹿港經典古蹟」is a regional description in the existing 150-minute plan. It deliberately has **no coordinate or point marker**. It is regional context, without a drawn route connection. No new sellable sights, opening hours, admission fees or guaranteed visits were inferred from these sources.
 
-## Active street geometry and license (2026-09-12)
+## Active street geometry and license (2026-09-20)
 
-© OpenStreetMap contributors, ODbL 1.0: https://www.openstreetmap.org/copyright . Current data: `src/data/townAtlasRoads.js`, 31 named ways / 209 WGS84 nodes, retrieved 2026-09-11 from https://www.openstreetmap.org/api/0.6/map?bbox=120.4305,24.0495,120.4375,24.0602 . Original response: artifacts/atlas-osm-20260911.xml. The OSM-derived coordinate dataset remains available under ODbL; application code is not relicensed.
+© OpenStreetMap contributors, ODbL 1.0: https://www.openstreetmap.org/copyright . Current `src/data/townAtlasRoads.js` preserves 62 ways with original WGS84 coordinates and node IDs. Source: https://www.openstreetmap.org/api/0.6/map?bbox=120.4295,24.0475,120.4400,24.0615 ; checked-in response: `artifacts/atlas-osm-20260920.xml`. The OSM-derived coordinate dataset remains available under ODbL; application code is not relicensed.
 
-Three principal roads (中山路、民權路、三民路), cultural lanes (瑤林街、埔頭街、桂花巷藝術村、金盛巷、九曲巷、摸乳巷), quieter context streets (文開路、民族路、館前街、菜園路、龍山街). Complete node coordinates are retained for selected ways. No invented links or road curves. Streets are clipped by the viewport, not extended by hand. The older atlasStreets.js remains a legacy extract, not the active renderer.
+Only selected contextual lanes and three principal roads (中山路、民權路、三民路) form the base map. Other extracted ways support the selected exploration line. Original shared nodes preserve intersections; no invented connectors. Minquan is NE–SW, Zhongshan NNW–SSE, and Sanmin approximately east–west.
 
 ## Active projection and responsive layout
 
-`townProject` in src/data/townAtlas.js is a local equirectangular projection:
+`townProject` applies the same unrotated editorial transform to roads and geographic anchors:
 
-- x = 70 + (longitude − 120.431) × 56000 × cos(24.055°)
-- y = 50 + (24.0598 − latitude) × 56000
-- Mobile adds 60 to x for framing only; it does not change geographic proportions.
-- Desktop viewBox 480 × 680, matching CSS aspect ratio 12 / 17. Mobile viewBox 600 × 680, matching 15 / 17. Neither stretches SVG axes. Compass north is up, east right.
+- x = 90 + (longitude − 120.431) × 40000 + (desktop ? 40 : 0)
+- y = 105 + (24.05937 − latitude) × 65000
+- Desktop viewBox 480 × 850; mobile 400 × 850. North is up, east right.
+- Longitude is compressed relative to latitude; this is not an equidistant projection. Distances come from WGS84 road geometry, never screen pixels. No scale bar.
 
-All roads and geographic anchors use the same function. The previous expanded-longitude projection in atlas.js is retained for legacy helpers/tests only, not this renderer. There is no navigation scale or promised vehicle access.
-
-TOWN_LABELS stores distinct desktop/mobile callout arrangements keyed by sight ID. Fine dashed leaders end beside text, with one common offset rule per layout. Actual anchor coordinates never move to solve collisions. Four monochrome drawings are place callouts, not geographic building footprints.
+Tier 1: Tianhou, Old Street and Longshan. Tier 2: four cultural sights. Tier 3: restrained public landmarks (Lukang Assembly Hall, first multistorey car park, Wenwu–Wenkai complex). See `ATLAS_GEOGRAPHY_REVISION.md` for source links and coordinates. Architectural drawings are stylized callouts, not surveyed footprints. HTML labels use short leaders terminating at the measured label edge; extension captions avoid nearby text and road crossings without moving geographic anchors.
 
 ## Architectural observations
 
@@ -48,6 +46,10 @@ Sketches are original simplified SVG geometry, not photo copies or architectural
 
 ## Interaction and maintenance
 
-Brick highlights exactly the reference membership in tours.js; other landmarks remain muted and browsable. No route paths, arrowheads, fixed start or promised stop sequence. Selecting a place only changes the description; it does not add a booking preference or change duration. Seven physical places have callouts; the north/south regional entry deliberately has no fabricated coordinate.
+Brick highlights the existing exact plan membership. Thin exploration lines are offline editorial examples along connected OSM walkable edges, not vehicle directions or guaranteed stops. `atlasItineraries.js` retains node/way IDs and distances; raw-OSM tests verify every edge. Private/no-access/foot=no/area=yes ways are excluded from path preparation. Snapshot data does not guarantee current access.
 
-Verification: scripts/town-atlas.test.mjs covers geographic aspect, shared projection, authentic lane IDs/presence, four drawing types, distinct mobile placement and exact plan membership. scripts/town-atlas-qa.mjs covers both languages, ten widths, three times, all seven buttons, actual clicks, keyboard duration tabs, 44px targets, separation/containment, aspect-ratio and page errors. Human visual review remains necessary for new labels/drawings.
+Browsing preserves duration and booking data. Explicit preferences are temporary component state, separately copyable, and are not silently added to booking notes or LINE text. Reloading/language navigation clears this temporary list. Duration controls continue synchronizing the existing price calculation. Regional descriptions have no fabricated point.
+
+Walking hints use only 134 m (Old Street–Osmanthus) and 377 m (Molu–Longshan), rounded for display; 60–80 m/min estimates exclude visits, waiting and small representative-point snap gaps. No unsupported dwell-time estimates.
+
+Validation: `scripts/atlas-geography.test.mjs` and `scripts/town-atlas.test.mjs`, plus responsive browser checks documented in `ATLAS_GEOGRAPHY_REVISION.md`. Older standalone browser scripts describe prior layouts and are not evidence of this revision's visual verification.
