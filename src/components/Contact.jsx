@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BUSINESS } from '../data/business'
+import { BUSINESS, lineMessageUrl } from '../data/business'
 import { bookingSummary, estimateTour, money } from '../data/booking'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
@@ -57,6 +57,12 @@ export default function Contact({ trip, updateTrip: setTrip }) {
     if (copyState === 'copied')
       lineAction.current?.focus({ preventScroll: true })
   }, [copyState])
+  function sendToLine() {
+    setCopyState('sent')
+    // Quiet backup: if LINE drops the prefilled text, the summary is
+    // usually already on the clipboard. Failure here is not an error.
+    navigator.clipboard?.writeText(summary).catch(() => {})
+  }
   async function copySummary() {
     try {
       await navigator.clipboard.writeText(summary)
@@ -221,15 +227,32 @@ export default function Contact({ trip, updateTrip: setTrip }) {
             </div>
             {price('desktop')}
             <p className="small-copy">{copy.instruction}</p>
+            {valid ? (
+              <a
+                href={lineMessageUrl(summary)}
+                target="_blank"
+                rel="noreferrer"
+                className="button"
+                onClick={sendToLine}
+              >
+                {copy.line}
+                <span aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              <button className="button" type="button" disabled>
+                {copy.line}
+                <span aria-hidden="true">↗</span>
+              </button>
+            )}
             {copyState !== 'copied' ? (
               <button
-                className="button"
+                className="text-link booking-copy-backup"
                 type="button"
                 disabled={!valid}
                 onClick={copySummary}
               >
-                {lang === 'zh' ? '1. 複製行程摘要' : '1. Copy trip summary'}
-                <span aria-hidden="true">⧉</span>
+                {copy.backup}
+                <span aria-hidden="true"> ⧉</span>
               </button>
             ) : (
               <a
@@ -239,12 +262,9 @@ export default function Contact({ trip, updateTrip: setTrip }) {
                 data-analytics-summary="true"
                 target="_blank"
                 rel="noreferrer"
-                className="button"
+                className="text-link"
               >
-                {lang === 'zh'
-                  ? '2. 開啟 LINE 貼上摘要'
-                  : '2. Open LINE and paste'}
-                <span aria-hidden="true">↗</span>
+                {copy.openLine}
               </a>
             )}
             <a
@@ -259,7 +279,9 @@ export default function Contact({ trip, updateTrip: setTrip }) {
             <p className="copy-status" role="status">
               {copyState === 'copied'
                 ? copy.copied
-                : copyState === 'failed'
+                : copyState === 'sent'
+                  ? copy.sent
+                  : copyState === 'failed'
                   ? copy.failed
                   : ''}
             </p>

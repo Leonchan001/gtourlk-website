@@ -13,3 +13,24 @@
 .summary-sights {
   overflow-wrap: anywhere;
 }
+
+/* Fallback copy action under the LINE button: looks like the text links. */
+.booking-copy-backup {
+  background: none;
+  border-top: 0;
+  border-inline: 0;
+  border-radius: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+}
+.booking-copy-backup:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.booking-summary > .text-link {
+  display: flex;
+  width: fit-content;
+}
