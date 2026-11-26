@@ -5,10 +5,11 @@
 // While the placeholder is in place, GA is never loaded and nothing is sent.
 // (Comments stay in English: the font-coverage test scans all source text.)
 export const GA_PLACEHOLDER_ID = 'G-XXXXXXXXXX'
+const GA_SITE_ID = 'G-KXNZE09GMR'
 export const GA_MEASUREMENT_ID =
   (typeof import.meta !== 'undefined' &&
     import.meta.env?.VITE_GA_MEASUREMENT_ID) ||
-  GA_PLACEHOLDER_ID
+  GA_SITE_ID
 
 export function isValidMeasurementId(id) {
   return /^G-[A-Z0-9]{4,}$/.test(id || '') && id !== GA_PLACEHOLDER_ID

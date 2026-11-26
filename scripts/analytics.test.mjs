@@ -9,8 +9,8 @@ import {
   initAnalytics,
 } from '../src/analytics.js'
 
-test('GA stays off until a real measurement ID is set', () => {
-  assert.equal(GA_MEASUREMENT_ID, GA_PLACEHOLDER_ID)
+test('GA uses a real measurement ID, never the placeholder', () => {
+  assert.equal(isValidMeasurementId(GA_MEASUREMENT_ID), true)
   assert.equal(isValidMeasurementId(GA_PLACEHOLDER_ID), false)
   assert.equal(isValidMeasurementId(''), false)
   assert.equal(isValidMeasurementId('UA-12345-1'), false)
