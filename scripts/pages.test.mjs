@@ -54,3 +54,16 @@ test('sitemap lists every page with a lastmod date', { skip: !built }, () => {
   for (const page of listPages())
     assert.ok(sitemap.includes(`<loc>${absolute(page.path)}</loc>`), page.path)
 })
+
+test('sight guides are bilingual, sourced and attached to real sights', async () => {
+  const { PLACE_GUIDES } = await import('../src/data/placeGuides.js')
+  for (const [id, guide] of Object.entries(PLACE_GUIDES)) {
+    assert.ok(PLACE_SLUGS[id], id)
+    assert.ok(guide.sources.length && guide.sources.every((s) => /^https?:\/\//.test(s.url)), id)
+    for (const lang of ['zh', 'en']) {
+      assert.ok(guide[lang].history.length && guide[lang].highlights.length && guide[lang].tips.length, `${id} ${lang}`)
+      assert.equal(guide[lang].highlights.length, guide[lang === 'zh' ? 'en' : 'zh'].highlights.length, id)
+    }
+    if (guide.official) assert.match(guide.official.url, /^https?:\/\//)
+  }
+})

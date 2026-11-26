@@ -146,6 +146,11 @@ export const PAGE_COPY = {
     switchLabel: 'EN',
     switchLang: 'en',
     story: '景點故事',
+    history: '歷史沿革',
+    highlights: '看點',
+    tips: '參觀提醒',
+    sources: '資料來源：',
+    official: '官方最新資訊',
     inTours: '這個景點在哪些路線',
     notInTours:
       '這個景點不在三條參考路線中，預約時告訴導覽員，就能評估加入你的行程。',
@@ -200,6 +205,11 @@ export const PAGE_COPY = {
     switchLabel: '中文',
     switchLang: 'zh-Hant',
     story: 'The story',
+    history: 'History',
+    highlights: 'What to look for',
+    tips: 'Visiting tips',
+    sources: 'Sources: ',
+    official: 'Latest from the venue',
     inTours: 'Included in these routes',
     notInTours:
       'This sight is not on the three suggested routes. Mention it when you book and your guide can work it into your visit.',
