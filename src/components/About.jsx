@@ -1,6 +1,7 @@
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { MEDIA } from '../data/media'
 import { useLanguage } from '../i18n'
+import { SITE_COPY } from '../data/siteCopy'
 import Photo from './Photo'
 import { BUSINESS } from '../data/business'
 export default function About() {
@@ -20,7 +21,7 @@ export default function About() {
           </figcaption>
         </figure>
         <div className="people-copy">
-          <p className="eyebrow">06 / Your local company</p>
+          <p className="eyebrow">{SITE_COPY[lang].sections.about}</p>
           <h2 id="about-title">
             {copy.title.map((line) => (
               <span key={line}>{line}</span>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
+import { SITE_COPY } from '../data/siteCopy'
 import Photo from './Photo'
 import { MEDIA_CREDITS } from '../data/media'
 
@@ -35,7 +36,7 @@ export default function ExperienceStory() {
     <section id="experience" className="experience-section section-space" aria-labelledby="experience-title">
       <div className="page-width">
         <header className="story-heading">
-          <p className="eyebrow">03 / Along the way</p>
+          <p className="eyebrow">{SITE_COPY[lang].sections.story}</p>
           <h2 id="experience-title">{copy.title.map(line => <span key={line}>{line}</span>)}</h2>
         </header>
         <div className="story-spread">

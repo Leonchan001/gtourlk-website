@@ -3,6 +3,7 @@ import { BUSINESS, lineMessageUrl } from '../data/business'
 import { bookingSummary, estimateTour, money } from '../data/booking'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
+import { SITE_COPY } from '../data/siteCopy'
 import { track, trackBookingStep } from '../analytics'
 import { DurationInput, GuestInput } from './TripControls'
 import './BookingPreferences.css'
@@ -95,7 +96,7 @@ export default function Contact({ trip, updateTrip: setTrip }) {
       <div className="page-width">
         <header className="booking-heading">
           <div>
-            <p className="eyebrow">07 / A journey of your own</p>
+            <p className="eyebrow">{SITE_COPY[lang].sections.booking}</p>
             <h2 id="booking-title" tabIndex="-1">
               {copy.title.map((line) => (
                 <span key={line}>{line}</span>
@@ -206,7 +207,7 @@ export default function Contact({ trip, updateTrip: setTrip }) {
             </details>
           </form>
           <aside className="booking-summary" aria-labelledby="summary-title">
-            <p className="eyebrow">GtourLK / Trip inquiry</p>
+            <p className="eyebrow">{SITE_COPY[lang].sections.summary}</p>
             <h3 id="summary-title">{copy.summary}</h3>
             <div className="summary-live" aria-live="polite" aria-atomic="true">
               <p className="summary-date">
@@ -300,7 +301,7 @@ export default function Contact({ trip, updateTrip: setTrip }) {
             </details>
           </aside>
         </div>
-        <details className="contact-details">
+        <details className="contact-details" open>
           <summary>
             <span>{copy.contact}</span>
             {copy.phone}

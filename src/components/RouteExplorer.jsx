@@ -12,6 +12,7 @@ import { placePath } from '../data/pages'
 import LukangMap, { LandmarkDrawing } from './LukangMap'
 import Photo from './Photo'
 import { useLanguage } from '../i18n'
+import { SITE_COPY } from '../data/siteCopy'
 import './RouteExplorer.css'
 
 const MAIN_PLACES = ATLAS_STOPS.filter(place => place.coordinates)
@@ -132,18 +133,18 @@ export default function RouteExplorer({ trip, updateTrip, onPlan }) {
     <section id="routes" className="route-section section-space atlas-revised" aria-labelledby="route-title">
       <div className="page-width">
         <header className="section-heading">
-          <p className="eyebrow">02 / LUKANG ROUTE ATLAS</p>
+          <p className="eyebrow">{SITE_COPY[lang].sections.routes}</p>
           <h2 id="route-title">{copy.title.map(line => <span key={line}>{line}</span>)}</h2>
           <p className="body-copy">{lang === 'zh' ? '選一段時間，從地圖認識鹿港的廟宇、老屋與巷弄。' : 'Choose your time, then discover Lukang’s temples, old houses and lanes.'}</p>
         </header>
         <div className="atlas-module" id="route-atlas">
           <header className="atlas-masthead">
-            <div><p className="atlas-kicker">GTOURLK / A CULTURAL FIELD GUIDE</p><h3>{ui.title}</h3><p>{ui.subtitle}</p></div>
+            <div>{lang === 'en' && <p className="atlas-kicker">GTOURLK / A CULTURAL FIELD GUIDE</p>}<h3>{ui.title}</h3><p>{ui.subtitle}</p></div>
             <span className="atlas-seal" aria-hidden="true">鹿<br />港</span>
           </header>
           <div className="atlas-duration" role="tablist" aria-label={copy.label}>
             {plans.map((item, index) => <button key={item.minutes} type="button" role="tab" id={`route-tab-${item.minutes}`} ref={el => { tabs.current[index] = el }} aria-selected={item.minutes === plan.minutes} aria-controls="route-panel" tabIndex={item.minutes === plan.minutes ? 0 : -1} onClick={() => selectDuration(index)} onKeyDown={event => keySelect(event, index)}>
-              <span className="atlas-duration-number">{item.minutes}<small> MIN</small></span>
+              <span className="atlas-duration-number">{item.minutes}<small>{lang === 'zh' ? ' 分鐘' : ' MIN'}</small></span>
               <span className="atlas-duration-name">{item.title}</span>
               <span className="atlas-duration-feature">{ui.features[item.minutes]}</span>
             </button>)}

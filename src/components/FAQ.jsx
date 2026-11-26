@@ -2,6 +2,7 @@ import { BUSINESS } from '../data/business'
 import { getFaqs } from '../data/faq'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
+import { SITE_COPY } from '../data/siteCopy'
 export default function FAQ() {
   const { lang } = useLanguage()
   const copy = EXPERIENCE_COPY[lang].faq
@@ -13,7 +14,7 @@ export default function FAQ() {
     >
       <div className="page-width faq-layout">
         <header>
-          <p className="eyebrow">08 / Before you arrive</p>
+          <p className="eyebrow">{SITE_COPY[lang].sections.faq}</p>
           <h2 id="faq-title">
             {copy.title.map((line) => (
               <span key={line}>{line}</span>

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../i18n'
 import LanguageSwitcher from './LanguageSwitcher'
+import { QuickContact } from './QuickContact'
+import { getTourPlans } from '../data/tours'
+import { placesPath, tourPath } from '../data/pages'
 export default function Header() {
   const { copy, lang } = useLanguage()
   const [open, setOpen] = useState(false)
@@ -99,6 +102,21 @@ export default function Header() {
               <span aria-hidden="true">↗</span>
             </a>
           ))}
+          <div className="mobile-nav-more">
+            <a href="#about" onClick={() => setOpen(false)}>
+              {copy.header.about}
+            </a>
+            <a href={placesPath(lang)}>{copy.header.places}</a>
+            <p>
+              <span>{copy.header.routes}</span>
+              {getTourPlans(lang).map((plan) => (
+                <a key={plan.minutes} href={tourPath(lang, plan.minutes)}>
+                  {copy.header.routeLabel(plan.minutes)}
+                </a>
+              ))}
+            </p>
+          </div>
+          <QuickContact location="mobile_menu" className="mobile-nav-contact" />
         </nav>
       )}
     </header>

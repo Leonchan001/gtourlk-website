@@ -12,7 +12,7 @@ export default {
         rule: 'var(--border)',
       },
       fontFamily: {
-        sans: ['"Noto Sans TC"', 'system-ui', 'sans-serif'],
+        sans: ['"Noto Sans TC"', '"PingFang TC"', '"Microsoft JhengHei"', '"Noto Sans CJK TC"', 'system-ui', 'sans-serif'],
         serif: ['"Noto Serif TC"', 'Georgia', 'serif'],
         display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace'],

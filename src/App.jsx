@@ -11,6 +11,7 @@ import Contact from './components/Contact'
 import FAQ from './components/FAQ'
 import Footer from './components/Footer'
 import FloatingCTA from './components/FloatingCTA'
+import { MidCta } from './components/QuickContact'
 import CampaignSpotlight from './components/CampaignSpotlight'
 import { INITIAL_TRIP, getSights } from './data/booking'
 import { useLanguage } from './i18n'
@@ -54,7 +55,7 @@ function readSavedTrip() {
 }
 
 export default function App() {
-  const { lang } = useLanguage()
+  const { lang, copy } = useLanguage()
   // Match the static HTML first; restore this tab's draft after hydration.
   const [trip, setTrip] = useState(INITIAL_TRIP)
   const [draftReady, setDraftReady] = useState(false)
@@ -116,11 +117,13 @@ export default function App() {
         <BrandStatement />
         <RouteExplorer trip={trip} updateTrip={updateTrip} onPlan={onPlan} />
         <ExperienceStory />
+        <MidCta id="story" title={copy.midCta.story} />
         <SocialProof />
+        <MidCta id="reviews" title={copy.midCta.reviews} />
         <Pricing onBook={onPlan} />
-        <About />
-        <Contact trip={trip} updateTrip={updateTrip} />
         <FAQ />
+        <Contact trip={trip} updateTrip={updateTrip} />
+        <About />
       </main>
       <Footer />
       <FloatingCTA />

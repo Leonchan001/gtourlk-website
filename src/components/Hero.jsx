@@ -2,12 +2,16 @@ import { BUSINESS } from '../data/business'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
 import Photo from './Photo'
+import { TOUR_PRICING } from '../data/tours'
 export default function Hero() {
   const { lang } = useLanguage()
   const copy = EXPERIENCE_COPY[lang].hero
+  const { copy: site } = useLanguage()
   return (
     <section id="top" className="hero" aria-labelledby="hero-title">
-      <div className="hero-edition" aria-hidden="true"><span>THE LUKANG JOURNAL</span><span>{lang === 'zh' ? '在地的眼光・旅行的步調' : 'LOCAL STORIES, AT YOUR PACE'}</span><span>GTOURLK — EST. 2024</span></div>
+      {lang === 'en' && (
+        <div className="hero-edition" aria-hidden="true"><span>THE LUKANG JOURNAL</span><span>LOCAL STORIES, AT YOUR PACE</span><span>GTOURLK — EST. 2024</span></div>
+      )}
       <div className="hero-copy">
         <p className="eyebrow">{copy.kicker}</p>
         <h1 id="hero-title">
@@ -17,8 +21,19 @@ export default function Hero() {
             </span>
           ))}
         </h1>
-        <p className="hero-script" lang="en">The art of taking your time.</p>
+        {lang === 'en' && <p className="hero-script">The art of taking your time.</p>}
         <p className="hero-intro">{copy.intro}</p>
+        <p className="hero-facts">
+          <span>
+            <strong>{'NT$' + TOUR_PRICING.oneToTwoHourly}</strong> {site.from}
+            <small>{site.perCarHour}</small>
+          </span>
+          <a href={BUSINESS.googleReviewsUrl} target="_blank" rel="noreferrer">
+            <strong>{'Google ' + BUSINESS.reviewRating}</strong>
+            <span aria-hidden="true"> ★ </span>
+            <small>{lang === 'zh' ? `${BUSINESS.reviewCount} 則評價` : `${BUSINESS.reviewCount} reviews`}</small>
+          </a>
+        </p>
         <div className="hero-actions">
           <a href="#contact" className="button">
             {copy.book}
@@ -31,10 +46,6 @@ export default function Hero() {
         </div>
         <p className="hero-reservation">{copy.note}</p>
         <div className="hero-metadata">
-          <a href={BUSINESS.googleReviewsUrl} target="_blank" rel="noreferrer">
-            {BUSINESS.reviewRating} <span aria-hidden="true">★</span> Google /{' '}
-            {BUSINESS.reviewCount} reviews
-          </a>
           <span>{copy.metadata}</span>
         </div>
       </div>
@@ -47,11 +58,13 @@ export default function Hero() {
           <i>鹿港</i>
         </span>
       </figure>
-      <div className="hero-folio" aria-hidden="true">
-        <span>LUKANG, TAIWAN</span>
-        <span>A town. A story. Your own pace.</span>
-        <span>01 — GtourLK</span>
-      </div>
+      {lang === 'en' && (
+        <div className="hero-folio" aria-hidden="true">
+          <span>LUKANG, TAIWAN</span>
+          <span>A town. A story. Your own pace.</span>
+          <span>01 — GtourLK</span>
+        </div>
+      )}
     </section>
   )
 }

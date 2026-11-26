@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useLanguage } from '../i18n'
+import { QuickContact } from './QuickContact'
 export default function FloatingCTA() {
-  const { lang } = useLanguage()
   const [show, setShow] = useState(false)
   useEffect(() => {
     const onScroll = () => {
@@ -27,9 +26,8 @@ export default function FloatingCTA() {
     }
   }, [])
   return show ? (
-    <a href="#contact" className="floating-booking">
-      {lang === 'zh' ? '安排我的鹿港' : 'Plan my Lukang'}
-      <span aria-hidden="true">↗</span>
-    </a>
+    <div className="floating-booking">
+      <QuickContact location="floating_bar" />
+    </div>
   ) : null
 }

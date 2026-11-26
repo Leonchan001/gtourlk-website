@@ -1,6 +1,7 @@
 import { TOUR_PRICING } from '../data/tours'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
+import { SITE_COPY } from '../data/siteCopy'
 export default function Pricing({ onBook }) {
   const { lang } = useLanguage()
   const copy = EXPERIENCE_COPY[lang].pricing
@@ -13,7 +14,7 @@ export default function Pricing({ onBook }) {
       <div className="page-width">
         <div className="price-introduction">
           <header>
-            <p className="eyebrow">05 / A clear price</p>
+            <p className="eyebrow">{SITE_COPY[lang].sections.pricing}</p>
             <h2 id="pricing-title">
               {copy.title.map((line) => (
                 <span key={line}>{line}</span>
