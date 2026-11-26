@@ -1,6 +1,8 @@
 import { BUSINESS } from '../data/business'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
+import { getTourPlans } from '../data/tours'
+import { placesPath, tourPath } from '../data/pages'
 export default function Footer() {
   const { lang, copy, clock } = useLanguage()
   return (
@@ -40,6 +42,12 @@ export default function Footer() {
                 {item.label}
               </a>
             ))}
+            {getTourPlans(lang).map((plan) => (
+              <a href={tourPath(lang, plan.minutes)} key={plan.minutes}>
+                {lang === 'zh' ? `${plan.minutes} 分鐘路線` : `${plan.minutes}-minute route`}
+              </a>
+            ))}
+            <a href={placesPath(lang)}>{lang === 'zh' ? '鹿港景點' : 'Lukang sights'}</a>
           </nav>
           <div className="footer-contact">
             <p>{BUSINESS.address[lang]}</p>

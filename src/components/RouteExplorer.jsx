@@ -8,6 +8,7 @@ import { ATLAS_PHOTOS } from '../data/atlasPhotos'
 import { TOWN_LABELS, PUBLIC_ANCHORS } from '../data/townAtlas'
 import { ATLAS_ITINERARIES } from '../data/atlasItineraries'
 import { MEDIA_CREDITS } from '../data/media'
+import { placePath } from '../data/pages'
 import LukangMap, { LandmarkDrawing } from './LukangMap'
 import Photo from './Photo'
 import { useLanguage } from '../i18n'
@@ -173,6 +174,7 @@ export default function RouteExplorer({ trip, updateTrip, onPlan }) {
                 <p className="atlas-story-text">{story?.[lang].story || selected[lang].detail}</p>
                 <p className="atlas-stay-note">{ui.stay}</p>
                 <button type="button" className="atlas-preference-toggle" aria-pressed={preferences.includes(selected.id)} onClick={() => togglePreference(selected.id)}>{preferences.includes(selected.id) ? '✓ ' + ui.remove : '＋ ' + ui.add}</button>
+                <a className="atlas-place-source" href={placePath(lang, selected.id)}>{lang === 'zh' ? '看完整介紹' : 'Read the full guide'}<span aria-hidden="true"> →</span></a>
                 <a className="atlas-place-source" href={selected.source} target="_blank" rel="noreferrer">{ui.source}<span aria-hidden="true"> ↗</span></a>
                 <a className="atlas-back-to-map" href="#atlas-town-map">{lang === 'zh' ? '返回地圖 ↑' : 'Back to the map ↑'}</a>
               </div>
