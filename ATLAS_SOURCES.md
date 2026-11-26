@@ -53,3 +53,7 @@ Browsing preserves duration and booking data. Explicit preferences are temporary
 Walking hints use only 134 m (Old Street–Osmanthus) and 377 m (Molu–Longshan), rounded for display; 60–80 m/min estimates exclude visits, waiting and small representative-point snap gaps. No unsupported dwell-time estimates.
 
 Validation: `scripts/atlas-geography.test.mjs` and `scripts/town-atlas.test.mjs`, plus responsive browser checks documented in `ATLAS_GEOGRAPHY_REVISION.md`. Older standalone browser scripts describe prior layouts and are not evidence of this revision's visual verification.
+
+## Real-street base map (2026-11-26)
+
+The route section was rebuilt. `scripts/build-town-basemap.mjs` turns the checked-in OSM snapshot (`artifacts/atlas-osm-20260920.xml`) into `public/atlas/lukang-basemap-{zh,en}.svg` (every street, lane and building footprint, with road names) and `src/data/townBasemap.js` (projection constants). The projection is true to scale (one metre east equals one metre north), north up; phones use a tighter crop of the same map. Route lines still come from `src/data/atlasItineraries.js`. The old compressed editorial projection, label-collision code and three-road base map were removed. Re-run the script after replacing the OSM snapshot.

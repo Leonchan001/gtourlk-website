@@ -9,7 +9,6 @@ import {
   atlasPath,
   project,
 } from '../src/data/atlas.js'
-import { ATLAS_STREETS } from '../src/data/atlasStreets.js'
 import { getTourPlans } from '../src/data/tours.js'
 
 const point = (id) => ATLAS_STOPS.find((stop) => stop.id === id)
@@ -70,40 +69,4 @@ test('duration changes keep compatible selection and safely reset an incompatibl
   assert.equal(atlasSelection(150, '辜家大宅').id, '辜家大宅')
   assert.equal(atlasSelection(60, '辜家大宅').id, '鹿港天后宮')
   assert.equal(atlasSelection(90, '鹿港老街').id, '鹿港老街')
-})
-test('offline street geometry has unique source way IDs and finite coordinates', () => {
-  assert.equal(
-    new Set(ATLAS_STREETS.map(([id]) => id)).size,
-    ATLAS_STREETS.length,
-  )
-  for (const [id, name, coordinates] of ATLAS_STREETS) {
-    assert.match(id, /^\d+$/)
-    assert.ok(name)
-    assert.ok(
-      coordinates
-        .split(/[ ,]/)
-        .every((value) => Number.isFinite(Number(value))),
-    )
-  }
-})
-test('all mobile callout touch rectangles are separate at 320/375/390/430', () => {
-  for (const viewport of [320, 375, 390, 430]) {
-    // Include a 15px desktop scrollbar even when emulating mobile: conservative.
-    const width = viewport - (viewport < 359 ? 40 : 48) - 15
-    const height = Math.min(250, Math.max(214, viewport * 0.58))
-    const rects = ATLAS_STOPS.filter((s) => s.coordinates).map((s) => ({
-      id: s.id,
-      x: (s.label[0] / 600) * width,
-      y: (s.label[1] / 500) * height,
-    }))
-    for (let i = 0; i < rects.length; i++)
-      for (let j = i + 1; j < rects.length; j++) {
-        const a = rects[i],
-          b = rects[j]
-        assert.ok(
-          Math.abs(a.x - b.x) >= 76 || Math.abs(a.y - b.y) >= 44,
-          `${viewport}: ${a.id} / ${b.id}`,
-        )
-      }
-  }
 })
