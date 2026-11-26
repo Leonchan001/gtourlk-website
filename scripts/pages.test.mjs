@@ -67,3 +67,19 @@ test('sight guides are bilingual, sourced and attached to real sights', async ()
     if (guide.official) assert.match(guide.official.url, /^https?:\/\//)
   }
 })
+
+test('nearby sights use street walking distance, never shorter than a straight line', async () => {
+  const { PLACE_WALKING } = await import('../src/data/placeWalking.js')
+  const { nearbyPlaces } = await import('../src/data/pages.js')
+  const line = ([a, b], [c, d]) => Math.hypot((a - c) * Math.cos(24.055 * Math.PI / 180), b - d) * 111195
+  for (const from of PLACES) {
+    for (const to of PLACES.filter((p) => p !== from)) {
+      const meters = PLACE_WALKING[from.id][to.id]
+      assert.ok(meters >= line(from.coordinates, to.coordinates) - 1, `${from.id}→${to.id}`)
+      assert.equal(meters, PLACE_WALKING[to.id][from.id], 'symmetric')
+    }
+    const near = nearbyPlaces(from.id)
+    assert.equal(near.length, 3)
+    near.slice(1).forEach((n, i) => assert.ok(n.meters >= near[i].meters))
+  }
+})

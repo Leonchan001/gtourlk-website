@@ -320,6 +320,7 @@ function placeView(lang, id) {
               </li>
             ))}
           </ul>
+          <p className="small-copy lp-walk-note">{copy.walkNote}</p>
         </aside>
       </div>
       <Cta lang={lang} title={copy.ctaTitle(p.name)} lineText={copy.linePlace(p.name)} />

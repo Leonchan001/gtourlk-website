@@ -7,6 +7,10 @@ import { ATLAS_PHOTOS } from './atlasPhotos.js'
 import { MEDIA, MEDIA_CREDITS } from './media.js'
 import { TOUR_PRICING, getTourPlans } from './tours.js'
 import { EXPERIENCE_COPY } from './experienceCopy.js'
+import { PLACE_WALKING } from './placeWalking.js'
+
+// Walking estimate at 60–80 metres per minute, as on the homepage atlas.
+export const walkMinutes = (m) => [Math.max(1, Math.ceil(m / 80)), Math.max(1, Math.ceil(m / 60))]
 
 export const SITE_ORIGIN = 'https://gtourlk.com.tw'
 export const BUSINESS_ID = `${SITE_ORIGIN}/#business`
@@ -96,16 +100,9 @@ export function toursIncluding(id, lang = 'zh') {
   return getTourPlans(lang).filter((_, i) => zhPlans[i].stops.includes(id))
 }
 
-function distance([lon1, lat1], [lon2, lat2]) {
-  const rad = Math.PI / 180
-  const x = (lon2 - lon1) * rad * Math.cos(((lat1 + lat2) / 2) * rad)
-  const y = (lat2 - lat1) * rad
-  return Math.sqrt(x * x + y * y) * 6371000
-}
 export function nearbyPlaces(id, count = 3) {
-  const origin = placeById(id).coordinates
   return PLACES.filter((place) => place.id !== id)
-    .map((place) => ({ place, meters: distance(origin, place.coordinates) }))
+    .map((place) => ({ place, meters: PLACE_WALKING[id][place.id] }))
     .sort((a, b) => a.meters - b.meters)
     .slice(0, count)
 }
@@ -155,7 +152,11 @@ export const PAGE_COPY = {
     notInTours:
       '這個景點不在三條參考路線中，預約時告訴導覽員，就能評估加入你的行程。',
     nearby: '周邊景點',
-    walk: (m) => `直線約 ${Math.round(m / 10) * 10} 公尺`,
+    walk: (m) => {
+      const [low, high] = walkMinutes(m)
+      return `步行約 ${Math.round(m / 10) * 10} 公尺・約 ${low === high ? low : `${low}–${high}`} 分鐘`
+    },
+    walkNote: '依 OpenStreetMap 街道計算景點代表點之間的步行距離，不含參觀與等候時間。',
     source: '景點資料',
     photo: '照片：',
     license: '授權：',
@@ -214,7 +215,11 @@ export const PAGE_COPY = {
     notInTours:
       'This sight is not on the three suggested routes. Mention it when you book and your guide can work it into your visit.',
     nearby: 'Nearby',
-    walk: (m) => `About ${Math.round(m / 10) * 10} m away`,
+    walk: (m) => {
+      const [low, high] = walkMinutes(m)
+      return `About ${Math.round(m / 10) * 10} m on foot · ${low === high ? low : `${low}–${high}`} min walk`
+    },
+    walkNote: 'Walking distance along OpenStreetMap streets between representative points; excludes time spent at each sight.',
     source: 'Sight source',
     photo: 'Photo: ',
     license: 'License: ',
