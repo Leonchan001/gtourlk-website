@@ -1,0 +1,59 @@
+name: Sync Google rating
+
+on:
+  schedule:
+    # Mondays 03:17 Taiwan time (Sunday 19:17 UTC)
+    - cron: '17 19 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: sync-google-rating
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch rating from Google
+        run: node scripts/sync-google-rating.mjs
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ vars.GOOGLE_PLACE_ID }}
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Build and test
+        if: steps.diff.outputs.changed == 'true'
+        run: npm run build && npm test
+
+      - name: Commit and deploy
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/business.js index.html en/index.html
+          git commit -m "Sync Google rating and review count"
+          git push
+          # Pushes made with GITHUB_TOKEN do not start other workflows, so start the deploy explicitly.
+          gh workflow run deploy.yml --ref "${GITHUB_REF_NAME}"
