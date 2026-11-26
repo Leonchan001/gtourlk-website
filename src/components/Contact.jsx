@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { BUSINESS } from '../data/business'
+import { BUSINESS, lineMessageUrl } from '../data/business'
 import { bookingSummary, estimateTour, money } from '../data/booking'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
+import { track, trackBookingStep } from '../analytics'
 import { DurationInput, GuestInput } from './TripControls'
 import './BookingPreferences.css'
 
-export default function Contact({ trip, updateTrip }) {
+export default function Contact({ trip, updateTrip: setTrip }) {
   const { lang, copy: siteCopy, clock } = useLanguage()
   const copy = EXPERIENCE_COPY[lang].booking
   const priceCopy = EXPERIENCE_COPY[lang].pricing
@@ -14,6 +15,24 @@ export default function Contact({ trip, updateTrip }) {
   const summaryField = useRef(null)
   const summaryDetails = useRef(null)
   const lineAction = useRef(null)
+  const section = useRef(null)
+  // Form edits made here count as booking funnel steps.
+  function updateTrip(patch) {
+    for (const step of Object.keys(patch)) trackBookingStep(step)
+    setTrip(patch)
+  }
+  useEffect(() => {
+    const node = section.current
+    if (!node || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        track('view_booking_form')
+        observer.disconnect()
+      }
+    }, { threshold: 0.25 })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
   const summary = bookingSummary(trip, lang)
   const estimate = estimateTour(trip.people, trip.minutes)
   const today = new Intl.DateTimeFormat('en-CA', {
@@ -38,12 +57,27 @@ export default function Contact({ trip, updateTrip }) {
     if (copyState === 'copied')
       lineAction.current?.focus({ preventScroll: true })
   }, [copyState])
+  function sendToLine() {
+    setCopyState('sent')
+    // Quiet backup: if LINE drops the prefilled text, the summary is
+    // usually already on the clipboard. Failure here is not an error.
+    navigator.clipboard?.writeText(summary).catch(() => {})
+  }
   async function copySummary() {
     try {
       await navigator.clipboard.writeText(summary)
       setCopyState('copied')
+      track('copy_summary', {
+        result: 'success',
+        guests: Number(trip.people),
+        duration_minutes: Number(trip.minutes),
+        has_date: Boolean(trip.date),
+        value: estimate?.linePrice,
+        currency: 'TWD',
+      })
     } catch {
       setCopyState('failed')
+      track('copy_summary', { result: 'failed' })
       if (summaryDetails.current) summaryDetails.current.open = true
       requestAnimationFrame(() => {
         summaryField.current?.focus()
@@ -53,6 +87,7 @@ export default function Contact({ trip, updateTrip }) {
   }
   return (
     <section
+      ref={section}
       id="contact"
       className="booking-section section-space"
       aria-labelledby="booking-title"
@@ -192,33 +227,52 @@ export default function Contact({ trip, updateTrip }) {
             </div>
             {price('desktop')}
             <p className="small-copy">{copy.instruction}</p>
+            {valid ? (
+              <a
+                href={lineMessageUrl(summary)}
+                data-analytics-location="booking_summary"
+                data-analytics-summary="true"
+                target="_blank"
+                rel="noreferrer"
+                className="button"
+                onClick={sendToLine}
+              >
+                {copy.line}
+                <span aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              <button className="button" type="button" disabled>
+                {copy.line}
+                <span aria-hidden="true">↗</span>
+              </button>
+            )}
             {copyState !== 'copied' ? (
               <button
-                className="button"
+                className="text-link booking-copy-backup"
                 type="button"
                 disabled={!valid}
                 onClick={copySummary}
               >
-                {lang === 'zh' ? '1. 複製行程摘要' : '1. Copy trip summary'}
-                <span aria-hidden="true">⧉</span>
+                {copy.backup}
+                <span aria-hidden="true"> ⧉</span>
               </button>
             ) : (
               <a
                 ref={lineAction}
                 href={BUSINESS.lineUrl}
+                data-analytics-location="booking_summary"
+                data-analytics-summary="true"
                 target="_blank"
                 rel="noreferrer"
-                className="button"
+                className="text-link"
               >
-                {lang === 'zh'
-                  ? '2. 開啟 LINE 貼上摘要'
-                  : '2. Open LINE and paste'}
-                <span aria-hidden="true">↗</span>
+                {copy.openLine}
               </a>
             )}
             <a
               className="text-link"
               href={BUSINESS.lineUrl}
+              data-analytics-location="booking_direct_chat"
               target="_blank"
               rel="noreferrer"
             >
@@ -227,7 +281,9 @@ export default function Contact({ trip, updateTrip }) {
             <p className="copy-status" role="status">
               {copyState === 'copied'
                 ? copy.copied
-                : copyState === 'failed'
+                : copyState === 'sent'
+                  ? copy.sent
+                  : copyState === 'failed'
                   ? copy.failed
                   : ''}
             </p>

@@ -9,6 +9,8 @@ export const BUSINESS = {
   reviewCount: 254,
   lineId: '@lk167',
   lineUrl: 'https://line.me/R/ti/p/@lk167',
+  // Opens a chat with the official account and prefills the message box.
+  lineMessageBase: 'https://line.me/R/oaMessage/@lk167/',
   googleReviewsUrl:
     'https://www.google.com/search?q=%E5%B0%8E%E9%B9%BF&si=APenkKm7iecQ4G6P-TsbSMFKIQtv3EFIqRAFw-i8uEbk55Z-_4VIyVstdjrYJ2nmzpvUvQgPKsuO58_cMHDtn2h0SErbUNni7cM43gVwfHNzp_rUIoLlhdGIV0P3fu6ExxbAtlsYqC9dZfrcxCPyILu5j9llu9cf45D0LNoVTb7WdAqFkwys5dw%3D',
   phones: [
@@ -16,4 +18,9 @@ export const BUSINESS = {
     { label: '預約專線 ②', tel: '+886927291828', display: '0927-291-828' },
     { label: '客服總機', tel: '+88647740142', display: '(04) 7740-142' },
   ],
+}
+
+// LINE URL scheme: https://line.me/R/oaMessage/{LINE ID}/?{URL-encoded text}
+export function lineMessageUrl(text) {
+  return `${BUSINESS.lineMessageBase}?${encodeURIComponent(text)}`
 }
