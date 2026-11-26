@@ -6,7 +6,7 @@ export const BUSINESS = {
   },
   mapsUrl: 'https://maps.app.goo.gl/Ej2KZiMvKAzaCCxe7',
   reviewRating: '5.0',
-  reviewCount: 254,
+  reviewCount: 274,
   lineId: '@lk167',
   lineUrl: 'https://line.me/R/ti/p/@lk167',
   // Opens a chat with the official account and prefills the message box.
