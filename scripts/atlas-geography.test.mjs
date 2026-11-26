@@ -2,8 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import { ATLAS_ITINERARIES } from '../src/data/atlasItineraries.js'
-import { TOWN_ROADS } from '../src/data/townAtlasRoads.js'
-import { townProject, PUBLIC_ANCHORS, TOWN_LABELS } from '../src/data/townAtlas.js'
+import { projectToMap, BASEMAP_SIZE, MOBILE_VIEWBOX, MAP_POINTS } from '../src/data/townBasemap.js'
 import { ATLAS_STOPS, atlasStops } from '../src/data/atlas.js'
 
 const stops = Object.fromEntries(ATLAS_STOPS.filter(s => s.coordinates).map(s => [s.id, s]))
@@ -22,31 +21,33 @@ for (const m of xml.matchAll(/<way\b[^>]+>([\s\S]*?)<\/way>/g)) {
 }
 const distance = (a, b) => Math.hypot((a[0] - b[0]) * Math.cos(24.055 * Math.PI / 180), a[1] - b[1]) * 111195
 
-test('fresh road extract retains authentic OSM nodes and true junctions', () => {
-  for (const road of TOWN_ROADS) {
-    assert.equal(road.points.length, road.nodeIds.length)
-    road.nodeIds.forEach((id, i) => assert.deepEqual(road.points[i], rawNodes.get(id), `${road.id}/${id}`))
+test('base map is generated from the OSM snapshot with attribution and real streets', () => {
+  for (const lang of ['zh', 'en']) {
+    const svg = fs.readFileSync(new URL(`../public/atlas/lukang-basemap-${lang}.svg`, import.meta.url), 'utf8')
+    assert.match(svg, /OpenStreetMap contributors, ODbL/)
+    assert.match(svg, new RegExp(`viewBox="0 0 ${BASEMAP_SIZE[0]} ${BASEMAP_SIZE[1]}"`))
+    assert.ok(svg.length < 200_000, 'base map stays light')
   }
-  const nodesFor = name => new Set(TOWN_ROADS.filter(r => r.name === name).flatMap(r => r.nodeIds))
-  const zhongshan = nodesFor('中山路')
-  for (const cross of ['民權路', '三民路']) {
-    assert.ok([...nodesFor(cross)].some(id => zhongshan.has(id)), `${cross} must actually meet Zhongshan`)
-  }
+  assert.match(fs.readFileSync(new URL('../public/atlas/lukang-basemap-zh.svg', import.meta.url), 'utf8'), />中山路<.*>民權路<.*>三民路</s)
+  // True scale: 100 m east and 100 m north are the same length on the map.
+  const [x0, y0] = projectToMap([120.433, 24.054])
+  const east = projectToMap([120.433 + 100 / (111320 * Math.cos(24.054 * Math.PI / 180)), 24.054])[0] - x0
+  const north = y0 - projectToMap([120.433, 24.054 + 100 / 111320])[1]
+  assert.ok(Math.abs(east - north) / north < 0.01)
+  assert.ok(distance(MAP_POINTS.辜家大宅, stops.辜家大宅.coordinates) < 60, 'footprint marker stays near the official point')
 })
 
 test('north/south and east/west sight ordering survives both layouts', () => {
   const northToSouth = ['鹿港天后宮','鹿港老街','桂花巷藝術村','辜家大宅','九曲巷','摸乳巷','鹿港龍山寺']
   const westToEast = ['鹿港天后宮','桂花巷藝術村','摸乳巷','鹿港老街','鹿港龍山寺','九曲巷','辜家大宅']
-  for (const mobile of [false, true]) {
-    for (const [ids, axis] of [[northToSouth,1],[westToEast,0]]) ids.slice(1).forEach((id, i) => {
-      assert.ok(townProject(stops[id].coordinates,mobile)[axis] > townProject(stops[ids[i]].coordinates,mobile)[axis], `${ids[i]} before ${id}`)
-    })
-    const tianhou = townProject(stops.鹿港天后宮.coordinates,mobile)
-    const longshan = townProject(stops.鹿港龍山寺.coordinates,mobile)
-    assert.ok(longshan[1] - tianhou[1] > 550)
-    const gui = townProject(stops.桂花巷藝術村.coordinates,mobile)
-    const old = townProject(stops.鹿港老街.coordinates,mobile)
-    assert.ok(Math.abs(gui[1] - old[1]) < 8, 'near-equal latitude must not become a long north/south trip')
+  for (const [ids, axis] of [[northToSouth,1],[westToEast,0]]) ids.slice(1).forEach((id, i) => {
+    assert.ok(projectToMap(stops[id].coordinates)[axis] > projectToMap(stops[ids[i]].coordinates)[axis], `${ids[i]} before ${id}`)
+  })
+  const [mx, my, mw, mh] = MOBILE_VIEWBOX
+  for (const stop of Object.values(stops)) {
+    const [x, y] = projectToMap(MAP_POINTS[stop.id] || stop.coordinates)
+    assert.ok(x > 20 && y > 20 && x < BASEMAP_SIZE[0] - 20 && y < BASEMAP_SIZE[1] - 20, `${stop.id} on desktop map`)
+    assert.ok(x > mx + 20 && y > my + 20 && x < mx + mw - 20 && y < my + mh - 20, `${stop.id} on phone crop`)
   }
 })
 
@@ -68,18 +69,6 @@ test('duration paths use connected real street edges, not point-to-point chords'
     })
   }
   assert.ok(!ATLAS_ITINERARIES[150].order.includes('摸乳巷'), 'plans are not cumulative')
-})
-
-test('labels and drawings stay local; tiers reflect three anchors and restrained public context', () => {
-  assert.deepEqual(Object.entries(TOWN_LABELS).filter(([,l]) => l.tier === 1).map(([id]) => id).sort(), ['鹿港天后宮','鹿港老街','鹿港龍山寺'].sort())
-  for (const [id, label] of Object.entries(TOWN_LABELS)) for (const view of ['desktop','mobile']) {
-    const [x,y] = townProject(stops[id].coordinates,view === 'mobile'), [lx,ly] = label[view]
-    assert.ok(Math.hypot(lx-x,ly-y) < 90, `${id} remote label`)
-    const building = label[view+'Building']
-    if (building) assert.ok(Math.hypot(building[0]-x,building[1]-y) < 60, `${id} remote building`)
-  }
-  assert.equal(PUBLIC_ANCHORS.length,3)
-  assert.ok(PUBLIC_ANCHORS.every(p => p.source.startsWith('https://') && p.coordinates.every(Number.isFinite)))
 })
 
 test('walking estimates derive from short connected legs, not whole-tour duration', () => {
