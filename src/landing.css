@@ -74,3 +74,16 @@ figcaption a { text-decoration: underline; text-underline-offset: 3px; }
   .lp-cards { grid-template-columns: 1fr; }
   .lp-footer-inner { grid-template-columns: 1fr; }
 }
+.lp-columns section > h2:not(:first-child) { margin-top: 48px; }
+.lp-columns section > .body-copy + .body-copy { margin-top: 16px; }
+.lp-highlights { margin: 0; }
+.lp-highlights > div { padding: 16px 0; border-bottom: var(--rule); }
+.lp-highlights > div:first-child { border-top: var(--rule); }
+.lp-highlights dt { font: 500 17px/1.6 var(--serif); }
+.lp-highlights dd { margin: 6px 0 0; color: var(--muted); line-height: 1.9; }
+.lp-sources { margin-top: 40px !important; }
+.lp-sources a { text-decoration: underline; text-underline-offset: 4px; }
+.lp-official { margin-bottom: 40px; padding: 24px; background: var(--surface); }
+.lp-official h2 { margin-bottom: 12px !important; }
+.lp-official .body-copy { font-size: 14px; line-height: 1.9; }
+.lp-official .lp-text-link { margin-top: 12px; }

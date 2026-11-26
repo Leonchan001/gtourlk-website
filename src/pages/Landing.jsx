@@ -20,6 +20,7 @@ import {
   tourStops,
   toursIncluding,
 } from '../data/pages.js'
+import { PLACE_GUIDES } from '../data/placeGuides.js'
 
 const other = (lang) => (lang === 'en' ? 'zh' : 'en')
 const json = (data) => JSON.stringify(data).replaceAll('<', '\\u003c')
@@ -197,6 +198,7 @@ const provider = (lang) => ({
 
 function placeView(lang, id) {
   const place = placeById(id)
+  const guide = PLACE_GUIDES[id]
   const p = place[lang]
   const copy = PAGE_COPY[lang]
   const trail = [
@@ -247,15 +249,51 @@ function placeView(lang, id) {
         <section>
           <h2>{copy.story}</h2>
           <p className="body-copy">{p.story || p.detail}</p>
-          {place.source && (
-            <p className="small-copy">
-              <a href={place.source} target="_blank" rel="noreferrer">
-                {copy.source} ↗
-              </a>
-            </p>
+          {guide && (
+            <>
+              <h2>{copy.history}</h2>
+              {guide[lang].history.map((text) => (
+                <p className="body-copy" key={text}>{text}</p>
+              ))}
+              <h2>{copy.highlights}</h2>
+              <dl className="lp-highlights">
+                {guide[lang].highlights.map(([title, text]) => (
+                  <div key={title}>
+                    <dt>{title}</dt>
+                    <dd>{text}</dd>
+                  </div>
+                ))}
+              </dl>
+              <h2>{copy.tips}</h2>
+              {guide[lang].tips.map((text) => (
+                <p className="body-copy" key={text}>{text}</p>
+              ))}
+            </>
           )}
+          <p className="small-copy lp-sources">
+            {copy.sources}
+            {(guide?.sources || [{ url: place.source, name: copy.source }])
+              .filter((source) => source.url)
+              .map((source, i) => (
+                <React.Fragment key={source.url}>
+                  {i > 0 && '・'}
+                  <a href={source.url} target="_blank" rel="noreferrer">
+                    {source.name[lang] || source.name}
+                  </a>
+                </React.Fragment>
+              ))}
+          </p>
         </section>
         <aside>
+          {guide?.official && (
+            <div className="lp-official">
+              <h2>{copy.official}</h2>
+              <p className="body-copy">{guide.official.note[lang]}</p>
+              <a className="lp-text-link" href={guide.official.url} target="_blank" rel="noreferrer">
+                {guide.official.label[lang]} <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          )}
           <h2>{copy.inTours}</h2>
           {tours.length ? (
             <ul className="lp-link-list">

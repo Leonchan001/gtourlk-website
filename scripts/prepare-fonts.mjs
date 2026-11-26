@@ -44,8 +44,12 @@ const cjk = [...characters].filter((character) => !latin.includes(character))
 const subsets = [
   ['latin', latin],
   ['opening', cjk.filter((character) => opening.includes(character)).join('')],
-  ['body', cjk.filter((character) => !opening.includes(character)).join('')],
 ]
+// Google Fonts silently drops most glyphs when `text` gets too long, so the
+// body subset is requested in chunks: body, body-2, body-3...
+const body = cjk.filter((character) => !opening.includes(character))
+for (let i = 0; i < body.length; i += 500)
+  subsets.push([i ? `body-${i / 500 + 1}` : 'body', body.slice(i, i + 500).join('')])
 const families = [
   // Body text uses the visitor's system Chinese font (PingFang TC,
   // Microsoft JhengHei, Noto Sans CJK); only Latin glyphs are bundled.
