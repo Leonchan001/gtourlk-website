@@ -61,7 +61,8 @@ function onDocumentClick(event) {
       link_location: linkLocation(link),
       line_account: lineAccount(href),
       with_summary: link.dataset.analyticsSummary === 'true',
-      link_url: href,
+      // Drop the query: oaMessage links carry the guest's trip details.
+      link_url: href.split('?')[0],
     })
   } else if (href.startsWith('tel:')) {
     track('phone_click', {

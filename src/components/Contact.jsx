@@ -230,6 +230,8 @@ export default function Contact({ trip, updateTrip: setTrip }) {
             {valid ? (
               <a
                 href={lineMessageUrl(summary)}
+                data-analytics-location="booking_summary"
+                data-analytics-summary="true"
                 target="_blank"
                 rel="noreferrer"
                 className="button"
