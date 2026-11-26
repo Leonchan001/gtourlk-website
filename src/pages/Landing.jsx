@@ -25,7 +25,7 @@ import { PLACE_GUIDES } from '../data/placeGuides.js'
 const other = (lang) => (lang === 'en' ? 'zh' : 'en')
 const json = (data) => JSON.stringify(data).replaceAll('<', '\\u003c')
 
-function Picture({ photo, lang, priority, sizes = '(min-width: 900px) 56vw, 100vw' }) {
+function Picture({ photo, lang, priority, eager, sizes = '(min-width: 900px) 56vw, 100vw' }) {
   if (!photo) return null
   return (
     <picture className="lp-photo">
@@ -41,7 +41,7 @@ function Picture({ photo, lang, priority, sizes = '(min-width: 900px) 56vw, 100v
         width={photo.width}
         height={photo.height}
         style={{ objectPosition: photo.position || 'center' }}
-        loading={priority ? 'eager' : 'lazy'}
+        loading={priority || eager ? 'eager' : 'lazy'}
         fetchpriority={priority ? 'high' : undefined}
         decoding="async"
       />
@@ -479,14 +479,15 @@ function placesView(lang) {
     [copy.home, homePath(lang)],
     [copy.places, placesPath(lang)],
   ]
-  const group = (title, places) => (
+  // The first cards sit in the first screen, so they load eagerly (the first one is the LCP).
+  const group = (title, places, firstGroup) => (
     <section className="lp-group">
       <h2>{title}</h2>
       <ul className="lp-cards">
-        {places.map((place) => (
+        {places.map((place, index) => (
           <li key={place.id}>
             <a href={placePath(lang, place.id)}>
-              <Picture photo={place.photo} lang={lang} sizes="(min-width: 900px) 30vw, 100vw" />
+              <Picture photo={place.photo} lang={lang} priority={firstGroup && index === 0} eager={firstGroup && index < 3} sizes="(min-width: 900px) 30vw, 100vw" />
               <strong>{place[lang].name}</strong>
               <span>{place[lang].highlight || place[lang].detail}</span>
             </a>
@@ -515,7 +516,7 @@ function placesView(lang) {
         <h1>{copy.placesHeading}</h1>
         <p className="body-copy">{copy.placesIntro}</p>
       </div>
-      {group(copy.featuredPlaces, PLACES.filter((p) => p.featured))}
+      {group(copy.featuredPlaces, PLACES.filter((p) => p.featured), true)}
       {group(copy.morePlaces, PLACES.filter((p) => !p.featured))}
       <Cta lang={lang} title={copy.ctaTitle(lang === 'en' ? 'Lukang' : '鹿港')} />
     </>

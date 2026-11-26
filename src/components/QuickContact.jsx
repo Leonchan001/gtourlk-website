@@ -20,9 +20,8 @@ export function QuickContact({ location, className = '', showCall = true }) {
         <a
           className="quick-call"
           href={`tel:${phone.tel}`}
-          aria-label={`${copy.contact.callPrimary} ${phone.display}`}
         >
-          {copy.contact.call}
+          {copy.contact.call}{' '}
           <span className="quick-call-number">{phone.display}</span>
         </a>
       )}

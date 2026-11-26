@@ -5,6 +5,7 @@ import { ATLAS_STOPS } from '../data/atlas'
 import { MORE_PLACES } from '../data/morePlaces'
 import { ATLAS_STORIES } from '../data/atlasStories'
 import { ATLAS_PHOTOS } from '../data/atlasPhotos'
+import { atlasSources } from '../data/atlasSources'
 import { ATLAS_ITINERARIES } from '../data/atlasItineraries'
 import { MEDIA, MEDIA_CREDITS } from '../data/media'
 import { placePath, placesPath } from '../data/pages'
@@ -39,11 +40,11 @@ const UI = {
 
 function photoFor(place) {
   const photo = ATLAS_PHOTOS[place.id]
-  if (photo) return { src: photo.src, width: photo.width, height: photo.height, position: photo.position, alt: photo.alt, source: photo.source, credit: `${photo.author}${photo.year ? ` (${photo.year})` : ''}`, license: photo.license, licenseUrl: photo.licenseUrl }
+  if (photo) return { sources: atlasSources(photo.src, photo.width), src: photo.src, width: photo.width, height: photo.height, position: photo.position, alt: photo.alt, source: photo.source, credit: `${photo.author}${photo.year ? ` (${photo.year})` : ''}`, license: photo.license, licenseUrl: photo.licenseUrl }
   const key = ATLAS_STORIES[place.id]?.photoKey
   const media = key && MEDIA[key]
   const credit = key && MEDIA_CREDITS[key]
-  return media ? { src: media.src, width: media.width, height: media.height, position: media.position, alt: media.alt, source: credit?.source, creditByLang: credit, licenseUrl: credit?.license } : null
+  return media ? { sources: media.sources, src: media.src, width: media.width, height: media.height, position: media.position, alt: media.alt, source: credit?.source, creditByLang: credit, licenseUrl: credit?.license } : null
 }
 
 function Visual({ place, lang, large = false }) {
@@ -52,7 +53,13 @@ function Visual({ place, lang, large = false }) {
   if (!photo || failed) return <span className="route-stop-visual is-drawing" aria-hidden="true"><LandmarkDrawing kind={DRAWING[place.id] || 'lane'} /></span>
   return (
     <figure className="route-stop-visual">
-      <img src={photo.src} alt={large ? photo.alt?.[lang] || place[lang].name : ''} width={photo.width} height={photo.height} loading="lazy" decoding="async" style={{ objectPosition: photo.position || 'center' }} onError={() => setFailed(true)} />
+      <picture>
+        {photo.sources && <>
+          <source type="image/avif" srcSet={photo.sources.avif} sizes={large ? '(min-width: 900px) 40vw, 90vw' : '84px'} />
+          <source type="image/webp" srcSet={photo.sources.webp} sizes={large ? '(min-width: 900px) 40vw, 90vw' : '84px'} />
+        </>}
+        <img src={photo.src} alt={large ? photo.alt?.[lang] || place[lang].name : ''} width={photo.width} height={photo.height} loading="lazy" decoding="async" style={{ objectPosition: photo.position || 'center' }} onError={() => setFailed(true)} />
+      </picture>
       {large && photo.source && <figcaption><a href={photo.source} target="_blank" rel="noreferrer">{photo.creditByLang ? photo.creditByLang[lang] : `${place[lang].name} · ${photo.credit}`}</a>{photo.licenseUrl && <> · <a href={photo.licenseUrl} target="_blank" rel="noreferrer">{photo.license || UI[lang].license}</a></>}</figcaption>}
     </figure>
   )
