@@ -2,6 +2,7 @@ import { BUSINESS } from '../data/business'
 import { REVIEW_COPY } from '../data/reviews'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
+import { SITE_COPY } from '../data/siteCopy'
 export default function SocialProof() {
   const { lang } = useLanguage()
   const copy = EXPERIENCE_COPY[lang].reviews
@@ -13,7 +14,7 @@ export default function SocialProof() {
     >
       <div className="page-width reviews-layout">
         <div className="reviews-rating">
-          <p className="eyebrow">04 / Words from our guests</p>
+          <p className="eyebrow">{SITE_COPY[lang].sections.reviews}</p>
           <p className="rating-number">{BUSINESS.reviewRating}</p>
           <p
             className="rating-stars"

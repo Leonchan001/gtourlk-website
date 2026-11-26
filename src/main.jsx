@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import './editorial.css'
+import './uiux.css'
 import { LanguageProvider } from './i18n.jsx'
 import { initAnalytics } from './analytics.js'
 

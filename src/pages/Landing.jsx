@@ -1,7 +1,8 @@
 // Static sight and route pages: build-time HTML only, no client JavaScript.
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { BUSINESS } from '../data/business.js'
+import { BUSINESS, lineMessageUrl } from '../data/business.js'
+import { SITE_COPY } from '../data/siteCopy.js'
 import { getTourPlans } from '../data/tours.js'
 import {
   BUSINESS_ID,
@@ -91,7 +92,7 @@ function Header({ lang, alternate }) {
           <a href={alternate} lang={copy.switchLang} hrefLang={copy.switchLang}>
             {copy.switchLabel}
           </a>
-          <a className="lp-book" href={BUSINESS.lineUrl} target="_blank" rel="noreferrer">
+          <a className="lp-book" href={lineMessageUrl(copy.lineHello)} target="_blank" rel="noreferrer">
             {copy.book} <span aria-hidden="true">↗</span>
           </a>
         </nav>
@@ -114,16 +115,21 @@ function Breadcrumbs({ lang, trail }) {
   )
 }
 
-function Cta({ lang, title }) {
+function Cta({ lang, title, lineText, showPrice = true }) {
   const copy = PAGE_COPY[lang]
+  const phone = BUSINESS.phones[0]
   return (
     <section className="lp-cta">
       <h2>{title}</h2>
       <p>{copy.ctaBody}</p>
+      {showPrice && <p className="lp-cta-price">{copy.priceFrom}</p>}
       <p className="lp-cta-note">{copy.lineDiscount}</p>
       <div className="lp-actions">
-        <a className="button" href={BUSINESS.lineUrl} target="_blank" rel="noreferrer">
+        <a className="button" href={lineMessageUrl(lineText || copy.lineHello)} target="_blank" rel="noreferrer">
           {copy.book} <span aria-hidden="true">↗</span>
+        </a>
+        <a className="lp-text-link" href={`tel:${phone.tel}`}>
+          {phone.display}
         </a>
         <a className="lp-text-link" href={`${homePath(lang)}#contact`}>
           {copy.plan} <span aria-hidden="true">→</span>
@@ -155,8 +161,10 @@ function Footer({ lang, year }) {
           <a href={BUSINESS.lineUrl} target="_blank" rel="noreferrer">
             LINE / {BUSINESS.lineId} ↗
           </a>
-          {BUSINESS.phones.map((phone) => (
-            <a key={phone.tel} href={`tel:${phone.tel}`}>{phone.display}</a>
+          {BUSINESS.phones.map((phone, i) => (
+            <a key={phone.tel} href={`tel:${phone.tel}`}>
+              {SITE_COPY[lang].header.phoneLabels[i]}・{phone.display}
+            </a>
           ))}
         </div>
       </div>
@@ -276,7 +284,7 @@ function placeView(lang, id) {
           </ul>
         </aside>
       </div>
-      <Cta lang={lang} title={copy.ctaTitle(p.name)} />
+      <Cta lang={lang} title={copy.ctaTitle(p.name)} lineText={copy.linePlace(p.name)} />
     </>
   )
   return {
@@ -409,7 +417,7 @@ function tourView(lang, minutes) {
           </ul>
         </aside>
       </div>
-      <Cta lang={lang} title={copy.bookTour} />
+      <Cta lang={lang} title={copy.bookTour} lineText={copy.lineTour(plan)} showPrice={false} />
     </>
   )
   return {

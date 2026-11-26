@@ -47,12 +47,9 @@ const subsets = [
   ['body', cjk.filter((character) => !opening.includes(character)).join('')],
 ]
 const families = [
-  ...subsets.map(([suffix, text]) => [
-    'Noto Sans TC',
-    `noto-sans-tc-${suffix}`,
-    text,
-    'notosanstc',
-  ]),
+  // Body text uses the visitor's system Chinese font (PingFang TC,
+  // Microsoft JhengHei, Noto Sans CJK); only Latin glyphs are bundled.
+  ['Noto Sans TC', 'noto-sans-tc-latin', latin, 'notosanstc'],
   ...subsets.map(([suffix, text]) => [
     'Noto Serif TC',
     `noto-serif-tc-${suffix}`,

@@ -42,6 +42,7 @@ export default function Footer() {
                 {item.label}
               </a>
             ))}
+            <a href="#about">{copy.header.about}</a>
             {getTourPlans(lang).map((plan) => (
               <a href={tourPath(lang, plan.minutes)} key={plan.minutes}>
                 {lang === 'zh' ? `${plan.minutes} 分鐘路線` : `${plan.minutes}-minute route`}
@@ -61,8 +62,9 @@ export default function Footer() {
               <a
                 key={phone.tel}
                 href={`tel:${phone.tel}`}
-                aria-label={`${copy.header.phoneLabels[i]} ${phone.display}`}
+                className="footer-phone"
               >
+                <small>{copy.header.phoneLabels[i]}</small>
                 {phone.display}
               </a>
             ))}
@@ -73,7 +75,7 @@ export default function Footer() {
             © {new Date(clock).getFullYear()} {BUSINESS.name}. All rights
             reserved.
           </span>
-          <span>LUKANG · CHANGHUA · TAIWAN</span>
+          <span>{lang === 'zh' ? '台灣・彰化・鹿港' : 'LUKANG · CHANGHUA · TAIWAN'}</span>
           <a href="#top">{lang === 'zh' ? '回到頁首 ↑' : 'Back to top ↑'}</a>
         </div>
       </div>

@@ -9,10 +9,10 @@ function sourceText(dir) {
     return entry.isDirectory() ? sourceText(file) : /\.(jsx?|css)$/.test(entry.name) ? fs.readFileSync(file,'utf8') : ''
   }).join('')
 }
-test('both Chinese font families cover all site copy, including dynamic sight stories', () => {
+test('the serif family covers all Chinese site copy; sans bundles Latin only', () => {
   const characters = new Set(sourceText('src').match(/[\u2e80-\u9fff\uff00-\uffef]/gu))
   const css = fs.readFileSync('src/fonts.css','utf8')
-  for (const family of ['Noto Sans TC','Noto Serif TC']) {
+  for (const family of ['Noto Serif TC']) {
     const faces = css.match(/@font-face\{[^}]+\}/g).filter(face=>face.includes(`"${family}"`))
     const points = new Set([...faces.join('').matchAll(/U\+([0-9a-f]+)/gi)].map(m=>parseInt(m[1],16)))
     const missing = [...characters].filter(c=>!points.has(c.codePointAt(0)))
@@ -24,4 +24,8 @@ test('both Chinese font families cover all site copy, including dynamic sight st
       assert.ok(fs.existsSync('public'+asset), `Missing font file ${asset}`)
     }
   }
+  const sans = css.match(/@font-face\{[^}]+\}/g).filter(face=>face.includes('"Noto Sans TC"'))
+  assert.equal(sans.length, 1)
+  assert.ok(![...sans[0].matchAll(/U\+([0-9a-f]+)/gi)].some(m=>parseInt(m[1],16) >= 0x2e80), 'Sans should stay Latin-only; CJK body text uses system fonts')
+  assert.match(fs.readFileSync('src/index.css','utf8'), /--sans:[^;]*PingFang TC[^;]*Microsoft JhengHei/)
 })

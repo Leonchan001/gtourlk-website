@@ -1,4 +1,5 @@
 import { useLanguage } from '../i18n'
+import { SITE_COPY } from '../data/siteCopy'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import Photo from './Photo'
 
@@ -11,7 +12,7 @@ export default function BrandStatement() {
       aria-labelledby="brand-title"
     >
       <div className="page-width brand-layout">
-        <p className="eyebrow brand-label">01 / A town, told by its people</p>
+        <p className="eyebrow brand-label">{SITE_COPY[lang].sections.brand}</p>
         <h2 id="brand-title" className="brand-title">
           {copy.title.map((line, i) => (
             <span key={line} className={i === 2 ? 'accent' : ''}>
