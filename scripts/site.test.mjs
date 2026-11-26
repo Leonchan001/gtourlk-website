@@ -131,3 +131,12 @@ test(
     }
   },
 )
+
+test('LINE booking link opens the official account with the summary prefilled', async () => {
+  const { lineMessageUrl } = await import('../src/data/business.js')
+  const text = '您好導鹿\n日期：2026-12-01 & 人數：2 位?'
+  const url = lineMessageUrl(text)
+  assert.ok(url.startsWith('https://line.me/R/oaMessage/@lk167/?'))
+  assert.equal(decodeURIComponent(url.split('/?')[1]), text)
+  assert.ok(!/[\s&?#]/.test(url.split('/?')[1]))
+})
