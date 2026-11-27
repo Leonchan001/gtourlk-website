@@ -162,6 +162,10 @@ test('binding commands need the bind code', () => {
   post(bot, [event('綁定主要 123456', 'Udad'), event('綁定備援 123456', 'Umom')])
   assert.equal(bot.store.PRIMARY_USER_ID, 'Udad')
   assert.equal(bot.store.BACKUP_USER_ID, 'Umom')
+  post(bot, [event('綁定主要１２３４５６', 'Udad2')])
+  assert.equal(bot.store.PRIMARY_USER_ID, 'Udad2')
+  post(bot, [event('綁定 主要', 'Ux')])
+  assert.match(replies(bot).at(-1).body.messages[0].text, /綁定格式/)
 })
 
 test('website inquiry: free reply to guest, one push to primary, logged', () => {

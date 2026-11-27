@@ -434,7 +434,13 @@ function isStaff(userId) {
  *   小幫手狀態             → 看目前設定與額度（只有負責人能用）
  */
 function handleAdminCommand(msg, userId, replyToken) {
-  var m = msg.match(/^綁定(主要|備援)\s+(\S+)$/);
+  // 容許中間沒空格、全形空格或全形數字，例如「綁定主要 １２３４５６」
+  var compact = msg.replace(/\s+/g, '').replace(/[０-９]/g, function (d) { return String.fromCharCode(d.charCodeAt(0) - 0xFEE0); });
+  var m = compact.match(/^綁定(主要|備援)[:：]?(\S+)$/);
+  if (!m && compact.indexOf('綁定') === 0) {
+    reply(replyToken, [text('綁定格式：「綁定主要 綁定碼」或「綁定備援 綁定碼」。')]);
+    return true;
+  }
   if (m) {
     var code = prop('BIND_CODE');
     if (!code || m[2] !== code) { reply(replyToken, [text('綁定碼不正確。')]); return true; }
@@ -461,7 +467,7 @@ function handleInquiry(inquiry, raw, userId, replyToken, now) {
   var sheet, id, duplicate, name, flags;
   try {
     sheet = logSheet();
-    duplicate = recentPending(sheet, userId, now);
+    duplicate = prop('TEST_MODE') !== 'on' && recentPending(sheet, userId, now);
     if (!duplicate) {
       id = Utilities.formatDate(now, TZ, 'MMddHHmmss') + '-' + userId.slice(-4);
       name = displayNameOf(userId);
