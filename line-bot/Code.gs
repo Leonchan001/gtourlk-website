@@ -10,7 +10,9 @@
  *   4. 導覽時長（按鈕上直接顯示參考價）
  *   5. 上車地點（可直接打字）
  *   6. 聯絡手機
- *   → 預約摘要（和官網送出的格式一樣）＋寫進 Google 試算表
+ *   → 簡短的預約摘要（含參考價）＋寫進 Google 試算表
+ *
+ * 晚上（REPLY_END_HOUR 後）一般訊息由小幫手回一次「訊息收到」，取代官方帳號的「非回應時間｜通用」。
  *
  * 全部用免費的「回覆訊息」，不花每月推播額度。旅客任何時候打字聊天，小幫手就安靜退出，交給真人。
  * 官網送出的完整預約訊息不再問一次，只記到試算表。
@@ -22,8 +24,12 @@ var DEFAULTS = {
   INTENT_KEYWORDS: '我要預約導覽,預約導覽,導覽預約,我想預約,book a tour,booking',
   TIME_OPTIONS: '09:00,10:00,11:00,13:00,14:00,15:00,16:00',
   PICKUP_OPTIONS: '天后宮停車場旁',
-  REPLY_START_HOUR: '8',    // 真人回覆時段（台北時間），用在最後一句「多久會回覆」
-  REPLY_END_HOUR: '21',
+  REPLY_START_HOUR: '8',    // 真人回覆時段（台北時間），和官方帳號的回應時間一致
+  REPLY_END_HOUR: '19',
+  // 非回應時間由小幫手回這句（每位旅客一晚只回一次），請關掉官方帳號的「非回應時間｜通用」自動回應，避免重複
+  NIGHT_ACK: '訊息收到 🦌 我們會於下一個 08:00–19:00 回覆時段處理。\n行程、價格與預約：https://gtourlk.com.tw/\n預約須由專人確認。',
+  // 官方帳號關鍵字自動回應已經會回的字，晚上不再加回「訊息收到」
+  OA_KEYWORDS: '停車資訊,上車停車,停車,上車地點,回覆時間,營業時間,幾點回覆,優惠,LINE優惠,95折,常見問題,FAQ,活動優惠,優惠券,150分鐘優惠,價格,費用,收費,行程怎麼選,導覽行程,行程,我要詢問接送,在地接送,接送',
   FLOW_HOURS: '6'           // 問到一半多久沒動作就作廢（最多 6 小時）
 };
 
@@ -40,10 +46,6 @@ var STEPS = ['date', 'time', 'people', 'minutes', 'pickup', 'phone'];
 
 // 和官網 src/data/tours.js 的 TOUR_PRICING 相同
 var PRICING = { oneToTwoHourly: 600, threePlusHourlyPerPerson: 200, guestsPerVehicle: 5, lineDiscountRate: 0.95 };
-var DEFAULT_ROUTE = {
-  zh: '沒有特別要求，就按所選時長的導鹿預設路線安排；想去特定地方，直接跟導覽員說明即可。',
-  en: 'We follow the GtourLK default route for your chosen duration unless you request otherwise. Tell your guide directly about any special requests.'
-};
 
 // ---------------------------------------------------------------- 安裝
 
@@ -107,39 +109,31 @@ function money(amount) {
 function cleanPhone(value) { return String(value || '').replace(/[\s\-().]/g, ''); }
 function validPhone(value) { return /^\+?\d{8,15}$/.test(cleanPhone(value)); }
 
-/** 摘要的欄位行，格式和官網 bookingSummary 一樣，負責人看起來不會有差別。 */
-function summaryLines(trip, lang) {
+/** 給旅客看的短摘要。 */
+function guestSummary(trip, lang) {
+  var en = lang === 'en';
+  var tbc = en ? 'TBC' : '待確認';
   var est = estimateTour(trip.people, trip.minutes);
-  if (lang === 'en') {
-    var tbc = 'To be confirmed';
-    return [
-      'Date: ' + (trip.date || tbc),
-      'Departure: ' + (trip.departure || tbc),
-      'Guests: ' + (trip.people || tbc),
-      'Mobile: ' + (trip.phone || tbc),
-      'Duration: ' + (trip.minutes ? trip.minutes + ' minutes' : tbc),
-      'Route: ' + DEFAULT_ROUTE.en,
-      'Pick-up / drop-off: ' + (trip.pickup || tbc),
-      'Other requests: ' + (trip.notes || 'None specified'),
-      'Estimated vehicles: ' + (est ? est.vehicles : tbc),
-      'Standard total: ' + (est ? money(est.total) : tbc),
-      'Official LINE estimate (5% off): ' + (est ? money(est.linePrice) : tbc)
-    ];
+  var date = tbc;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trip.date || '')) {
+    var wd = new Date(trip.date + 'T00:00:00Z').getUTCDay();
+    var md = Number(trip.date.slice(5, 7)) + '/' + Number(trip.date.slice(8, 10));
+    date = en ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][wd] + ' ' + md : md + '（' + '日一二三四五六'.charAt(wd) + '）';
   }
-  var pending = '待確認';
-  return [
-    '日期：' + (trip.date || pending),
-    '出發時間：' + (trip.departure || pending),
-    '人數：' + (trip.people ? trip.people + ' 位' : pending),
-    '聯絡手機：' + (trip.phone || pending),
-    '導覽時間：' + (trip.minutes ? trip.minutes + ' 分鐘' : pending),
-    '路線：' + DEFAULT_ROUTE.zh,
-    '上下車地點：' + (trip.pickup || pending),
-    '其他需求：' + (trip.notes || '未指定'),
-    '預估車輛：' + (est ? est.vehicles : pending) + ' 台',
-    '牌價合計：' + (est ? money(est.total) : pending),
-    '官方 LINE 預約參考價（95 折）：' + (est ? money(est.linePrice) : pending)
+  var lines = en ? [
+    '📅 ' + date + ' · ' + (trip.departure || 'time TBC'),
+    '👥 ' + (trip.people ? trip.people + (trip.people === 1 ? ' guest' : ' guests') : tbc) + ' · ' + (trip.minutes ? trip.minutes + ' min' : tbc),
+    '💰 ' + (est ? 'Estimate ' + money(est.linePrice) + ' (LINE 5% off)' : 'We will send you a quote'),
+    '📍 Pick-up: ' + (trip.pickup || tbc),
+    '📞 Mobile: ' + (trip.phone || tbc)
+  ] : [
+    '📅 ' + date + '・' + (trip.departure || '時間待確認'),
+    '👥 ' + (trip.people ? trip.people + ' 位' : tbc) + '・' + (trip.minutes ? trip.minutes + ' 分鐘' : tbc),
+    '💰 ' + (est ? '參考價 ' + money(est.linePrice) + '（LINE 95 折）' : '導鹿會另外幫您報價'),
+    '📍 上車：' + (trip.pickup || tbc),
+    '📞 手機：' + (trip.phone || tbc)
   ];
+  return lines.join('\n');
 }
 
 /** 平日／今天／明天／日期已過 */
@@ -264,11 +258,10 @@ var COPY = {
     chat: '改用文字聊', chatDisplay: '我想直接用文字聊',
     chatReply: '好的，直接在這裡留言就可以，導鹿會盡快回覆您 🦌',
     expired: '這個選單已經過期了，請再點一次「我要預約導覽」。',
-    summaryTitle: '這是您的預約詢問摘要：',
-    largeGroup: '人數較多，導鹿會另外幫您報價。',
-    dayReply: '導鹿會在這裡跟您確認時段、集合地點與費用，白天通常幾分鐘內回覆 🦌',
-    nightReply: function (h) { return '現在是休息時間，導鹿明天早上 ' + h + ' 點起會優先回覆您 🦌'; },
-    edit: '想修改的話，直接打字告訴我們就好。'
+    summaryTitle: '這是您的預約詢問 🦌',
+    dayReply: '導鹿會在這裡跟您確認時段與費用，通常幾分鐘內回覆。',
+    nightReply: function (h) { return '現在是休息時間，導鹿明天早上 ' + h + ' 點後回覆您。'; },
+    edit: '想修改或有其他需求，直接打字告訴我們就好。'
   },
   en: {
     date: 'Great, let’s plan your tour 🦌\nWhich day would you like to visit Lukang?',
@@ -284,11 +277,10 @@ var COPY = {
     chat: 'Just chat', chatDisplay: 'I’d like to just chat',
     chatReply: 'Sure, just send us a message here and we will reply soon 🦌',
     expired: 'This menu has expired. Please tap “Book a tour” again.',
-    summaryTitle: 'Here is your booking request:',
-    largeGroup: 'For a large group we will send you a separate quote.',
-    dayReply: 'We will confirm the time, meeting point and fee with you here, usually within minutes during the day 🦌',
-    nightReply: function (h) { return 'We are offline now and will reply after ' + h + ':00 AM (Taiwan time) 🦌'; },
-    edit: 'Need to change something? Just type it here.'
+    summaryTitle: 'Your booking request 🦌',
+    dayReply: 'We will confirm the time and fee with you here, usually within minutes.',
+    nightReply: function (h) { return 'We are offline now and will reply after ' + h + ':00 AM (Taiwan time).'; },
+    edit: 'Anything to change or add? Just type it here.'
   }
 };
 
@@ -367,12 +359,28 @@ function nextStep(state) {
 /** 最後給旅客的摘要。 */
 function finalMessages(state, now) {
   var c = COPY[state.lang];
+  var night = isNight(now);
+  if (night) markNightAck(state.userId); // 已經說過幾點回覆，今晚不再回「訊息收到」
+  return [text(c.summaryTitle + '\n\n' + guestSummary(state, state.lang) + '\n\n' +
+    (night ? c.nightReply(Number(prop('REPLY_START_HOUR'))) : c.dayReply) + '\n' + c.edit)];
+}
+
+function isNight(now) {
   var hour = taipeiNow(now).hour;
-  var start = Number(prop('REPLY_START_HOUR')), end = Number(prop('REPLY_END_HOUR'));
-  var night = hour < start || hour >= end;
-  var body = c.summaryTitle + '\n\n' + summaryLines(state, state.lang).join('\n');
-  if (state.people && !estimateTour(state.people, state.minutes)) body += '\n\n' + c.largeGroup;
-  return [text(body), text((night ? c.nightReply(start) : c.dayReply) + '\n' + c.edit)];
+  return hour < Number(prop('REPLY_START_HOUR')) || hour >= Number(prop('REPLY_END_HOUR'));
+}
+
+function markNightAck(userId) {
+  CacheService.getScriptCache().put('night_' + userId, '1', 21600);
+}
+
+/** 非回應時間的一般訊息：每位旅客一晚只回一次「訊息收到」；官方帳號關鍵字已經會回的就不回。 */
+function nightAck(msg, userId, replyToken, now) {
+  if (!isNight(now) || !prop('NIGHT_ACK')) return;
+  if (listProp('OA_KEYWORDS').indexOf(msg) !== -1) return;
+  if (CacheService.getScriptCache().get('night_' + userId)) return;
+  markNightAck(userId);
+  reply(replyToken, [text(prop('NIGHT_ACK').replace(/\\n/g, '\n'))]);
 }
 
 // ---------------------------------------------------------------- 對話狀態（存在快取，FLOW_HOURS 小時後作廢）
@@ -518,7 +526,7 @@ function handleText(msg, userId, replyToken, now) {
     // 官網表單已經有完整資料，不再問一次；只記到試算表，交給真人回覆。
     clearState(userId);
     writeRow(newRecord(trip, msg, userId, now), STATUS.WEBSITE, now);
-    return;
+    return nightAck(msg, userId, replyToken, now);
   }
   if (trip) {
     var fresh = newRecord(trip, msg, userId, now);
@@ -529,7 +537,7 @@ function handleText(msg, userId, replyToken, now) {
   }
 
   var state = loadState(userId);
-  if (!state) return; // 一般聊天，交給真人
+  if (!state) return nightAck(msg, userId, replyToken, now); // 一般聊天，交給真人
   var c = COPY[state.lang];
   var step = state.step;
   // 問到一半，有些步驟可以直接打字回答
@@ -549,6 +557,7 @@ function handleText(msg, userId, replyToken, now) {
   clearState(userId);
   state.notes = (state.notes ? state.notes + '／' : '') + msg.slice(0, 200);
   writeRow(state, STATUS.CHAT, now);
+  nightAck(msg, userId, replyToken, now);
 }
 
 function handlePostback(event, userId, now) {

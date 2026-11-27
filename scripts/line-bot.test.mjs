@@ -137,17 +137,16 @@ test('recognises hello buttons and booking keywords, ignores small talk', () => 
   assert.equal(ctx.parseInquiry('謝謝', kw), null)
 })
 
-test('price and summary lines match the website exactly', () => {
+test('price matches the website, summary is short and readable', () => {
   const { ctx } = load()
   for (const people of [1, 2, 3, 7, 50, 51]) for (const minutes of [60, 90, 150]) {
     assert.deepEqual(JSON.parse(JSON.stringify(ctx.estimateTour(people, minutes))), siteEstimate(people, minutes))
   }
-  for (const t of [trip, { ...trip, phone: '', pickup: '天后宮停車場旁', notes: '長輩同行' }, { ...trip, date: '', people: 7, minutes: 150 }]) {
-    for (const lang of ['zh', 'en']) {
-      const site = bookingSummary(t, lang)
-      for (const line of ctx.summaryLines(t, lang)) assert.ok(site.includes(line), `${lang}: ${line}`)
-    }
-  }
+  const zh = ctx.guestSummary({ date: '2026-12-17', departure: '', people: 5, minutes: 90, pickup: '', phone: '' }, 'zh')
+  assert.equal(zh, '📅 12/17（四）・時間待確認\n👥 5 位・90 分鐘\n💰 參考價 NT$1,425（LINE 95 折）\n📍 上車：待確認\n📞 手機：待確認')
+  const en = ctx.guestSummary({ date: '2026-12-19', departure: '10:00', people: 60, minutes: 60, pickup: 'Hotel', phone: '+81 90' }, 'en')
+  assert.match(en, /Sat 12\/19 · 10:00/)
+  assert.match(en, /separate quote|send you a quote/)
 })
 
 test('understands typed dates, times and phone numbers', () => {
@@ -203,11 +202,12 @@ test('full button flow: every answer is a free reply and the summary has the pri
   assert.match(lastReply(bot)[0].text, /不太對/)
   send(bot, event('0912-345-678'))
   const done = lastReply(bot)
-  assert.match(done[0].text, /日期：2026-12-02/)
-  assert.match(done[0].text, /聯絡手機：0912-345-678/)
-  assert.match(done[0].text, /上下車地點：鹿港老街民宿/)
+  assert.equal(done.length, 1)
+  assert.match(done[0].text, /12\/2（三）・14:00/)
+  assert.match(done[0].text, /手機：0912-345-678/)
+  assert.match(done[0].text, /上車：鹿港老街民宿/)
   assert.match(done[0].text, /NT\$1,140/)
-  assert.match(done[1].text, /幾分鐘內回覆/)
+  assert.match(done[0].text, /幾分鐘內回覆/)
   assert.equal(pushes(bot).length, 0)
   const rows = bot.getSheet().rows
   assert.equal(rows.length, 2) // 同一筆一路更新，不會一步一列
@@ -236,13 +236,15 @@ test('"not sure" and typed answers all work; night reply says when we answer', (
   send(bot, pb('f=pickup&v='), NIGHT)
   assert.deepEqual(quick(lastReply(bot)[0]).map((a) => a.label), ['Just chat']) // no skip button
   send(bot, event('+81 90 1234 5678'), NIGHT)
-  const done = lastReply(bot)
-  assert.match(done[0].text, /Date: 2026-12-24/)
-  assert.match(done[0].text, /Departure: To be confirmed/)
-  assert.match(done[0].text, /Guests: 25/)
-  assert.match(done[0].text, /Duration: 150 minutes/)
-  assert.match(done[0].text, /Mobile: \+81 90 1234 5678/)
-  assert.match(done[1].text, /8:00 AM/)
+  const done = lastReply(bot)[0].text
+  assert.match(done, /Thu 12\/24 · time TBC/)
+  assert.match(done, /25 guests · 150 min/)
+  assert.match(done, /Mobile: \+81 90 1234 5678/)
+  assert.match(done, /8:00 AM/)
+  // already told when we reply, so no "message received" later tonight
+  const n = replies(bot).length
+  send(bot, event('Can we bring a stroller?'), NIGHT)
+  assert.equal(replies(bot).length, n)
 })
 
 test('typing anything else hands the chat to a person, quietly', () => {
@@ -270,6 +272,20 @@ test('"just chat" button and old buttons', () => {
   send(bot, pb('f=chat'))
   assert.match(lastReply(bot)[0].text, /直接在這裡留言/)
   assert.equal(bot.getSheet().rows[1][15], '改用文字聊')
+})
+
+test('at night, one "message received" per guest, and none for menu keywords', () => {
+  const bot = load()
+  send(bot, event('請問有空位嗎'), NIGHT)
+  assert.match(lastReply(bot)[0].text, /訊息收到/)
+  send(bot, event('還有一個問題'), NIGHT)
+  assert.equal(replies(bot).length, 1)
+  send(bot, event('價格', 'Uguest0002'), NIGHT) // the account's own keyword reply answers this
+  assert.equal(replies(bot).length, 1)
+  send(bot, event('請問有空位嗎', 'Uguest0003'), DAY) // daytime: people reply
+  assert.equal(replies(bot).length, 1)
+  send(bot, event(bookingSummary(trip, 'zh'), 'Uguest0004'), NIGHT)
+  assert.match(lastReply(bot)[0].text, /訊息收到/)
 })
 
 test('website form is only logged, never asked again', () => {
