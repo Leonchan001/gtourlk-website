@@ -9,7 +9,7 @@
  *   3. 人數
  *   4. 導覽時長（按鈕上直接顯示參考價）
  *   5. 上車地點（可直接打字）
- *   6. 聯絡手機（選填，可略過）
+ *   6. 聯絡手機（有「略過」按鈕）
  *   → 預約摘要（和官網送出的格式一樣）＋寫進 Google 試算表
  *
  * 全部用免費的「回覆訊息」，不花每月推播額度。旅客任何時候打字聊天，小幫手就安靜退出，交給真人。
@@ -258,7 +258,7 @@ var COPY = {
     minutes: '想導覽多久呢？按鈕上是 LINE 預約的參考價（95 折）。',
     minutesLabel: function (m, p) { return m + ' 分鐘' + (p ? ' ' + money(p) : ''); },
     pickup: '要在哪裡上車呢？\n住宿、停車場、景點都可以，直接打字告訴我們就好。',
-    phone: '最後，方便留一支手機嗎？（選填）\n確認時段和當天聯絡會比較快。沒有台灣電話的話，按「略過」就好。',
+    phone: '最後，方便留一支手機嗎？確認時段和當天聯絡會比較快。',
     skip: '略過', badPhone: '這個號碼好像不太對，請再輸入一次，或按「略過」。',
     badPeople: '請輸入 1 到 200 之間的人數，例如 25。',
     chat: '改用文字聊', chatDisplay: '我想直接用文字聊',
@@ -278,7 +278,7 @@ var COPY = {
     minutes: 'How long would you like the tour to be? Prices shown are the LINE booking estimate (5% off).',
     minutesLabel: function (m, p) { return m + ' min' + (p ? ' ' + money(p) : ''); },
     pickup: 'Where should we pick you up?\nA hotel, car park or sight is fine. Just type it.',
-    phone: 'Lastly, could you leave a mobile number? (optional)\nIt helps us reach you on the day. No local number? Tap “Skip”.',
+    phone: 'Lastly, could you leave a mobile number? It helps us reach you on the day.',
     skip: 'Skip', badPhone: 'That number doesn’t look right. Please type it again, or tap “Skip”.',
     badPeople: 'Please type a number from 1 to 200, e.g. 25.',
     chat: 'Just chat', chatDisplay: 'I’d like to just chat',
