@@ -62,6 +62,9 @@ try {
     await fs.writeFile(file, renderLanding(page, { css, year }))
   }
   console.log(`Pre-rendered ${pages.length} sight and route pages`)
+  const { landingAnalytics, LANDING_GA_PATH } = await server.ssrLoadModule('/src/pagePerf.js')
+  const ga = landingAnalytics()
+  if (ga) await fs.writeFile(`dist${LANDING_GA_PATH}`, ga)
 
   // Sitemap: lastmod is the latest commit touching a page's source files,
   // or the build date when those files have uncommitted changes.
