@@ -37,6 +37,20 @@ var ACTIONS = {
   chat: { status: STATUS.CHAT, label: '我來聊' }
 };
 
+// ---------------------------------------------------------------- 安裝
+
+/** 安裝時在編輯器手動執行一次：建立試算表分頁與每 5 分鐘的觸發條件。 */
+function setup() {
+  logSheet();
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'escalatePending') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('escalatePending').timeBased().everyMinutes(5).create();
+  if (!prop('WEBHOOK_KEY')) setProp('WEBHOOK_KEY', Utilities.getUuid().replace(/-/g, ''));
+  if (!prop('BIND_CODE')) setProp('BIND_CODE', String(Math.floor(100000 + Math.random() * 900000)));
+  console.log('完成。WEBHOOK_KEY 與 BIND_CODE 已寫入指令碼屬性，請到「專案設定」查看。');
+}
+
 // ---------------------------------------------------------------- 設定
 
 function prop(name) {
@@ -539,16 +553,4 @@ function escalatePending(now) {
       sheet.getRange(start + i, COL['已轉備援']).setValue(now);
     }
   });
-}
-
-/** 安裝時在編輯器手動執行一次：建立試算表分頁與每 5 分鐘的觸發條件。 */
-function setup() {
-  logSheet();
-  ScriptApp.getProjectTriggers().forEach(function (t) {
-    if (t.getHandlerFunction() === 'escalatePending') ScriptApp.deleteTrigger(t);
-  });
-  ScriptApp.newTrigger('escalatePending').timeBased().everyMinutes(5).create();
-  if (!prop('WEBHOOK_KEY')) setProp('WEBHOOK_KEY', Utilities.getUuid().replace(/-/g, ''));
-  if (!prop('BIND_CODE')) setProp('BIND_CODE', String(Math.floor(100000 + Math.random() * 900000)));
-  console.log('完成。WEBHOOK_KEY 與 BIND_CODE 已寫入指令碼屬性，請到「專案設定」查看。');
 }
