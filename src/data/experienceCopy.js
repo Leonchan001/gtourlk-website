@@ -1,3 +1,8 @@
+import { BUSINESS } from './business.js'
+
+const [asOfYear, asOfMonth] = BUSINESS.reviewsAsOf.split('-').map(Number)
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
 export const EXPERIENCE_COPY = {
   zh: {
     hero: {
@@ -77,7 +82,7 @@ export const EXPERIENCE_COPY = {
     reviews: {
       title: '好導覽，留在旅人的記憶裡。',
       source: 'Google 評論摘錄・保留旅人的原話',
-      date: '評分及評論數截至 2026 年 9 月，以 Google 商家頁面為準。',
+      date: `評分及評論數截至 ${asOfYear} 年 ${asOfMonth} 月，以 Google 商家頁面為準。`,
       all: '查看全部 Google 評價',
     },
     pricing: {
@@ -228,7 +233,7 @@ export const EXPERIENCE_COPY = {
     reviews: {
       title: 'The stories that stay with our guests.',
       source: 'Google review excerpts · Translated from Chinese',
-      date: 'Rating and count as of September 2026. See Google for current information.',
+      date: `Rating and count as of ${MONTHS[asOfMonth - 1]} ${asOfYear}. See Google for current information.`,
       all: 'Read all Google reviews',
     },
     pricing: {
