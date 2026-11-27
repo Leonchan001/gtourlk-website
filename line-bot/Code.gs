@@ -257,6 +257,7 @@ var COPY = {
     badPeople: '請輸入 1 到 200 之間的人數，例如 25。',
     chat: '改用文字聊', chatDisplay: '我想直接用文字聊',
     chatReply: '好的，直接在這裡留言就可以，導鹿會盡快回覆您 🦌',
+    chatReplyNight: function (h) { return '好的，直接在這裡留言就可以 🦌\n現在是休息時間，導鹿明天早上 ' + h + ' 點後回覆您。'; },
     expired: '這個選單已經過期了，請再點一次「我要預約導覽」。',
     summaryTitle: '這是您的預約詢問 🦌',
     dayReply: '導鹿會在這裡跟您確認時段與費用，通常幾分鐘內回覆。',
@@ -276,6 +277,7 @@ var COPY = {
     badPeople: 'Please type a number from 1 to 200, e.g. 25.',
     chat: 'Just chat', chatDisplay: 'I’d like to just chat',
     chatReply: 'Sure, just send us a message here and we will reply soon 🦌',
+    chatReplyNight: function (h) { return 'Sure, just send us a message here 🦌\nWe are offline now and will reply after ' + h + ':00 AM (Taiwan time).'; },
     expired: 'This menu has expired. Please tap “Book a tour” again.',
     summaryTitle: 'Your booking request 🦌',
     dayReply: 'We will confirm the time and fee with you here, usually within minutes.',
@@ -576,6 +578,10 @@ function handlePostback(event, userId, now) {
   if (data.f === 'chat') {
     clearState(userId);
     writeRow(state, STATUS.CHAT, now);
+    if (isNight(now)) {
+      markNightAck(userId); // 已經說過幾點回覆，今晚不再回「訊息收到」
+      return reply(event.replyToken, [text(c.chatReplyNight(Number(prop('REPLY_START_HOUR'))))]);
+    }
     return reply(event.replyToken, [text(c.chatReply)]);
   }
   if (data.f !== state.step) {

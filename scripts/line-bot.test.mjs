@@ -274,6 +274,16 @@ test('"just chat" button and old buttons', () => {
   assert.equal(bot.getSheet().rows[1][15], '改用文字聊')
 })
 
+test('"just chat" at night says when we reply, then stays quiet', () => {
+  const bot = load()
+  send(bot, event('我要預約導覽'), NIGHT)
+  send(bot, pb('f=chat'), NIGHT)
+  assert.match(lastReply(bot)[0].text, /明天早上 8 點後回覆/)
+  const n = replies(bot).length
+  send(bot, event('可以帶狗嗎'), NIGHT)
+  assert.equal(replies(bot).length, n)
+})
+
 test('at night, one "message received" per guest, and none for menu keywords', () => {
   const bot = load()
   send(bot, event('請問有空位嗎'), NIGHT)
