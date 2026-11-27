@@ -80,10 +80,49 @@ export function initAnalytics(lang, id = GA_MEASUREMENT_ID) {
   window.gtag = window.gtag || gtag
   window.gtag('js', new Date())
   window.gtag('config', id, { site_language: lang })
-  const script = document.createElement('script')
-  script.async = true
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`
-  document.head.appendChild(script)
   document.addEventListener('click', onDocumentClick, true)
+  // Events queue in dataLayer right away; gtag.js itself waits until the page
+  // has loaded and the main thread is idle, so it never delays first paint.
+  afterLoadIdle(() => {
+    const script = document.createElement('script')
+    script.async = true
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`
+    document.head.appendChild(script)
+    reportWebVitals()
+  })
   return true
+}
+
+function afterLoadIdle(callback) {
+  const idle = () =>
+    (window.requestIdleCallback || ((fn) => setTimeout(fn, 1)))(callback, {
+      timeout: 3000,
+    })
+  if (document.readyState === 'complete') idle()
+  else window.addEventListener('load', idle, { once: true })
+}
+
+// Real-visitor Core Web Vitals (LCP, INP, CLS) as GA4 events, so the site is
+// judged on what guests actually experience, not only on lab tests.
+export function sendWebVital({ name, value, rating, id, navigationType }) {
+  track('web_vitals', {
+    metric_name: name,
+    metric_value: Math.round(name === 'CLS' ? value * 1000 : value),
+    metric_rating: rating,
+    metric_id: id,
+    navigation_type: navigationType,
+    non_interaction: true,
+  })
+}
+
+function reportWebVitals() {
+  import('web-vitals')
+    .then(({ onLCP, onINP, onCLS }) => {
+      onLCP(sendWebVital)
+      onINP(sendWebVital)
+      onCLS(sendWebVital)
+    })
+    .catch(() => {
+      /* Metrics are optional; the site works without them. */
+    })
 }

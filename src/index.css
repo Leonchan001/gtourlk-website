@@ -1532,3 +1532,8 @@ html[lang='en'] .faq-item h3 {
     scroll-behavior: auto !important;
   }
 }
+
+/* Smooth cross-page transitions in browsers that support them. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}

@@ -21,11 +21,23 @@ import {
   toursIncluding,
 } from '../data/pages.js'
 import { PLACE_GUIDES } from '../data/placeGuides.js'
+import { SPECULATION_RULES, landingAnalytics } from '../pagePerf.js'
 
 const other = (lang) => (lang === 'en' ? 'zh' : 'en')
 const json = (data) => JSON.stringify(data).replaceAll('<', '\\u003c')
 
-function Picture({ photo, lang, priority, eager, sizes = '(min-width: 900px) 56vw, 100vw' }) {
+const HERO_SIZES = '(min-width: 900px) 56vw, 100vw'
+const CARD_SIZES = '(min-width: 900px) 30vw, 100vw'
+
+// Lets the browser start the LCP photo before it parses the body and the fonts.
+function PreloadPhoto({ preload }) {
+  const photo = preload?.photo
+  if (!photo) return null
+  if (!photo.sources) return <link rel="preload" as="image" href={photo.src} fetchpriority="high" />
+  return <link rel="preload" as="image" type="image/avif" imageSrcSet={photo.sources.avif} imageSizes={preload.sizes} fetchpriority="high" />
+}
+
+function Picture({ photo, lang, priority, eager, sizes = HERO_SIZES }) {
   if (!photo) return null
   return (
     <picture className="lp-photo">
@@ -331,6 +343,7 @@ function placeView(lang, id) {
     description: copy.placeDescription(p),
     image: place.photo?.src,
     imageAlt: place.photo?.alt[lang],
+    preload: { photo: place.photo, sizes: HERO_SIZES },
     alternates: { zh: placePath('zh', id), en: placePath('en', id) },
     schema,
     body,
@@ -467,6 +480,7 @@ function tourView(lang, minutes) {
     ),
     image: plan.photo,
     imageAlt: photo?.alt[lang],
+    preload: { photo, sizes: HERO_SIZES },
     alternates: { zh: tourPath('zh', minutes), en: tourPath('en', minutes) },
     schema,
     body,
@@ -487,7 +501,7 @@ function placesView(lang) {
         {places.map((place, index) => (
           <li key={place.id}>
             <a href={placePath(lang, place.id)}>
-              <Picture photo={place.photo} lang={lang} priority={firstGroup && index === 0} eager={firstGroup && index < 3} sizes="(min-width: 900px) 30vw, 100vw" />
+              <Picture photo={place.photo} lang={lang} priority={firstGroup && index === 0} eager={firstGroup && index < 3} sizes={CARD_SIZES} />
               <strong>{place[lang].name}</strong>
               <span>{place[lang].highlight || place[lang].detail}</span>
             </a>
@@ -525,6 +539,7 @@ function placesView(lang) {
     title: copy.placesTitle,
     description: copy.placesDescription,
     image: '/hero-main.jpg',
+    preload: { photo: PLACES.find((p) => p.featured)?.photo, sizes: CARD_SIZES },
     alternates: { zh: placesPath('zh'), en: placesPath('en') },
     schema,
     body,
@@ -569,7 +584,9 @@ export function renderLanding(page, { css, year }) {
         <meta name="twitter:title" content={view.title} />
         <meta name="twitter:description" content={view.description} />
         <meta name="twitter:image" content={image} />
+        <PreloadPhoto preload={view.preload} />
         <style dangerouslySetInnerHTML={{ __html: css.replaceAll('</style', '<\\/style') }} />
+        <script type="speculationrules" dangerouslySetInnerHTML={{ __html: SPECULATION_RULES }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(ld) }} />
       </head>
       <body>
@@ -579,6 +596,7 @@ export function renderLanding(page, { css, year }) {
           {view.body}
         </main>
         <Footer lang={lang} year={year} />
+        <script dangerouslySetInnerHTML={{ __html: landingAnalytics(lang) }} />
       </body>
     </html>
   )
