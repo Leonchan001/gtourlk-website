@@ -45,7 +45,7 @@ export default function Contact({ trip, updateTrip: setTrip }) {
   const badDate = Boolean(trip.date && trip.date < today)
   const phoneOk = validPhone(trip.phone)
   const badPhone = Boolean(trip.phone?.trim()) && !phoneOk
-  const valid = Boolean(estimate) && !badDate && phoneOk
+  const valid = Boolean(estimate) && !badDate && !badPhone
   // One visible price placement per breakpoint, from the same calculation.
   const price = (placement) => (
     <div className={`summary-price price-${placement}`} aria-live="polite" aria-atomic="true">
@@ -179,7 +179,6 @@ export default function Contact({ trip, updateTrip: setTrip }) {
                 inputMode="tel"
                 autoComplete="tel"
                 maxLength={30}
-                required
                 value={trip.phone}
                 placeholder={copy.mobileHint}
                 aria-invalid={badPhone}
@@ -196,12 +195,7 @@ export default function Contact({ trip, updateTrip: setTrip }) {
               )}
             </div>
             <p className="small-copy">{copy.defaultRoute}</p>
-            <details className="booking-options">
-              <summary>
-                {lang === 'zh'
-                  ? '接送與其他需求（選填）'
-                  : 'Pick-up and other requests (optional)'}
-              </summary>
+            <div className="booking-options">
               <div className="form-field">
                 <label htmlFor="trip-pickup" className="field-label">
                   {copy.pickup}
@@ -232,7 +226,7 @@ export default function Contact({ trip, updateTrip: setTrip }) {
                   }
                 />
               </div>
-            </details>
+            </div>
           </form>
           <aside className="booking-summary" aria-labelledby="summary-title">
             <p className="eyebrow">{SITE_COPY[lang].sections.summary}</p>
@@ -255,11 +249,7 @@ export default function Contact({ trip, updateTrip: setTrip }) {
               )}
             </div>
             {price('desktop')}
-            <p className="small-copy">
-              {estimate && !badDate && !phoneOk
-                ? copy.mobileNeeded
-                : copy.instruction}
-            </p>
+            <p className="small-copy">{copy.instruction}</p>
             {valid ? (
               <a
                 href={lineMessageUrl(summary)}

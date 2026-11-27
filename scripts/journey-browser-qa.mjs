@@ -56,7 +56,7 @@ try {
         1,
       )
       await click('.atlas-plan-cta')
-      assert.equal(await page.$eval('.booking-options', (el) => el.open), true)
+      assert.ok(await page.isVisible('#trip-pickup'))
       await click('.priority-options button')
       await click('.booking-summary > button')
       await page.waitForSelector('.booking-summary > a.button')

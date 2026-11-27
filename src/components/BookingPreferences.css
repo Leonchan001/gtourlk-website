@@ -2,11 +2,6 @@
   border-top: 1px solid var(--border);
   padding-top: 12px;
 }
-.booking-options > summary {
-  min-height: 44px;
-  padding: 10px 0;
-  cursor: pointer;
-}
 .booking-options > .form-field {
   margin-top: 20px;
 }
