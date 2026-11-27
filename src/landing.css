@@ -88,3 +88,8 @@ figcaption a { text-decoration: underline; text-underline-offset: 3px; }
 .lp-official .body-copy { font-size: 14px; line-height: 1.9; }
 .lp-official .lp-text-link { margin-top: 12px; }
 .lp-walk-note { margin-top: -28px !important; }
+
+/* Smooth cross-page transitions in browsers that support them. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
