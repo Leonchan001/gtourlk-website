@@ -234,7 +234,7 @@ test('"not sure" and typed answers all work; night reply says when we answer', (
   // 150 minutes came from the website button, so no duration question
   assert.match(lastReply(bot)[0].text, /pick you up/)
   send(bot, pb('f=pickup&v='), NIGHT)
-  assert.deepEqual(quick(lastReply(bot)[0]).map((a) => a.label), ['Just chat']) // no skip button
+  assert.equal(lastReply(bot)[0].quickReply, undefined) // no skip / chat buttons
   send(bot, event('+81 90 1234 5678'), NIGHT)
   const done = lastReply(bot)[0].text
   assert.match(done, /Thu 12\/24 · time TBC/)
@@ -264,7 +264,7 @@ test('typing anything else hands the chat to a person, quietly', () => {
   assert.match(lastReply(bot)[0].text, /過期/)
 })
 
-test('"just chat" button and old buttons', () => {
+test('old "just chat" button and old buttons still work', () => {
   const bot = load()
   send(bot, event('預約導覽'))
   send(bot, pb('f=time&v=10:00')) // pressed a button from a later step: ask the current one again
