@@ -10,7 +10,7 @@ export const BUSINESS = {
   // Updated weekly by scripts/sync-google-rating.mjs (Google Places API).
   reviewsAsOf: '2026-11',
   googleCid: '12797714118618682370',
-  googlePlaceId: '',
+  googlePlaceId: 'ChIJUwmJPZNFaTQRApREiS-dmrE',
   lineId: '@lk167',
   lineUrl: 'https://line.me/R/ti/p/@lk167',
   // Opens a chat with the official account and prefills the message box.
