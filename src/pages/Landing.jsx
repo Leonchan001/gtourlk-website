@@ -21,7 +21,7 @@ import {
   toursIncluding,
 } from '../data/pages.js'
 import { PLACE_GUIDES } from '../data/placeGuides.js'
-import { SPECULATION_RULES, landingAnalytics } from '../pagePerf.js'
+import { SPECULATION_RULES, LANDING_GA_PATH, landingAnalytics } from '../pagePerf.js'
 
 const other = (lang) => (lang === 'en' ? 'zh' : 'en')
 const json = (data) => JSON.stringify(data).replaceAll('<', '\\u003c')
@@ -596,7 +596,7 @@ export function renderLanding(page, { css, year }) {
           {view.body}
         </main>
         <Footer lang={lang} year={year} />
-        <script dangerouslySetInnerHTML={{ __html: landingAnalytics(lang) }} />
+        {landingAnalytics() && <script src={LANDING_GA_PATH} defer />}
       </body>
     </html>
   )

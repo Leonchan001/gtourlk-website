@@ -13,10 +13,35 @@ test('home pages carry the same speculation rules as the sight and route pages',
 })
 
 test('static pages load GA only after load and track LINE and phone taps', () => {
-  const script = landingAnalytics('zh', 'G-TEST1234')
+  const script = landingAnalytics('G-TEST1234')
   assert.match(script, /addEventListener\('load'/)
   assert.match(script, /line_click/)
   assert.match(script, /phone_click/)
   assert.doesNotThrow(() => new Function(script))
-  assert.equal(landingAnalytics('zh', 'G-XXXXXXXXXX'), '')
+  assert.equal(landingAnalytics('G-XXXXXXXXXX'), '')
+})
+
+// The Content Security Policy (set at Cloudflare) allows no inline scripts
+// except speculation rules; JSON-LD data blocks never execute.
+test('built pages contain no inline executable scripts', async () => {
+  const { readdir } = await import('node:fs/promises')
+  const pages = []
+  const walk = async (dir) => {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const path = `${dir}/${entry.name}`
+      if (entry.isDirectory()) await walk(path)
+      else if (entry.name === 'index.html') pages.push(path)
+    }
+  }
+  await walk(new URL('../dist', import.meta.url).pathname)
+  assert.ok(pages.length > 40)
+  for (const page of pages) {
+    const html = await readFile(page, 'utf8')
+    for (const [, attrs, body] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+      if (/type="(application\/ld\+json|speculationrules)"/.test(attrs)) continue
+      assert.match(attrs, /\bsrc=/, `${page} has an inline script`)
+      assert.equal(body.trim(), '', `${page} has an inline script body`)
+    }
+    assert.doesNotMatch(html, /\son[a-z]+="/i, `${page} has an inline event handler`)
+  }
 })

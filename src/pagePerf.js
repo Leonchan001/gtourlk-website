@@ -21,15 +21,19 @@ export const SPECULATION_RULES = JSON.stringify({
   ],
 })
 
-// Static sight and route pages have no app bundle, so this tiny inline script
-// loads GA after the page has loaded and records LINE and phone taps with the
-// same event names as the home page (see src/analytics.js).
-export function landingAnalytics(lang, id = GA_MEASUREMENT_ID) {
+// Static sight and route pages have no app bundle, so this tiny script
+// (written to dist/landing-ga.js at build time, never inline, so the Content
+// Security Policy needs no 'unsafe-inline') loads GA after the page has loaded
+// and records LINE and phone taps with the same event names as the home page
+// (see src/analytics.js).
+export const LANDING_GA_PATH = '/landing-ga.js'
+export function landingAnalytics(id = GA_MEASUREMENT_ID) {
   if (!isValidMeasurementId(id)) return ''
   return `(function(){
 var w=window,d=document;w.dataLayer=w.dataLayer||[];
+var lang=(d.documentElement.lang||'').indexOf('en')===0?'en':'zh';
 function gtag(){w.dataLayer.push(arguments)}w.gtag=w.gtag||gtag;
-gtag('js',new Date());gtag('config',${JSON.stringify(id)},{site_language:${JSON.stringify(lang)}});
+gtag('js',new Date());gtag('config',${JSON.stringify(id)},{site_language:lang});
 function where(el){var t=el.closest('[data-analytics-location]');if(t)return t.dataset.analyticsLocation;var a=el.closest('section[id],header,footer,nav');return a?(a.id||a.tagName.toLowerCase()):'other'}
 d.addEventListener('click',function(e){var l=e.target.closest&&e.target.closest('a[href]');if(!l)return;var h=l.getAttribute('href');
 if(/^https?:\\/\\/(?:[\\w-]+\\.)*line\\.me\\//i.test(h)){var m=/line\\.me\\/.*?(@[\\w.-]+)/i.exec(decodeURIComponent(h));
