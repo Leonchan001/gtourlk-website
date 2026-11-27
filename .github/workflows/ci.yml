@@ -25,11 +25,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Unit tests
-        run: npm test
-
+      # Some tests read the prerendered pages, so build first.
       - name: Build
         run: npm run build
+
+      - name: Unit tests
+        run: npm test
 
       # Mobile Lighthouse on the built site (local server, no compression, so
       # speed scores read lower than the live site). Fails the PR if a page drops
