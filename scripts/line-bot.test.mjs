@@ -81,7 +81,7 @@ function load({ props = {}, quota = { type: 'limited', value: 200 }, used = 10 }
   return { ctx, store, calls, getSheet: () => sheet }
 }
 
-const trip = { date: '2026-12-02', departure: '14:00', people: 4, minutes: 90, pickup: '', notes: '' }
+const trip = { date: '2026-12-02', departure: '14:00', people: 4, minutes: 90, phone: '0912-345-678', pickup: '', notes: '' }
 const event = (text, userId = 'Uguest0001', replyToken = 'r1') => ({
   type: 'message', replyToken, source: { type: 'user', userId }, message: { type: 'text', text },
 })
@@ -98,6 +98,7 @@ test('parses the zh and en website inquiry exactly as the site writes it', () =>
   assert.equal(zh.departure, '14:00')
   assert.equal(zh.people, 4)
   assert.equal(zh.minutes, 90)
+  assert.equal(zh.phone, '0912-345-678')
   assert.equal(zh.pickup, '')
   assert.equal(zh.notes, '')
   assert.match(zh.price, /\d/)
@@ -105,6 +106,9 @@ test('parses the zh and en website inquiry exactly as the site writes it', () =>
   assert.equal(en.lang, 'en')
   assert.equal(en.people, 4)
   assert.equal(en.pickup, 'Lukang Old Street')
+  assert.equal(en.phone, '0912-345-678')
+  const noPhone = ctx.parseInquiry(bookingSummary({ ...trip, phone: '' }, 'zh'), '')
+  assert.equal(noPhone.phone, '')
   const blank = ctx.parseInquiry(bookingSummary({ ...trip, date: '', departure: '' }, 'zh'), '')
   assert.equal(blank.date, '')
   assert.equal(blank.departure, '')
@@ -188,6 +192,8 @@ test('website inquiry: free reply to guest, one push to primary, logged', () => 
   assert.equal(rows[1][2], 'Uguest0001')
   assert.equal(rows[1][3], '王小明')
   assert.equal(rows[1][14], '待處理')
+  assert.equal(rows[1][19], '0912-345-678')
+  assert.match(JSON.stringify(card.contents.body), /手機.*0912-345-678/)
   // same guest again within 30 minutes: acked, but no second push
   post(bot, [event(bookingSummary(trip, 'zh'), 'Uguest0001', 'r2')])
   assert.equal(pushes(bot).length, 1)
@@ -245,6 +251,7 @@ test('escalates to backup once after the wait', () => {
   const toMom = pushes(bot).filter((p) => p.body.to === 'Umom')
   assert.equal(toMom.length, 1)
   assert.match(JSON.stringify(toMom[0].body), /轉給你/)
+  assert.match(JSON.stringify(toMom[0].body), /0912-345-678/)
   assert.ok(bot.getSheet().rows[1][17])
 })
 
@@ -252,4 +259,14 @@ test('warns on the card when the monthly quota is nearly gone', () => {
   const bot = load({ props: { PRIMARY_USER_ID: 'Udad' }, used: 190 })
   post(bot, [event(bookingSummary(trip, 'zh'))])
   assert.match(JSON.stringify(pushes(bot)[0].body), /只剩 10 則/)
+})
+
+test('adds the phone column header to a sheet made by an older version', () => {
+  const bot = load({ props: { PRIMARY_USER_ID: 'Udad' } })
+  post(bot, [event(bookingSummary(trip, 'zh'))])
+  const rows = bot.getSheet().rows
+  rows[0].length = 19 // older header without 手機
+  post(bot, [event(bookingSummary(trip, 'zh'), 'Uguest0002', 'r9')])
+  assert.equal(rows[0][19], '手機')
+  assert.equal(rows[2][19], '0912-345-678')
 })

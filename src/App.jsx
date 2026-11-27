@@ -48,6 +48,7 @@ function readSavedTrip() {
           : [],
       pickup: text(saved.pickup, 200),
       notes: text(saved.notes, 1000),
+      phone: text(saved.phone, 30),
     }
   } catch {
     return INITIAL_TRIP

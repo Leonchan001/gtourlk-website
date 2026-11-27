@@ -25,7 +25,7 @@ var TZ = 'Asia/Taipei';
 var LINE_API = 'https://api.line.me/v2/bot';
 var LOG_SHEET = '詢問紀錄';
 var LOG_HEADERS = ['編號', '收到時間', '旅客 ID', '旅客名稱', '語言', '來源', '日期', '出發時間', '人數',
-  '導覽分鐘', '上下車地點', '其他需求', '參考價', '提醒', '狀態', '處理人', '處理時間', '已轉備援', '原始訊息'];
+  '導覽分鐘', '上下車地點', '其他需求', '參考價', '提醒', '狀態', '處理人', '處理時間', '已轉備援', '原始訊息', '手機'];
 var COL = {};
 LOG_HEADERS.forEach(function (name, i) { COL[name] = i + 1; });
 
@@ -75,6 +75,7 @@ var FIELD_LABELS = {
   departure: ['出發時間', 'Departure'],
   people: ['人數', 'Guests'],
   minutes: ['導覽時間', 'Duration'],
+  phone: ['聯絡手機', 'Mobile'],
   pickup: ['上下車地點', 'Pick-up / drop-off'],
   notes: ['其他需求', 'Other requests'],
   price: ['官方 LINE 預約參考價（95 折）', 'Official LINE estimate (5% off)']
@@ -108,6 +109,7 @@ function parseInquiry(text, keywords) {
       departure: fields.departure || '',
       people: peopleMatch ? Number(peopleMatch[0]) : '',
       minutes: minutesMatch ? Number(minutesMatch[0]) : '',
+      phone: fields.phone || '',
       pickup: fields.pickup || '',
       notes: fields.notes || '',
       price: fields.price || ''
@@ -135,7 +137,7 @@ function parseInquiry(text, keywords) {
 }
 
 function blankInquiry(source, lang) {
-  return { source: source, lang: lang, date: '', departure: '', people: '', minutes: '', pickup: '', notes: '', price: '' };
+  return { source: source, lang: lang, date: '', departure: '', people: '', minutes: '', phone: '', pickup: '', notes: '', price: '' };
 }
 
 /** 回傳提醒字串陣列，例如 ['平日', '明天']。now 是 Date，today 用台北日期比較。 */
@@ -246,6 +248,7 @@ function inquiryCard(id, inq, displayName, flags, extraNote) {
   row('時間', inq.departure);
   row('人數', inq.people ? inq.people + ' 位' : '');
   row('導覽', inq.minutes ? inq.minutes + ' 分鐘' : '');
+  row('手機', inq.phone);
   row('接送', inq.pickup);
   row('需求', inq.notes);
   row('參考價', inq.price);
@@ -341,6 +344,12 @@ function logSheet() {
     sheet = book.insertSheet(LOG_SHEET);
     sheet.appendRow(LOG_HEADERS);
     sheet.setFrozenRows(1);
+  } else {
+    // 舊版試算表沒有後來加的欄位，補上標題
+    var header = sheet.getRange(1, 1, 1, LOG_HEADERS.length).getValues()[0];
+    LOG_HEADERS.forEach(function (name, i) {
+      if (!header[i]) sheet.getRange(1, i + 1).setValue(name);
+    });
   }
   return sheet;
 }
@@ -361,6 +370,7 @@ function rowInquiry(values) {
     departure: formatCellTime(values[COL['出發時間'] - 1]),
     people: values[COL['人數'] - 1],
     minutes: values[COL['導覽分鐘'] - 1],
+    phone: String(values[COL['手機'] - 1] || ''),
     pickup: values[COL['上下車地點'] - 1],
     notes: values[COL['其他需求'] - 1],
     price: values[COL['參考價'] - 1]
@@ -473,10 +483,12 @@ function handleInquiry(inquiry, raw, userId, replyToken, now) {
       name = displayNameOf(userId);
       flags = inquiryFlags(inquiry, now);
       sheet.appendRow([id, now, userId, name, inquiry.lang, inquiry.source, inquiry.date, inquiry.departure, inquiry.people,
-        inquiry.minutes, inquiry.pickup, inquiry.notes, inquiry.price, flags.join('、'), STATUS.PENDING, '', '', '', raw.slice(0, 1000)]);
+        inquiry.minutes, inquiry.pickup, inquiry.notes, inquiry.price, flags.join('、'), STATUS.PENDING, '', '', '', raw.slice(0, 1000), inquiry.phone]);
       // 日期與時間存成文字，避免試算表自動轉格式
       var row = sheet.getLastRow();
       sheet.getRange(row, COL['日期'], 1, 2).setNumberFormat('@').setValues([[inquiry.date, inquiry.departure]]);
+      // 手機也存成文字，保留開頭的 0
+      sheet.getRange(row, COL['手機'], 1, 1).setNumberFormat('@').setValues([[inquiry.phone]]);
     }
   } finally {
     lock.releaseLock();

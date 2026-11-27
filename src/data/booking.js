@@ -11,6 +11,7 @@ export const INITIAL_TRIP = {
   guideChoice: true,
   pickup: '',
   notes: '',
+  phone: '',
 }
 export function estimateTour(people, minutes) {
   const guests = Number(people)
@@ -33,6 +34,14 @@ export function estimateTour(people, minutes) {
     vehicles: Math.ceil(guests / TOUR_PRICING.guestsPerVehicle),
   }
 }
+// Accepts Taiwan mobiles (0912-345-678), landlines and international
+// numbers (+81 90 1234 5678): 8–15 digits once spacing is removed.
+export function cleanPhone(value) {
+  return String(value ?? '').replace(/[\s\-().]/g, '')
+}
+export function validPhone(value) {
+  return /^\+?\d{8,15}$/.test(cleanPhone(value))
+}
 export function money(amount) {
   return `NT$${new Intl.NumberFormat('en-US').format(amount)}`
 }
@@ -49,6 +58,6 @@ export function bookingSummary(trip, lang) {
   const pending = en ? 'To be confirmed' : '待確認'
   const route = EXPERIENCE_COPY[lang].booking.defaultRoute
   return en
-    ? `Hello GtourLK, I would like to ask about a private electric tour.\n\nDate: ${trip.date || pending}\nDeparture: ${trip.departure || pending}\nGuests: ${trip.people}\nDuration: ${trip.minutes} minutes\nRoute: ${route}\nPick-up / drop-off: ${trip.pickup || pending}\nOther requests: ${trip.notes || 'None specified'}\nEstimated vehicles: ${estimate?.vehicles ?? pending}\nStandard total: ${estimate ? money(estimate.total) : pending}\nOfficial LINE estimate (5% off): ${estimate ? money(estimate.linePrice) : pending}\n\nPlease confirm availability, meeting point and final fee. Campaign coupons are not included in this estimate. Thank you.`
-    : `您好導鹿，我想詢問四輪電動車私人導覽：\n\n日期：${trip.date || pending}\n出發時間：${trip.departure || pending}\n人數：${trip.people} 位\n導覽時間：${trip.minutes} 分鐘\n路線：${route}\n上下車地點：${trip.pickup || pending}\n其他需求：${trip.notes || '未指定'}\n預估車輛：${estimate?.vehicles ?? pending} 台\n牌價合計：${estimate ? money(estimate.total) : pending}\n官方 LINE 預約參考價（95 折）：${estimate ? money(estimate.linePrice) : pending}\n\n麻煩協助確認時段、集合地點與實際費用。試算尚未扣除活動優惠券，謝謝。`
+    ? `Hello GtourLK, I would like to ask about a private electric tour.\n\nDate: ${trip.date || pending}\nDeparture: ${trip.departure || pending}\nGuests: ${trip.people}\nMobile: ${trip.phone?.trim() || pending}\nDuration: ${trip.minutes} minutes\nRoute: ${route}\nPick-up / drop-off: ${trip.pickup || pending}\nOther requests: ${trip.notes || 'None specified'}\nEstimated vehicles: ${estimate?.vehicles ?? pending}\nStandard total: ${estimate ? money(estimate.total) : pending}\nOfficial LINE estimate (5% off): ${estimate ? money(estimate.linePrice) : pending}\n\nPlease confirm availability, meeting point and final fee. Campaign coupons are not included in this estimate. Thank you.`
+    : `您好導鹿，我想詢問四輪電動車私人導覽：\n\n日期：${trip.date || pending}\n出發時間：${trip.departure || pending}\n人數：${trip.people} 位\n聯絡手機：${trip.phone?.trim() || pending}\n導覽時間：${trip.minutes} 分鐘\n路線：${route}\n上下車地點：${trip.pickup || pending}\n其他需求：${trip.notes || '未指定'}\n預估車輛：${estimate?.vehicles ?? pending} 台\n牌價合計：${estimate ? money(estimate.total) : pending}\n官方 LINE 預約參考價（95 折）：${estimate ? money(estimate.linePrice) : pending}\n\n麻煩協助確認時段、集合地點與實際費用。試算尚未扣除活動優惠券，謝謝。`
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { BUSINESS, lineMessageUrl } from '../data/business'
-import { bookingSummary, estimateTour, money } from '../data/booking'
+import { bookingSummary, estimateTour, money, validPhone } from '../data/booking'
 import { EXPERIENCE_COPY } from '../data/experienceCopy'
 import { useLanguage } from '../i18n'
 import { SITE_COPY } from '../data/siteCopy'
@@ -43,7 +43,9 @@ export default function Contact({ trip, updateTrip: setTrip }) {
     day: '2-digit',
   }).format(new Date(clock))
   const badDate = Boolean(trip.date && trip.date < today)
-  const valid = Boolean(estimate) && !badDate
+  const phoneOk = validPhone(trip.phone)
+  const badPhone = Boolean(trip.phone?.trim()) && !phoneOk
+  const valid = Boolean(estimate) && !badDate && phoneOk
   // One visible price placement per breakpoint, from the same calculation.
   const price = (placement) => (
     <div className={`summary-price price-${placement}`} aria-live="polite" aria-atomic="true">
@@ -167,6 +169,32 @@ export default function Contact({ trip, updateTrip: setTrip }) {
                 />
               </div>
             </div>
+            <div className="form-field">
+              <label className="field-label" htmlFor="trip-phone">
+                {copy.mobile}
+              </label>
+              <input
+                id="trip-phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                maxLength={30}
+                required
+                value={trip.phone}
+                placeholder={copy.mobileHint}
+                aria-invalid={badPhone}
+                aria-describedby={badPhone ? 'phone-error phone-note' : 'phone-note'}
+                onChange={(event) => updateTrip({ phone: event.target.value })}
+              />
+              <p className="small-copy" id="phone-note">
+                {copy.mobileNote}
+              </p>
+              {badPhone && (
+                <p className="field-error" id="phone-error">
+                  {copy.mobileError}
+                </p>
+              )}
+            </div>
             <p className="small-copy">{copy.defaultRoute}</p>
             <details className="booking-options">
               <summary>
@@ -227,7 +255,11 @@ export default function Contact({ trip, updateTrip: setTrip }) {
               )}
             </div>
             {price('desktop')}
-            <p className="small-copy">{copy.instruction}</p>
+            <p className="small-copy">
+              {estimate && !badDate && !phoneOk
+                ? copy.mobileNeeded
+                : copy.instruction}
+            </p>
             {valid ? (
               <a
                 href={lineMessageUrl(summary)}

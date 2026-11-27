@@ -5,6 +5,7 @@ import {
   bookingSummary,
   INITIAL_TRIP,
   getSights,
+  validPhone,
 } from '../src/data/booking.js'
 
 test('existing hourly rules and LINE discount at each duration', () => {
@@ -47,6 +48,7 @@ test('booking summary carries all entered fields, exact discount and disclaimer'
     stops: ['鹿港老街', '鹿港龍山寺'],
     pickup: '停車場',
     notes: '折疊輪椅',
+    phone: '0912-345-678',
   }
   const zh = bookingSummary(trip, 'zh')
   for (const text of [
@@ -61,6 +63,7 @@ test('booking summary carries all entered fields, exact discount and disclaimer'
     'NT$3,000',
     'NT$2,850',
     '尚未扣除活動優惠券',
+    '聯絡手機：0912-345-678',
   ])
     assert.ok(zh.includes(text), text)
   const en = bookingSummary(trip, 'en')
@@ -68,6 +71,7 @@ test('booking summary carries all entered fields, exact discount and disclaimer'
     'GtourLK default route',
     'NT$2,850',
     'Campaign coupons are not included',
+    'Mobile: 0912-345-678',
   ])
     assert.ok(en.includes(text), text)
 })
@@ -83,4 +87,11 @@ test('bilingual sights retain matching stable IDs', () => {
     getSights('en').map((s) => s.id),
   )
   assert.equal(getSights('zh').length, 8)
+})
+
+test('phone check accepts Taiwan and international numbers, rejects junk', () => {
+  for (const ok of ['0912345678', '0912-345-678', '(04) 7740-142', '+81 90 1234 5678', '+886 912 345 678'])
+    assert.ok(validPhone(ok), ok)
+  for (const bad of ['', '   ', '0912', 'abc12345678', '09-12', '+1234567890123456'])
+    assert.equal(validPhone(bad), false, bad)
 })
