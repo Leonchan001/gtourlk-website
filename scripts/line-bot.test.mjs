@@ -222,7 +222,7 @@ test('full button flow: every answer is a free reply and the summary has the pri
   assert.equal(row['旅客名稱'], '王小明')
 })
 
-test('skips, "not sure" and typed answers all work; night reply says when we answer', () => {
+test('"not sure" and typed answers all work; night reply says when we answer', () => {
   const bot = load()
   send(bot, event('Hi, I would like to book a 150-minute tour of Lukang.'), NIGHT)
   assert.match(lastReply(bot)[0].text, /Which day/)
@@ -234,13 +234,14 @@ test('skips, "not sure" and typed answers all work; night reply says when we ans
   // 150 minutes came from the website button, so no duration question
   assert.match(lastReply(bot)[0].text, /pick you up/)
   send(bot, pb('f=pickup&v='), NIGHT)
-  send(bot, pb('f=phone&v='), NIGHT)
+  assert.deepEqual(quick(lastReply(bot)[0]).map((a) => a.label), ['Just chat']) // no skip button
+  send(bot, event('+81 90 1234 5678'), NIGHT)
   const done = lastReply(bot)
   assert.match(done[0].text, /Date: 2026-12-24/)
   assert.match(done[0].text, /Departure: To be confirmed/)
   assert.match(done[0].text, /Guests: 25/)
   assert.match(done[0].text, /Duration: 150 minutes/)
-  assert.match(done[0].text, /Mobile: To be confirmed/)
+  assert.match(done[0].text, /Mobile: \+81 90 1234 5678/)
   assert.match(done[1].text, /8:00 AM/)
 })
 

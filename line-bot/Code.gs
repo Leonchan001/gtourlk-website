@@ -9,7 +9,7 @@
  *   3. 人數
  *   4. 導覽時長（按鈕上直接顯示參考價）
  *   5. 上車地點（可直接打字）
- *   6. 聯絡手機（有「略過」按鈕）
+ *   6. 聯絡手機
  *   → 預約摘要（和官網送出的格式一樣）＋寫進 Google 試算表
  *
  * 全部用免費的「回覆訊息」，不花每月推播額度。旅客任何時候打字聊天，小幫手就安靜退出，交給真人。
@@ -259,7 +259,7 @@ var COPY = {
     minutesLabel: function (m, p) { return m + ' 分鐘' + (p ? ' ' + money(p) : ''); },
     pickup: '要在哪裡上車呢？\n住宿、停車場、景點都可以，直接打字告訴我們就好。',
     phone: '最後，方便留一支手機嗎？確認時段和當天聯絡會比較快。',
-    skip: '略過', badPhone: '這個號碼好像不太對，請再輸入一次，或按「略過」。',
+    badPhone: '這個號碼好像不太對，可以再輸入一次嗎？',
     badPeople: '請輸入 1 到 200 之間的人數，例如 25。',
     chat: '改用文字聊', chatDisplay: '我想直接用文字聊',
     chatReply: '好的，直接在這裡留言就可以，導鹿會盡快回覆您 🦌',
@@ -279,7 +279,7 @@ var COPY = {
     minutesLabel: function (m, p) { return m + ' min' + (p ? ' ' + money(p) : ''); },
     pickup: 'Where should we pick you up?\nA hotel, car park or sight is fine. Just type it.',
     phone: 'Lastly, could you leave a mobile number? It helps us reach you on the day.',
-    skip: 'Skip', badPhone: 'That number doesn’t look right. Please type it again, or tap “Skip”.',
+    badPhone: 'That number doesn’t look right. Could you type it again?',
     badPeople: 'Please type a number from 1 to 200, e.g. 25.',
     chat: 'Just chat', chatDisplay: 'I’d like to just chat',
     chatReply: 'Sure, just send us a message here and we will reply soon 🦌',
@@ -353,7 +353,7 @@ function question(step, state, now) {
     });
     return ask(c.pickup, spots.concat([postbackItem(c.notSure, 'f=pickup&v=', c.notSure), chatItem(state.lang)]));
   }
-  return ask(c.phone, [postbackItem(c.skip, 'f=phone&v=', c.skip), chatItem(state.lang)]);
+  return ask(c.phone, [chatItem(state.lang)]);
 }
 
 function nextStep(state) {
