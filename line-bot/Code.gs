@@ -416,7 +416,8 @@ function handleEvent(event) {
   if (event.type !== 'message' || !event.message || event.message.type !== 'text') return;
   var msg = event.message.text.trim();
   if (handleAdminCommand(msg, userId, event.replyToken)) return;
-  if (isStaff(userId)) return; // 負責人自己傳的訊息不當作詢問
+  // 負責人自己傳的訊息不當作詢問；測試時把 TEST_MODE 設成 on，就能用同一支手機扮演旅客
+  if (isStaff(userId) && prop('TEST_MODE') !== 'on') return;
   var inquiry = parseInquiry(msg, prop('INTENT_KEYWORDS'));
   if (!inquiry) return;
   handleInquiry(inquiry, msg, userId, event.replyToken, new Date());

@@ -194,6 +194,9 @@ test('staff messages are never treated as inquiries', () => {
   const bot = load({ props: { PRIMARY_USER_ID: 'Udad' } })
   post(bot, [event(bookingSummary(trip, 'zh'), 'Udad')])
   assert.equal(pushes(bot).length, 0)
+  bot.store.TEST_MODE = 'on'
+  post(bot, [event(bookingSummary(trip, 'zh'), 'Udad')])
+  assert.equal(pushes(bot).length, 1)
 })
 
 test('postback sends the guest the answer once, and only staff can press', () => {
