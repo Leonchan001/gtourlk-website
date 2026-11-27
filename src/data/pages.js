@@ -4,6 +4,7 @@ import { ATLAS_STOPS } from './atlas.js'
 import { MORE_PLACES } from './morePlaces.js'
 import { ATLAS_STORIES } from './atlasStories.js'
 import { ATLAS_PHOTOS } from './atlasPhotos.js'
+import { atlasSources } from './atlasSources.js'
 import { MEDIA, MEDIA_CREDITS } from './media.js'
 import { TOUR_PRICING, getTourPlans } from './tours.js'
 import { EXPERIENCE_COPY } from './experienceCopy.js'
@@ -52,6 +53,7 @@ function placePhoto(id) {
       height: photo.height,
       position: photo.position,
       alt: photo.alt,
+      sources: atlasSources(photo.src, photo.width),
       credit: {
         source: photo.source,
         author: photo.author,
