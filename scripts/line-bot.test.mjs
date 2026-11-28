@@ -44,6 +44,7 @@ function load({ props = {}, quota = { type: 'limited', value: 200 }, used = 10 }
     PropertiesService: { getScriptProperties: () => ({
       getProperty: (k) => (k in store ? store[k] : null),
       setProperty: (k, v) => { store[k] = v },
+      deleteProperty: (k) => { delete store[k] },
     }) },
     UrlFetchApp: { fetch(url, opts) {
       const path = url.replace('https://api.line.me/v2/bot', '')
@@ -318,4 +319,102 @@ test('keeps the result someone typed into the sheet when the row updates', () =>
   bot.getSheet().rows[1][16] = '成交'
   send(bot, pb('f=date&v=2026-12-05'))
   assert.equal(bot.getSheet().rows[1][16], '成交')
+})
+
+test('questions say how many there are and show progress', () => {
+  const bot = load()
+  send(bot, event('我要預約導覽'))
+  const first = lastReply(bot)[0].text
+  assert.match(first, /回答 6 個小問題（約 30 秒）/)
+  assert.match(first, /（1\/6）想哪一天/)
+  send(bot, pb('f=date&v=2026-12-05'))
+  assert.match(lastReply(bot)[0].text, /^（2\/6）大概幾點/)
+  send(bot, pb('f=time&v=10:00'))
+  send(bot, pb('f=people&v=5'))
+  send(bot, pb('f=minutes&v=90'))
+  send(bot, pb('f=pickup&v='))
+  assert.match(lastReply(bot)[0].text, /^（6\/6）最後.*只用於這次預約/)
+  // website hello with a duration skips that question: 5 in total
+  const b2 = load()
+  send(b2, event('你好，我想預約 90 分鐘導覽。'))
+  assert.match(lastReply(b2)[0].text, /回答 5 個小問題[\s\S]*（1\/5）/)
+})
+
+const MOM = 'Umom00000001'
+const finish = (bot, now = DAY) => {
+  send(bot, event('我要預約導覽'), now)
+  for (const d of ['f=date&v=2026-12-17', 'f=time&v=10:00', 'f=people&v=5', 'f=minutes&v=90', 'f=pickup&v=']) send(bot, pb(d), now)
+  send(bot, event('0912-345-678'), now)
+}
+
+test('binding: wrong code is refused and limited, right code binds, unbind works', () => {
+  const bot = load()
+  send(bot, event('綁定 000000', MOM))
+  assert.match(lastReply(bot)[0].text, /不對/)
+  send(bot, event('綁定 123456', MOM))
+  assert.equal(bot.store.PUSH_TO, MOM)
+  assert.match(lastReply(bot)[0].text, /綁定完成/)
+  send(bot, event('取消綁定', MOM))
+  assert.equal(bot.store.PUSH_TO, '')
+  const b2 = load()
+  for (let i = 0; i < 5; i++) send(b2, event('綁定 111111', 'Uhacker'))
+  const n = replies(b2).length
+  send(b2, event('綁定 123456', 'Uhacker'))
+  assert.equal(replies(b2).length, n) // locked out
+  assert.equal(b2.store.PUSH_TO, undefined)
+  // nothing is pushed when no one is bound
+  finish(b2)
+  assert.equal(pushes(b2).length, 0)
+})
+
+test('daytime: finished inquiry, "找真人" and website form each push one summary to staff', () => {
+  const bot = load({ props: { PUSH_TO: MOM, BOT_USER_ID: 'Ubot' } })
+  finish(bot)
+  assert.equal(pushes(bot).length, 1)
+  const p = pushes(bot)[0].body
+  assert.equal(p.to, MOM)
+  const t = p.messages[0].text
+  assert.match(t, /新預約詢問｜王小明/)
+  assert.match(t, /12\/17（四）・10:00/)
+  assert.match(t, /0912-345-678/)
+  assert.match(t, /平日/)
+  assert.match(t, /chat\.line\.biz\/Ubot\/chat\/Uguest0001/)
+  send(bot, event('我要預約導覽', 'Uguest0002'))
+  send(bot, pb('f=chat', null, 'Uguest0002'))
+  assert.match(pushes(bot).at(-1).body.messages[0].text, /有人想找真人｜王小明/)
+  send(bot, event('預約導覽', 'Uguest0003'))
+  send(bot, event('可以帶狗嗎？', 'Uguest0003'))
+  assert.match(pushes(bot).at(-1).body.messages[0].text, /找真人[\s\S]*「可以帶狗嗎？」/)
+  send(bot, event(bookingSummary(trip, 'zh'), 'Uguest0004'))
+  assert.match(pushes(bot).at(-1).body.messages[0].text, /官網預約詢問/)
+  assert.equal(pushes(bot).length, 4)
+  assert.equal(bot.store['PUSH_COUNT_2026-12'], '4')
+})
+
+test('night inquiries are pushed as one message in the morning', () => {
+  const bot = load({ props: { PUSH_TO: MOM, BOT_USER_ID: 'Ubot' } })
+  finish(bot, NIGHT)
+  send(bot, event('我要預約導覽', 'Uguest0002'), NIGHT)
+  send(bot, pb('f=chat', null, 'Uguest0002'), NIGHT)
+  assert.equal(pushes(bot).length, 0)
+  bot.ctx.sendMorningDigest(at('2026-12-02T00:05:00Z'))
+  assert.equal(pushes(bot).length, 1)
+  const t = pushes(bot)[0].body.messages[0].text
+  assert.match(t, /晚上有 2 筆詢問/)
+  assert.match(t, /新預約詢問/)
+  assert.match(t, /找真人/)
+  bot.ctx.sendMorningDigest(at('2026-12-03T00:05:00Z'))
+  assert.equal(pushes(bot).length, 1) // nothing queued, nothing sent
+})
+
+test('push stops at the monthly limit and when the account quota is used up', () => {
+  const capped = load({ props: { PUSH_TO: MOM, PUSH_MONTHLY_LIMIT: '1' } })
+  finish(capped)
+  send(capped, event('預約導覽', 'Uguest0002'))
+  send(capped, pb('f=chat', null, 'Uguest0002'))
+  assert.equal(pushes(capped).length, 1)
+  const full = load({ props: { PUSH_TO: MOM }, used: 200 })
+  finish(full)
+  assert.equal(pushes(full).length, 0)
+  assert.equal(full.getSheet().rows[1][15], '資料齊了') // still logged
 })

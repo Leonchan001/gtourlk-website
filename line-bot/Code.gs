@@ -14,7 +14,10 @@
  *
  * 晚上（REPLY_END_HOUR 後）一般訊息由小幫手回一次「訊息收到」，取代官方帳號的「非回應時間｜通用」。
  *
- * 全部用免費的「回覆訊息」，不花每月推播額度。旅客任何時候打字聊天，小幫手就安靜退出，交給真人。
+ * 回旅客都用免費的「回覆訊息」。旅客打的字如果不是答案，或按了「找真人」，小幫手就安靜退出，交給真人。
+ *
+ * 推播給負責人（要先綁定）：資料問齊、找真人、官網表單送出時，推一則摘要到負責人的個人 LINE。
+ * 晚上不推，隔天早上合成一則推。推播會用到每月額度，所以有 PUSH_MONTHLY_LIMIT 上限，也不會超過帳號剩餘額度。
  * 官網送出的完整預約訊息不再問一次，只記到試算表。
  *
  * 設定都放在「專案設定 → 指令碼屬性」，程式裡不放任何金鑰。安裝步驟見 README.md。
@@ -30,7 +33,8 @@ var DEFAULTS = {
   NIGHT_ACK: '訊息收到 🦌 我們會於下一個 08:00–19:00 回覆時段處理。\n行程、價格與預約：https://gtourlk.com.tw/\n預約須由專人確認。',
   // 官方帳號關鍵字自動回應已經會回的字，晚上不再加回「訊息收到」
   OA_KEYWORDS: '停車資訊,上車停車,停車,上車地點,回覆時間,營業時間,幾點回覆,優惠,LINE優惠,95折,常見問題,FAQ,活動優惠,優惠券,150分鐘優惠,價格,費用,收費,行程怎麼選,導覽行程,行程,我要詢問接送,在地接送,接送',
-  FLOW_HOURS: '6'           // 問到一半多久沒動作就作廢（最多 6 小時）
+  FLOW_HOURS: '6',          // 問到一半多久沒動作就作廢（最多 6 小時）
+  PUSH_MONTHLY_LIMIT: '150' // 小幫手每月最多推幾則給負責人（額度和群發共用）
 };
 
 var TZ = 'Asia/Taipei';
@@ -49,7 +53,7 @@ var PRICING = { oneToTwoHourly: 600, threePlusHourlyPerPerson: 200, guestsPerVeh
 
 // ---------------------------------------------------------------- 安裝
 
-/** 安裝時在編輯器手動執行一次：建立試算表分頁與 WEBHOOK_KEY，並移除舊版的定時觸發。 */
+/** 安裝時在編輯器手動執行一次：建立試算表分頁、WEBHOOK_KEY、綁定碼，以及每天早上推送晚間詢問的觸發。 */
 function setup() {
   var sheet = logSheet();
   try {
@@ -57,8 +61,11 @@ function setup() {
     sheet.getRange(2, COL['結果'], 1000, 1).setDataValidation(rule);
   } catch (err) { console.warn('結果欄下拉選單沒設成功：' + err); }
   ScriptApp.getProjectTriggers().forEach(function (t) { ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('sendMorningDigest').timeBased().everyDays(1)
+    .atHour(Number(prop('REPLY_START_HOUR'))).inTimezone(TZ).create();
   if (!prop('WEBHOOK_KEY')) setProp('WEBHOOK_KEY', Utilities.getUuid().replace(/-/g, ''));
-  console.log('完成。WEBHOOK_KEY 已寫入指令碼屬性，請到「專案設定」查看。');
+  if (!prop('BIND_CODE')) setProp('BIND_CODE', String(Math.floor(100000 + Math.random() * 900000)));
+  console.log('完成。WEBHOOK_KEY 與 BIND_CODE（綁定碼）已寫入指令碼屬性，請到「專案設定」查看。');
 }
 
 // ---------------------------------------------------------------- 設定
@@ -245,14 +252,15 @@ function blankTrip(source, lang) {
 
 var COPY = {
   zh: {
-    date: '好的，幫您安排導覽 🦌\n想哪一天來鹿港呢？',
+    intro: function (n) { return '好的，幫您安排導覽 🦌\n回答 ' + n + ' 個小問題（約 30 秒），就能拿到參考價。'; },
+    date: '想哪一天來鹿港呢？',
     pickDate: '選日期', today: '今天', tomorrow: '明天', notSure: '還沒決定',
     time: '大概幾點出發呢？', otherTime: '其他時間',
     people: '幾位一起搭呢？', more: '超過 10 位', moreAsk: '請直接輸入人數，例如 25',
     minutes: '想導覽多久呢？按鈕上是 LINE 預約的參考價（95 折）。',
     minutesLabel: function (m, p) { return m + ' 分鐘' + (p ? ' ' + money(p) : ''); },
     pickup: '要在哪裡上車呢？\n住宿、停車場、景點都可以，直接打字告訴我們就好。',
-    phone: '最後，方便留一支手機嗎？確認時段和當天聯絡會比較快。',
+    phone: '最後，方便留一支手機嗎？確認時段和當天聯絡會比較快，號碼只用於這次預約。',
     badPhone: '這個號碼好像不太對，可以再輸入一次嗎？',
     badPeople: '請輸入 1 到 200 之間的人數，例如 25。',
     chat: '找真人', chatDisplay: '我想找真人',
@@ -265,14 +273,15 @@ var COPY = {
     edit: '想修改或有其他需求，直接打字告訴我們就好。'
   },
   en: {
-    date: 'Great, let’s plan your tour 🦌\nWhich day would you like to visit Lukang?',
+    intro: function (n) { return 'Great, let’s plan your tour 🦌\nAnswer ' + n + ' quick questions (about 30 seconds) to get an estimate.'; },
+    date: 'Which day would you like to visit Lukang?',
     pickDate: 'Pick a date', today: 'Today', tomorrow: 'Tomorrow', notSure: 'Not sure yet',
     time: 'Roughly what time would you like to start?', otherTime: 'Other time',
     people: 'How many guests?', more: 'More than 10', moreAsk: 'Please type the number of guests, e.g. 25',
     minutes: 'How long would you like the tour to be? Prices shown are the LINE booking estimate (5% off).',
     minutesLabel: function (m, p) { return m + ' min' + (p ? ' ' + money(p) : ''); },
     pickup: 'Where should we pick you up?\nA hotel, car park or sight is fine. Just type it.',
-    phone: 'Lastly, could you leave a mobile number? It helps us reach you on the day.',
+    phone: 'Lastly, could you leave a mobile number? It helps us reach you on the day, and we only use it for this booking.',
     badPhone: 'That number doesn’t look right. Could you type it again?',
     badPeople: 'Please type a number from 1 to 200, e.g. 25.',
     chat: 'Talk to a person', chatDisplay: 'I’d like to talk to a person',
@@ -306,8 +315,17 @@ function chatItem(lang) {
   return postbackItem(COPY[lang].chat, 'f=chat', COPY[lang].chatDisplay);
 }
 
-/** 某一步的問題（含按鈕）。 */
+/** 某一步的問題（含按鈕），前面加進度，例如「（2/6）」。 */
 function question(step, state, now) {
+  var q = rawQuestion(step, state, now);
+  var total = state.total || STEPS.length;
+  var index = Math.min(total, Object.keys(state.done || {}).length + 1);
+  q.text = '（' + index + '/' + total + '）' + q.text;
+  if (index === 1) q.text = COPY[state.lang].intro(total) + '\n\n' + q.text;
+  return q;
+}
+
+function rawQuestion(step, state, now) {
   var c = COPY[state.lang];
   var today = taipeiNow(now).date;
   if (step === 'date') {
@@ -523,15 +541,19 @@ function newRecord(trip, raw, userId, now) {
 }
 
 function handleText(msg, userId, replyToken, now) {
+  if (/^(綁定|取消綁定)/.test(msg)) return handleBinding(msg, userId, replyToken);
   var trip = parseInquiry(msg, prop('INTENT_KEYWORDS'));
   if (trip && trip.source === 'website') {
     // 官網表單已經有完整資料，不再問一次；只記到試算表，交給真人回覆。
     clearState(userId);
-    writeRow(newRecord(trip, msg, userId, now), STATUS.WEBSITE, now);
-    return nightAck(msg, userId, replyToken, now);
+    var record = newRecord(trip, msg, userId, now);
+    writeRow(record, STATUS.WEBSITE, now);
+    nightAck(msg, userId, replyToken, now);
+    return notifyStaff('website', record, now);
   }
   if (trip) {
     var fresh = newRecord(trip, msg, userId, now);
+    fresh.total = STEPS.filter(function (s) { return !(s === 'minutes' && fresh.minutes); }).length;
     fresh.step = nextStep(fresh);
     saveState(userId, fresh);
     writeRow(fresh, STATUS.ASKING, now);
@@ -560,6 +582,7 @@ function handleText(msg, userId, replyToken, now) {
   state.notes = (state.notes ? state.notes + '／' : '') + msg.slice(0, 200);
   writeRow(state, STATUS.CHAT, now);
   nightAck(msg, userId, replyToken, now);
+  notifyStaff('chat', state, now, msg);
 }
 
 function handlePostback(event, userId, now) {
@@ -580,9 +603,11 @@ function handlePostback(event, userId, now) {
     writeRow(state, STATUS.CHAT, now);
     if (isNight(now)) {
       markNightAck(userId); // 已經說過幾點回覆，今晚不再回「訊息收到」
-      return reply(event.replyToken, [text(c.chatReplyNight(Number(prop('REPLY_START_HOUR'))))]);
+      reply(event.replyToken, [text(c.chatReplyNight(Number(prop('REPLY_START_HOUR'))))]);
+    } else {
+      reply(event.replyToken, [text(c.chatReply)]);
     }
-    return reply(event.replyToken, [text(c.chatReply)]);
+    return notifyStaff('chat', state, now, '');
   }
   if (data.f !== state.step) {
     // 按到前面舊的按鈕：重新問目前這一步
@@ -612,4 +637,139 @@ function answer(state, step, value, replyToken, now) {
   clearState(state.userId);
   writeRow(state, STATUS.DONE, now);
   reply(replyToken, finalMessages(state, now));
+  notifyStaff('done', state, now);
+}
+
+// ---------------------------------------------------------------- 推播給負責人
+
+/**
+ * 負責人用自己的 LINE 加官方帳號好友，傳「綁定 綁定碼」就會收到推播；傳「取消綁定」停止。
+ * 綁定碼在指令碼屬性 BIND_CODE。猜錯 5 次就 6 小時內不再受理，避免被亂試。
+ */
+function handleBinding(msg, userId, replyToken) {
+  var ids = listProp('PUSH_TO');
+  if (/^取消綁定$/.test(msg)) {
+    if (ids.indexOf(userId) === -1) return;
+    setProp('PUSH_TO', ids.filter(function (id) { return id !== userId; }).join(','));
+    return reply(replyToken, [text('已取消綁定，這支 LINE 不會再收到預約通知。')]);
+  }
+  var m = msg.match(/^綁定\s*(\d{4,8})$/);
+  if (!m) return;
+  var cache = CacheService.getScriptCache();
+  var tries = Number(cache.get('bind_' + userId)) || 0;
+  if (tries >= 5) return;
+  if (!prop('BIND_CODE') || m[1] !== String(prop('BIND_CODE'))) {
+    cache.put('bind_' + userId, String(tries + 1), 21600);
+    return reply(replyToken, [text('綁定碼不對，請再確認一次。')]);
+  }
+  if (ids.indexOf(userId) === -1) setProp('PUSH_TO', ids.concat([userId]).join(','));
+  reply(replyToken, [text('綁定完成 🦌\n之後旅客填完預約資料、按「找真人」或從官網送出預約時，會通知這支 LINE。\n晚上進來的詢問，隔天早上 ' +
+    prop('REPLY_START_HOUR') + ' 點合成一則通知。')]);
+}
+
+/** 給負責人看的一則通知。 */
+function staffMessage(kind, state, now, said) {
+  var who = state.name || '旅客';
+  var head = kind === 'chat' ? '🙋 有人想找真人｜' : kind === 'website' ? '🦌 官網預約詢問｜' : '🦌 新預約詢問｜';
+  var lines = [head + who];
+  if (said) lines.push('「' + said.slice(0, 200) + '」');
+  var hasTrip = state.date || state.departure || state.people || state.minutes || state.pickup || state.phone;
+  if (kind !== 'chat' || hasTrip) lines.push(guestSummary(state, 'zh'));
+  var flags = tripFlags(state.date, now);
+  if (state.lang === 'en') flags.push('英文旅客');
+  if (flags.length) lines.push('⚠️ ' + flags.join('・'));
+  if (kind !== 'chat' && state.notes) lines.push('📝 ' + state.notes.slice(0, 200));
+  var link = chatLink(state.userId);
+  if (link) lines.push('開啟聊天室：' + link);
+  return lines.join('\n');
+}
+
+/** 官方帳號後台（chat.line.biz）這位旅客的聊天室網址。 */
+function chatLink(userId) {
+  var bot = prop('BOT_USER_ID');
+  if (!bot) {
+    var res = lineFetch('get', '/info');
+    try { bot = JSON.parse(res.body).userId || ''; } catch (err) { bot = ''; }
+    if (bot) setProp('BOT_USER_ID', bot);
+  }
+  return bot && userId ? 'https://chat.line.biz/' + bot + '/chat/' + userId : '';
+}
+
+function notifyStaff(kind, state, now, said) {
+  if (!listProp('PUSH_TO').length) return;
+  var msg = staffMessage(kind, state, now, said);
+  if (isNight(now)) return queueNight(msg);
+  pushToStaff(msg, now);
+}
+
+/** 晚上的通知先存起來（最多 6 則全文），早上再合成一則推。 */
+function queueNight(msg) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var q = readQueue();
+    q.count += 1;
+    if (q.items.length < 6) q.items.push(msg.slice(0, 400));
+    setProp('PUSH_QUEUE', JSON.stringify(q));
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function readQueue() {
+  try {
+    var q = JSON.parse(prop('PUSH_QUEUE'));
+    if (q && q.items) return q;
+  } catch (err) { /* 空的 */ }
+  return { count: 0, items: [] };
+}
+
+/** 每天早上由觸發執行：把晚上的詢問合成一則推給負責人。 */
+function sendMorningDigest(now) {
+  now = now && typeof now.getTime === 'function' ? now : new Date();
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  var q;
+  try {
+    q = readQueue();
+    PropertiesService.getScriptProperties().deleteProperty('PUSH_QUEUE');
+  } finally {
+    lock.releaseLock();
+  }
+  if (!q.count) return;
+  var body = ['🌅 晚上有 ' + q.count + ' 筆詢問'].concat(q.items).join('\n\n———\n\n');
+  if (q.count > q.items.length) body += '\n\n另外 ' + (q.count - q.items.length) + ' 筆請看試算表。';
+  pushToStaff(body, now);
+}
+
+/** 推給所有綁定的負責人。超過每月上限或帳號額度不夠就不推（試算表還是有紀錄）。 */
+function pushToStaff(msg, now) {
+  var ids = listProp('PUSH_TO');
+  if (!ids.length) return false;
+  var key = 'PUSH_COUNT_' + taipeiNow(now).date.slice(0, 7);
+  var sent = Number(prop(key)) || 0;
+  if (sent + ids.length > Number(prop('PUSH_MONTHLY_LIMIT'))) {
+    console.warn('本月推播已達上限 ' + prop('PUSH_MONTHLY_LIMIT') + ' 則，不再推。');
+    return false;
+  }
+  if (!quotaLeft(ids.length)) {
+    console.warn('官方帳號本月額度不夠，不推。');
+    return false;
+  }
+  ids.forEach(function (id) {
+    if (lineFetch('post', '/message/push', { to: id, messages: [text(msg.slice(0, 5000))] }).code < 300) sent += 1;
+  });
+  setProp(key, String(sent));
+  return true;
+}
+
+function quotaLeft(n) {
+  try {
+    var quota = JSON.parse(lineFetch('get', '/message/quota').body);
+    if (quota.type !== 'limited') return true;
+    var used = JSON.parse(lineFetch('get', '/message/quota/consumption').body).totalUsage;
+    return Number(used) + n <= Number(quota.value);
+  } catch (err) {
+    return false;
+  }
 }
