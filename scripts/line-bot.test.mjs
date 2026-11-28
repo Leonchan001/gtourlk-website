@@ -551,6 +551,7 @@ test('not understood: ask again once with an example, then hand to a person', ()
   const again = lastReply(bot)
   assert.match(again[0].text, /沒看懂.*12\/20/)
   assert.match(again[1].text, /想哪一天/) // buttons again
+  assert.doesNotMatch(again[1].text, /小問題/) // no intro the second time
   assert.ok(again[1].quickReply)
   assert.equal(pushes(bot).length, 0)
   send(bot, event('還不確定欸'))

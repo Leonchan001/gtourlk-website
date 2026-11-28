@@ -426,12 +426,12 @@ function chatItem(lang) {
 }
 
 /** 某一步的問題（含按鈕），前面加進度，例如「（2/6）」。 */
-function question(step, state, now) {
+function question(step, state, now, again) {
   var q = rawQuestion(step, state, now);
   var total = state.total || STEPS.length;
   var index = Math.min(total, Object.keys(state.done || {}).length + 1);
   q.text = '（' + index + '/' + total + '）' + q.text;
-  if (index === 1) q.text = COPY[state.lang].intro(total) + '\n\n' + q.text;
+  if (index === 1 && !again) q.text = COPY[state.lang].intro(total) + '\n\n' + q.text; // 重問時不再重複開頭
   return q;
 }
 
@@ -823,7 +823,7 @@ function handleText(msg, userId, replyToken, now) {
   if (!state.miss) {
     state.miss = 1;
     saveState(userId, state);
-    return reply(replyToken, [text(c.miss(c.hints[step] || '')), question(step, state, now)]);
+    return reply(replyToken, [text(c.miss(c.hints[step] || '')), question(step, state, now, true)]);
   }
   handOff(state, replyToken, now, msg, 'chat');
 }
@@ -873,7 +873,7 @@ function handlePostback(event, userId, now) {
   }
   if (data.f !== state.step) {
     // 按到前面舊的按鈕：重新問目前這一步
-    return reply(event.replyToken, [question(state.step, state, now)]);
+    return reply(event.replyToken, [question(state.step, state, now, true)]);
   }
   if (data.f === 'people' && data.v === 'more') {
     return reply(event.replyToken, [ask(c.moreAsk, [chatItem(state.lang)])]);
