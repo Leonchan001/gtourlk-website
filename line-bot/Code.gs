@@ -373,8 +373,6 @@ var COPY = {
     edit: '想修改或有其他需求，直接打字告訴我們就好。',
     handoff: '收到，我請專人回覆您 🦌',
     handoffNight: function (h) { return '收到 🦌 現在是休息時間，導鹿明天早上 ' + h + ' 點後回覆您。'; },
-    agency: '旅行社／遊覽車團', agencyDisplay: '我是旅行社／遊覽車團',
-    groupReply: '導遊與團體有專屬價格，導鹿會請專人報價 🦌',
     miss: function (hint) { return '不好意思沒看懂 🙏 可以用下面的按鈕選，或打「' + hint + '」這樣的格式。'; },
     hints: { date: '12/20', time: '14:00 或 下午2點', people: '5 或 2大1小', minutes: '90', pickup: '民宿名稱', phone: '0912-345-678' }
   },
@@ -400,8 +398,6 @@ var COPY = {
     edit: 'Anything to change or add? Just type it here.',
     handoff: 'Got it, a team member will reply to you here 🦌',
     handoffNight: function (h) { return 'Got it 🦌 We are offline now and will reply after ' + h + ':00 AM (Taiwan time).'; },
-    agency: 'Agency / coach', agencyDisplay: 'We are a travel agency / coach group',
-    groupReply: 'Tour guides and groups have special rates, so a team member will send you a quote 🦌',
     miss: function (hint) { return 'Sorry, I didn’t catch that. Please use the buttons below, or type it like “' + hint + '”.'; },
     hints: { date: '12/20', time: '14:00', people: '5', minutes: '90', pickup: 'your hotel name', phone: '0912 345 678' }
   }
@@ -462,8 +458,7 @@ function rawQuestion(step, state, now) {
     for (var n = 1; n <= 10; n++) {
       nums.push(postbackItem(String(n), 'f=people&v=' + n, state.lang === 'en' ? n + (n === 1 ? ' guest' : ' guests') : n + ' 位'));
     }
-    return ask(c.people, nums.concat([postbackItem(c.more, 'f=people&v=more', c.more),
-      postbackItem(c.agency, 'f=agency', c.agencyDisplay), chatItem(state.lang)]));
+    return ask(c.people, nums.concat([postbackItem(c.more, 'f=people&v=more', c.more), chatItem(state.lang)]));
   }
   if (step === 'minutes') {
     return ask(c.minutes, [60, 90, 150].map(function (m) {
@@ -791,8 +786,6 @@ function handleText(msg, userId, replyToken, now) {
   if (!state) return nightAck(msg, userId, replyToken, now); // 一般聊天，交給真人
   var c = COPY[state.lang];
   var step = state.step;
-  // 旅行社、導遊、遊覽車團：有專屬價格，交給真人報價
-  if (isAgency(msg)) return handOff(state, replyToken, now, msg, 'group');
   // 旅客在問問題（例如「可以帶狗嗎？」）：不當成答案，直接交給真人
   if (looksLikeQuestion(msg)) return handOff(state, replyToken, now, msg, 'chat');
   // 問到一半，每一步都可以直接打字回答
@@ -829,10 +822,6 @@ function handleText(msg, userId, replyToken, now) {
   handOff(state, replyToken, now, msg, 'chat');
 }
 
-function isAgency(textValue) {
-  return /旅行社|導遊|領隊|遊覽車|帶團|travel\s*agen|tour\s*guide|coach/i.test(String(textValue || ''));
-}
-
 function addNote(state, note) {
   state.notes = (state.notes ? state.notes + '／' : '') + note;
 }
@@ -842,12 +831,11 @@ function handOff(state, replyToken, now, said, kind) {
   var c = COPY[state.lang];
   clearState(state.userId);
   if (said) addNote(state, said.slice(0, 200));
-  if (kind === 'group') addNote(state, '旅行社／遊覽車，需報價');
   writeRow(state, STATUS.CHAT, now);
   var night = isNight(now);
   var h = Number(prop('REPLY_START_HOUR'));
   if (night) markNightAck(state.userId); // 已經說過幾點回覆，今晚不再回「訊息收到」
-  var msg = kind === 'group' ? c.groupReply + (night ? '\n' + c.nightReply(h) : '') : night ? c.handoffNight(h) : c.handoff;
+  var msg = night ? c.handoffNight(h) : c.handoff;
   reply(replyToken, [text(msg)]);
   notifyStaff(kind, state, now, said);
 }
@@ -876,7 +864,6 @@ function handlePostback(event, userId, now) {
     }
     return notifyStaff('chat', state, now, '');
   }
-  if (data.f === 'agency') return handOff(state, event.replyToken, now, '', 'group');
   if (data.f !== state.step) {
     // 按到前面舊的按鈕：重新問目前這一步
     return reply(event.replyToken, [question(state.step, state, now, true)]);
@@ -939,15 +926,12 @@ function handleBinding(msg, userId, replyToken) {
 /** 給負責人看的一則通知。 */
 function staffMessage(kind, state, now, said) {
   var who = state.name || '旅客';
-  var head = kind === 'chat' ? '🙋 有人想找真人｜' : kind === 'group' ? '🚌 旅行社／遊覽車報價｜' : kind === 'website' ? '🦌 官網預約詢問｜' : '🦌 新預約詢問｜';
+  var head = kind === 'chat' ? '🙋 有人想找真人｜' : kind === 'website' ? '🦌 官網預約詢問｜' : '🦌 新預約詢問｜';
   var lines = [head + who];
   if (said) lines.push('「' + said.slice(0, 200) + '」');
   var hasTrip = state.date || state.departure || state.people || state.minutes || state.pickup || state.phone;
-  var summary = guestSummary(state, 'zh');
-  if (kind === 'group') summary = summary.replace(/💰[^\n]*/, '💰 需另外報價（導遊／團體價）');
-  if (kind !== 'chat' || hasTrip) lines.push(summary);
+  if (kind !== 'chat' || hasTrip) lines.push(guestSummary(state, 'zh'));
   var flags = tripFlags(state.date, now);
-  if (kind === 'group') flags.unshift('旅行社／遊覽車');
   if (state.lang === 'en') flags.push('英文旅客');
   if (flags.length) lines.push('⚠️ ' + flags.join('・'));
   if (kind !== 'chat' && state.notes) lines.push('📝 ' + state.notes.slice(0, 200));

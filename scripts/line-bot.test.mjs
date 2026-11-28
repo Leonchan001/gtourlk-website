@@ -567,32 +567,7 @@ test('not understood: ask again once with an example, then hand to a person', ()
   assert.match(lastReply(b2)[0].text, /沒看懂/)
 })
 
-test('travel agencies / coach groups go to a person for a quote; large private groups still get a price', () => {
-  const bot = load({ props: { PUSH_TO: MOM } })
-  send(bot, event('我要預約導覽'))
-  send(bot, pb('f=date&v=2026-12-17'))
-  send(bot, pb('f=time&v=10:00'))
-  const labels = quick(lastReply(bot)[0]).map((a) => a.label)
-  assert.ok(labels.includes('旅行社／遊覽車團'))
-  assert.ok(labels.length <= 13)
-  send(bot, pb('f=agency'))
-  const r = lastReply(bot)[0].text
-  assert.match(r, /導遊與團體有專屬價格/)
-  assert.doesNotMatch(r, /NT\$/)
-  const row = bot.getSheet().rows[1]
-  assert.equal(row[15], '交給真人')
-  assert.equal(row[6], '2026-12-17')
-  assert.equal(row[7], '10:00')
-  const p = pushes(bot).at(-1).body.messages[0].text
-  assert.match(p, /旅行社／遊覽車報價/)
-  assert.match(p, /⚠️ 旅行社／遊覽車/)
-  assert.match(p, /需另外報價/)
-  // typing the words at any step does the same, and at night says when we reply
-  const b2 = load()
-  send(b2, event('我要預約導覽'), NIGHT)
-  send(b2, event('我們是旅行社帶團'), NIGHT)
-  assert.match(lastReply(b2)[0].text, /專屬價格[\s\S]*明天早上 8 點後/)
-  // 25 private guests: normal flow with a price
+test('large private groups follow the normal flow: price up to 50, quote after that', () => {
   const b3 = load()
   send(b3, event('我要預約導覽'))
   send(b3, pb('f=date&v=2026-12-17'))
@@ -601,11 +576,11 @@ test('travel agencies / coach groups go to a person for a quote; large private g
   send(b3, event('25位'))
   assert.match(lastReply(b3)[0].text, /多久/)
   assert.match(quick(lastReply(b3)[0])[0].label, /NT\$/)
-  // over 50: no formula price, still asked normally
   const b4 = load()
   send(b4, event('我要預約導覽'))
   send(b4, pb('f=date&v='))
   send(b4, pb('f=time&v='))
-  send(b4, event('60位'))
+  send(b4, event('六十位'))
+  assert.match(lastReply(b4)[0].text, /多久/)
   assert.doesNotMatch(quick(lastReply(b4)[0])[0].label, /NT\$/)
 })
