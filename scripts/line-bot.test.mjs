@@ -650,17 +650,16 @@ test('staff card: call, chat, status buttons and review invite', () => {
   assert.ok(!buttons(pushes(b2)[0].body.messages[0]).some((a) => a.label === '撥電話'))
 })
 
-test('staff taps a status: only the sheet result changes, no message is sent; others are ignored', () => {
+test('staff taps a status: sheet result is updated and an updated card comes back; others are ignored', () => {
   const bot = load({ props: { PUSH_TO: MOM } })
   finish(bot)
   const confirm = buttons(pushes(bot)[0].body.messages[0]).find((a) => a.label === '已確認')
   send(bot, pb(confirm.data, null, 'Ustranger'))
   assert.equal(bot.getSheet().rows[1][16], '') // not bound: ignored
-  const n = replies(bot).length
   send(bot, pb(confirm.data, null, MOM))
   assert.equal(bot.getSheet().rows[1][16], '已確認')
-  assert.equal(replies(bot).length, n) // no extra message
-  const lost = buttons(pushes(bot)[0].body.messages[0]).find((a) => a.label === '沒成交')
+  assert.match(allText(lastReply(bot)), /✅ 已確認/)
+  const lost = buttons(lastReply(bot)[0]).find((a) => a.label === '沒成交')
   send(bot, pb(lost.data, null, MOM)) // can be changed
   assert.equal(bot.getSheet().rows[1][16], '沒成交')
   // the guest's later answers never wipe out the result
@@ -680,7 +679,7 @@ test('review invite: pushes a thank-you with the Google review link once, marks 
   const row = bot.getSheet().rows[1]
   assert.equal(row[16], '已搭乘')
   assert.match(String(row[18]), /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
-  assert.deepEqual(lastReply(bot).map((m) => m.text), ['已邀請 王小明 留評論 ⭐'])
+  assert.match(allText(lastReply(bot)), /已邀請 王小明 留評論[\s\S]*⭐ 已邀請留評論/)
   send(bot, pb(invite.data, null, MOM))
   assert.equal(pushes(bot).length, before + 1)
   assert.match(lastReply(bot)[0].text, /已經邀請過/)
