@@ -95,6 +95,19 @@ const event = (text, userId = 'Uguest0001', replyToken = 'r1') => ({
 const post = (bot, events, key = 'k') => bot.ctx.doPost({ parameter: { key }, postData: { contents: JSON.stringify({ events }) } })
 const pushes = (bot) => bot.calls.filter((c) => c.path === '/message/push')
 const replies = (bot) => bot.calls.filter((c) => c.path === '/message/reply')
+// every text, altText and uri inside messages (text or Flex), joined by newlines
+const allText = (messages) => {
+  const out = []
+  const walk = (o) => {
+    if (Array.isArray(o)) return o.forEach(walk)
+    if (o && typeof o === 'object') {
+      for (const k of ['text', 'altText', 'uri', 'label']) if (typeof o[k] === 'string') out.push(o[k])
+      Object.values(o).forEach((v) => { if (v && typeof v === 'object') walk(v) })
+    }
+  }
+  walk(messages)
+  return out.join('\n')
+}
 
 
 const at = (s) => new Date(s)
@@ -379,7 +392,8 @@ test('daytime: finished inquiry, "找真人" and website form each push one summ
   assert.equal(pushes(bot).length, 1)
   const p = pushes(bot)[0].body
   assert.equal(p.to, MOM)
-  const t = p.messages[0].text
+  assert.equal(p.messages[0].type, 'flex')
+  const t = allText(p.messages)
   assert.match(t, /新預約詢問｜王小明/)
   assert.match(t, /12\/17（四）・10:00/)
   assert.match(t, /0912-345-678/)
@@ -387,12 +401,12 @@ test('daytime: finished inquiry, "找真人" and website form each push one summ
   assert.match(t, /chat\.line\.biz\/Ubot\/chat\/Uguest0001/)
   send(bot, event('我要預約導覽', 'Uguest0002'))
   send(bot, pb('f=chat', null, 'Uguest0002'))
-  assert.match(pushes(bot).at(-1).body.messages[0].text, /有人想找真人｜王小明/)
+  assert.match(allText(pushes(bot).at(-1).body.messages), /有人想找真人｜王小明/)
   send(bot, event('預約導覽', 'Uguest0003'))
   send(bot, event('可以帶狗嗎？', 'Uguest0003'))
-  assert.match(pushes(bot).at(-1).body.messages[0].text, /找真人[\s\S]*「可以帶狗嗎？」/)
+  assert.match(allText(pushes(bot).at(-1).body.messages), /找真人[\s\S]*「可以帶狗嗎？」/)
   send(bot, event(bookingSummary(trip, 'zh'), 'Uguest0004'))
-  assert.match(pushes(bot).at(-1).body.messages[0].text, /官網預約詢問/)
+  assert.match(allText(pushes(bot).at(-1).body.messages), /官網預約詢問/)
   assert.equal(pushes(bot).length, 4)
   assert.equal(bot.store['PUSH_COUNT_2026-12'], '4')
 })
@@ -405,7 +419,7 @@ test('night inquiries are pushed as one message in the morning', () => {
   assert.equal(pushes(bot).length, 0)
   bot.ctx.sendMorningDigest(at('2026-12-02T00:05:00Z'))
   assert.equal(pushes(bot).length, 1)
-  const t = pushes(bot)[0].body.messages[0].text
+  const t = allText(pushes(bot)[0].body.messages)
   assert.match(t, /晚上有 2 筆詢問/)
   assert.match(t, /新預約詢問/)
   assert.match(t, /找真人/)
@@ -477,7 +491,7 @@ test('health check pushes staff on errors and reports recovery', () => {
   bot.ctx.recordError(new Error('boom'))
   assert.equal(bot.ctx.healthCheck(DAY).ok, false)
   assert.equal(bot.mails.at(-1).to, 'leon@example.com')
-  assert.match(pushes(bot)[0].body.messages[0].text, /小幫手暫時有狀況/)
+  assert.match(allText(pushes(bot)[0].body.messages), /小幫手暫時有狀況/)
   assert.equal(bot.store.ERROR_LOG, undefined)
   assert.equal(bot.ctx.healthCheck(new Date(DAY.getTime() + 3600e3)).ok, true)
   assert.match(bot.mails.at(-1).subject, /恢復/)
@@ -557,7 +571,7 @@ test('not understood: ask again once with an example, then hand to a person', ()
   send(bot, event('還不確定欸'))
   assert.equal(lastReply(bot)[0].text, '收到，我請專人回覆您 🦌')
   assert.equal(bot.getSheet().rows[1][15], '交給真人')
-  assert.match(pushes(bot).at(-1).body.messages[0].text, /找真人[\s\S]*「還不確定欸」/)
+  assert.match(allText(pushes(bot).at(-1).body.messages), /找真人[\s\S]*「還不確定欸」/)
   // a miss only counts for the step it happened on
   const b2 = load()
   send(b2, event('我要預約導覽'))
@@ -597,11 +611,116 @@ test('English guests without a Taiwan number can tap "No local number"; Chinese 
   assert.equal(row[15], '資料齊了')
   assert.equal(row[11], '')
   assert.match(row[14], /沒有台灣手機，用 LINE 聯絡/)
-  const p = pushes(bot).at(-1).body.messages[0].text
+  const p = allText(pushes(bot).at(-1).body.messages)
   assert.match(p, /新預約詢問/)
   assert.match(p, /沒有台灣手機，用 LINE 聯絡/)
   const zh = load()
   send(zh, event('我要預約導覽'))
   for (const d of ['f=date&v=2026-12-17', 'f=time&v=10:00', 'f=people&v=2', 'f=minutes&v=60', 'f=pickup&v=']) send(zh, pb(d))
   assert.deepEqual(quick(lastReply(zh)[0]).map((a) => a.label), ['找真人'])
+})
+
+const buttons = (msg) => {
+  const out = []
+  const walk = (o) => {
+    if (Array.isArray(o)) return o.forEach(walk)
+    if (o && typeof o === 'object') {
+      if (o.type === 'button') out.push(o.action)
+      Object.values(o).forEach((v) => { if (v && typeof v === 'object') walk(v) })
+    }
+  }
+  walk(msg)
+  return out
+}
+
+test('staff card: call, chat, status buttons and review invite', () => {
+  const bot = load({ props: { PUSH_TO: MOM, BOT_USER_ID: 'Ubot' } })
+  finish(bot)
+  const card = pushes(bot)[0].body.messages[0]
+  assert.equal(card.type, 'flex')
+  const acts = buttons(card)
+  assert.deepEqual(acts.map((a) => a.label), ['撥電話', '開聊天室', '已確認', '沒成交', '邀請留評論'])
+  assert.equal(acts[0].uri, 'tel:0912345678')
+  assert.match(acts[1].uri, /chat\.line\.biz\/Ubot\/chat\/Uguest0001/)
+  assert.match(allText(card), /⏳ 待回覆/)
+  // no phone, no call button
+  const b2 = load({ props: { PUSH_TO: MOM } })
+  send(b2, event('book a tour'))
+  for (const d of ['f=date&v=2026-12-17', 'f=time&v=10:00', 'f=people&v=2', 'f=minutes&v=60', 'f=pickup&v=', 'f=phone&v=none']) send(b2, pb(d))
+  assert.ok(!buttons(pushes(b2)[0].body.messages[0]).some((a) => a.label === '撥電話'))
+})
+
+test('staff taps a status: sheet result is updated and an updated card comes back; others are ignored', () => {
+  const bot = load({ props: { PUSH_TO: MOM } })
+  finish(bot)
+  const confirm = buttons(pushes(bot)[0].body.messages[0]).find((a) => a.label === '已確認')
+  send(bot, pb(confirm.data, null, 'Ustranger'))
+  assert.equal(bot.getSheet().rows[1][16], '') // not bound: ignored
+  send(bot, pb(confirm.data, null, MOM))
+  assert.equal(bot.getSheet().rows[1][16], '已確認')
+  assert.match(allText(lastReply(bot)), /✅ 已確認/)
+  const lost = buttons(lastReply(bot)[0]).find((a) => a.label === '沒成交')
+  send(bot, pb(lost.data, null, MOM)) // can be changed
+  assert.equal(bot.getSheet().rows[1][16], '沒成交')
+  // the guest's later answers never wipe out the result
+  assert.equal(bot.getSheet().rows[0][18], '已邀評論')
+})
+
+test('review invite: pushes a thank-you with the Google review link once, marks 已搭乘', () => {
+  const bot = load({ props: { PUSH_TO: MOM } })
+  finish(bot)
+  const invite = buttons(pushes(bot)[0].body.messages[0]).find((a) => a.label === '邀請留評論')
+  const before = pushes(bot).length
+  send(bot, pb(invite.data, null, MOM))
+  const p = pushes(bot).at(-1).body
+  assert.equal(pushes(bot).length, before + 1)
+  assert.equal(p.to, 'Uguest0001')
+  assert.match(p.messages[0].text, /謝謝您搭乘導鹿[\s\S]*writereview\?placeid=ChIJUwmJPZNFaTQRApREiS-dmrE/)
+  const row = bot.getSheet().rows[1]
+  assert.equal(row[16], '已搭乘')
+  assert.match(String(row[18]), /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+  assert.match(allText(lastReply(bot)), /已邀請 王小明 留評論[\s\S]*⭐ 已邀請留評論/)
+  send(bot, pb(invite.data, null, MOM))
+  assert.equal(pushes(bot).length, before + 1)
+  assert.match(lastReply(bot)[0].text, /已經邀請過/)
+  // English guests get English
+  const b2 = load({ props: { PUSH_TO: MOM } })
+  send(b2, event('book a tour'))
+  for (const d of ['f=date&v=2026-12-17', 'f=time&v=10:00', 'f=people&v=2', 'f=minutes&v=60', 'f=pickup&v=', 'f=phone&v=none']) send(b2, pb(d))
+  const inv2 = buttons(pushes(b2)[0].body.messages[0]).find((a) => a.label === '邀請留評論')
+  send(b2, pb(inv2.data, null, MOM))
+  assert.match(pushes(b2).at(-1).body.messages[0].text, /Thank you for touring Lukang/)
+})
+
+test('morning message lists follow-ups: pending over 2 days, past trips still to invite', () => {
+  const bot = load({ props: { PUSH_TO: MOM } })
+  finish(bot) // DAY = 12/1, trip date 12/17
+  const b = bot.ctx
+  // second inquiry, confirmed, trip date already past by 12/20
+  send(bot, event('我要預約導覽', 'Uguest0002'))
+  for (const d of ['f=date&v=2026-12-02', 'f=time&v=10:00', 'f=people&v=3', 'f=minutes&v=60', 'f=pickup&v=']) send(bot, pb(d, null, 'Uguest0002'))
+  send(bot, event('0911-111-111', 'Uguest0002'))
+  const confirm = buttons(pushes(bot).at(-1).body.messages[0]).find((a) => a.label === '已確認')
+  send(bot, pb(confirm.data, null, MOM))
+  const n = pushes(bot).length
+  b.sendMorningDigest(at('2026-12-04T00:05:00Z')) // 12/4 08:05, nothing queued overnight
+  assert.equal(pushes(bot).length, n + 1)
+  const t = allText(pushes(bot).at(-1).body.messages)
+  assert.match(t, /追蹤中/)
+  assert.match(t, /王小明 12\/17（四）・10:00｜待回覆 2 天/)
+  assert.match(t, /12\/2（三）・10:00｜已過日期，記得邀評論/)
+  // nothing to follow up and nothing queued: no push
+  const quiet = load({ props: { PUSH_TO: MOM } })
+  quiet.ctx.sendMorningDigest(at('2026-12-04T00:05:00Z'))
+  assert.equal(pushes(quiet).length, 0)
+})
+
+test('night cards come in the morning as a carousel with status buttons', () => {
+  const bot = load({ props: { PUSH_TO: MOM } })
+  finish(bot, NIGHT)
+  bot.ctx.sendMorningDigest(at('2026-12-02T00:05:00Z'))
+  const msgs = pushes(bot)[0].body.messages
+  assert.match(msgs[0].text, /晚上有 1 筆詢問/)
+  assert.equal(msgs[1].contents.type, 'carousel')
+  assert.deepEqual(buttons(msgs[1]).map((a) => a.label).slice(-3), ['已確認', '沒成交', '邀請留評論'])
 })

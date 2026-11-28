@@ -37,17 +37,21 @@ var DEFAULTS = {
   PUSH_MONTHLY_LIMIT: '150', // 小幫手每月最多推幾則給負責人（額度和群發共用）
   // 小幫手出錯時回給旅客的話（和原本「導覽｜預約表單」自動回應同樣的用意），確保旅客不會石沉大海
   FALLBACK_TEXT: '訊息收到 🦌 想預約導覽的話，請告訴我們哪一天來鹿港、大概幾位，導鹿會盡快回覆您。\n急件請撥 0927-013-167（08:00–19:00）。',
-  STALE_HOURS: '72'         // 超過幾小時沒收到任何 LINE 事件，健康檢查就當成異常
+  STALE_HOURS: '72',        // 超過幾小時沒收到任何 LINE 事件，健康檢查就當成異常
+  REVIEW_URL: 'https://search.google.com/local/writereview?placeid=ChIJUwmJPZNFaTQRApREiS-dmrE'
 };
 
 var TZ = 'Asia/Taipei';
 var LINE_API = 'https://api.line.me/v2/bot';
 var LOG_SHEET = '預約詢問';
 var LOG_HEADERS = ['編號', '收到時間', '旅客 ID', '旅客名稱', '語言', '來源', '日期', '出發時間', '人數',
-  '導覽分鐘', '上下車地點', '手機', '其他需求', '參考價', '提醒', '狀態', '結果', '原始訊息'];
+  '導覽分鐘', '上下車地點', '手機', '其他需求', '參考價', '提醒', '狀態', '結果', '原始訊息', '已邀評論'];
 var COL = {};
 LOG_HEADERS.forEach(function (name, i) { COL[name] = i + 1; });
-var RESULTS = ['成交', '沒成交', '改電話', '其他'];
+var RESULTS = ['已確認', '已搭乘', '沒成交', '其他'];
+// 負責人在卡片上可以按的狀態（「已搭乘」在按「邀請留評論」時自動記）
+var CARD_RESULTS = ['已確認', '沒成交'];
+var RESULT_BADGE = { '': '⏳ 待回覆', 已確認: '✅ 已確認', 已搭乘: '🚐 已搭乘', 沒成交: '❌ 沒成交', 改電話: '📞 改電話', 其他: '📝 其他', 成交: '✅ 成交' };
 var STATUS = { ASKING: '問資料中', DONE: '資料齊了', CHAT: '交給真人', WEBSITE: '官網表單' };
 var STEPS = ['date', 'time', 'people', 'minutes', 'pickup', 'phone'];
 
@@ -573,6 +577,8 @@ function logSheet() {
     sheet = book.insertSheet(LOG_SHEET);
     sheet.appendRow(LOG_HEADERS);
     sheet.setFrozenRows(1);
+  } else if (sheet.getRange(1, COL['已邀評論'], 1, 1).getValues()[0][0] !== '已邀評論') {
+    sheet.getRange(1, COL['已邀評論'], 1, 1).setValues([['已邀評論']]); // 舊的試算表補上新欄位
   }
   return sheet;
 }
@@ -589,7 +595,7 @@ function rowValues(state, status, now) {
   var est = estimateTour(state.people, state.minutes);
   return [state.id, new Date(state.createdAt || now.getTime()), state.userId, state.name || '', state.lang, state.source,
     state.date, state.departure, state.people, state.minutes, state.pickup, state.phone, state.notes,
-    est ? money(est.linePrice) : (state.price || ''), tripFlags(state.date, now).concat(state.noLocal ? ['沒有台灣手機，用 LINE 聯絡'] : []).join('、'), status, '', (state.raw || '').slice(0, 1000)];
+    est ? money(est.linePrice) : (state.price || ''), tripFlags(state.date, now).concat(state.noLocal ? ['沒有台灣手機，用 LINE 聯絡'] : []).join('、'), status, '', (state.raw || '').slice(0, 1000), ''];
 }
 
 /** 新增或更新一列。日期、時間、手機存成文字，避免試算表自動改格式（例如吃掉手機開頭的 0）。 */
@@ -601,7 +607,9 @@ function writeRow(state, status, now) {
     var values = rowValues(state, status, now);
     var row = findRow(sheet, state.id);
     if (row) {
-      values[COL['結果'] - 1] = sheet.getRange(row, COL['結果']).getValues()[0][0] || '';
+      var kept = sheet.getRange(row, COL['結果'], 1, LOG_HEADERS.length - COL['結果'] + 1).getValues()[0];
+      values[COL['結果'] - 1] = kept[0] || ''; // 負責人填的結果、已邀評論不要被蓋掉
+      values[COL['已邀評論'] - 1] = kept[COL['已邀評論'] - COL['結果']] || '';
       sheet.getRange(row, 1, 1, values.length).setValues([values]);
     } else {
       sheet.appendRow(values);
@@ -719,7 +727,7 @@ function healthCheck(now) {
     setProp('ALERT_OPEN', String(now.getTime()));
     sendAlertMail('【導鹿】LINE 小幫手異常，請處理', alertBody(status));
     if (status.tokenOk) {
-      pushToStaff('⚠️ LINE 預約小幫手暫時有狀況，leon 已收到通知。\n這段時間請多留意官方帳號聊天室，旅客點「我要預約導覽」可能沒有自動回覆。', now);
+      pushToStaff([text('⚠️ LINE 預約小幫手暫時有狀況，leon 已收到通知。\n這段時間請多留意官方帳號聊天室，旅客點「我要預約導覽」可能沒有自動回覆。')], now);
     }
   }
   PropertiesService.getScriptProperties().deleteProperty('ERROR_LOG');
@@ -849,6 +857,7 @@ function handlePostback(event, userId, now) {
     if (i > 0) data[pair.slice(0, i)] = decodeURIComponent(pair.slice(i + 1));
   });
   var params = event.postback && event.postback.params || {};
+  if (data.f === 'st' || data.f === 'review') return handleStaffAction(data, userId, event.replyToken, now);
   var state = loadState(userId);
   if (!state) {
     if (data.f) reply(event.replyToken, [text(COPY.zh.expired)]);
@@ -928,22 +937,68 @@ function handleBinding(msg, userId, replyToken) {
     prop('REPLY_START_HOUR') + ' 點合成一則通知。')]);
 }
 
-/** 給負責人看的一則通知。 */
-function staffMessage(kind, state, now, said) {
-  var who = state.name || '旅客';
+/** 通知的標題、內容行、電話、聊天室連結（卡片和文字版共用）。 */
+function staffParts(kind, trip, now, said) {
+  var who = trip.name || '旅客';
   var head = kind === 'chat' ? '🙋 有人想找真人｜' : kind === 'website' ? '🦌 官網預約詢問｜' : '🦌 新預約詢問｜';
-  var lines = [head + who];
+  var lines = [];
   if (said) lines.push('「' + said.slice(0, 200) + '」');
-  var hasTrip = state.date || state.departure || state.people || state.minutes || state.pickup || state.phone;
-  if (kind !== 'chat' || hasTrip) lines.push(guestSummary(state, 'zh'));
-  var flags = tripFlags(state.date, now);
-  if (state.noLocal) flags.push('沒有台灣手機，用 LINE 聯絡');
-  if (state.lang === 'en') flags.push('英文旅客');
+  var hasTrip = trip.date || trip.departure || trip.people || trip.minutes || trip.pickup || trip.phone;
+  if (kind !== 'chat' || hasTrip) lines = lines.concat(guestSummary(trip, 'zh').split('\n'));
+  var flags = tripFlags(trip.date, now);
+  if (trip.noLocal) flags.push('沒有台灣手機，用 LINE 聯絡');
+  if (trip.lang === 'en') flags.push('英文旅客');
   if (flags.length) lines.push('⚠️ ' + flags.join('・'));
-  if (kind !== 'chat' && state.notes) lines.push('📝 ' + state.notes.slice(0, 200));
-  var link = chatLink(state.userId);
-  if (link) lines.push('開啟聊天室：' + link);
-  return lines.join('\n');
+  if (kind !== 'chat' && trip.notes) lines.push('📝 ' + String(trip.notes).slice(0, 200));
+  return { title: head + who, lines: lines, phone: trip.phone ? cleanPhone(trip.phone) : '', link: chatLink(trip.userId) };
+}
+
+/** 文字版（舊的通知格式，也用在測試與卡片的替代文字）。 */
+function staffMessage(kind, trip, now, said) {
+  var p = staffParts(kind, trip, now, said);
+  return [p.title].concat(p.lines).concat(p.link ? ['開啟聊天室：' + p.link] : []).join('\n');
+}
+
+function flexText(t, extra) {
+  var o = { type: 'text', text: String(t), wrap: true, size: 'sm' };
+  Object.keys(extra || {}).forEach(function (k) { o[k] = extra[k]; });
+  return o;
+}
+
+function flexButton(action, style) {
+  return { type: 'button', style: style || 'secondary', height: 'sm', action: action };
+}
+
+/** 給負責人的卡片：上面是摘要，下面是撥電話／開聊天室、狀態按鈕、邀請留評論。 */
+function staffBubble(kind, trip, now, said, result, invited) {
+  var p = staffParts(kind, trip, now, said);
+  var id = encodeURIComponent(trip.id || '');
+  var top = [];
+  if (p.phone) top.push(flexButton({ type: 'uri', label: '撥電話', uri: 'tel:' + p.phone }, 'primary'));
+  if (p.link) top.push(flexButton({ type: 'uri', label: '開聊天室', uri: p.link }, 'primary'));
+  var footer = [];
+  if (top.length) footer.push({ type: 'box', layout: 'horizontal', spacing: 'sm', contents: top });
+  if (trip.id) {
+    footer.push({ type: 'box', layout: 'horizontal', spacing: 'sm', contents: CARD_RESULTS.map(function (r) {
+      return flexButton({ type: 'postback', label: r, data: 'f=st&id=' + id + '&v=' + encodeURIComponent(r), displayText: '標記為「' + r + '」' });
+    }) });
+    footer.push(invited
+      ? flexText('⭐ 已邀請留評論', { align: 'center', color: '#888888' })
+      : flexButton({ type: 'postback', label: '邀請留評論', data: 'f=review&id=' + id, displayText: '邀請留評論' }));
+  }
+  var bubble = {
+    type: 'bubble',
+    body: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+      flexText(RESULT_BADGE[result || ''] || result, { weight: 'bold', color: result ? '#1f7a1f' : '#b26a00' }),
+      flexText(p.title, { weight: 'bold', size: 'md' })
+    ].concat(p.lines.filter(String).map(function (l) { return flexText(l); })) }
+  };
+  if (footer.length) bubble.footer = { type: 'box', layout: 'vertical', spacing: 'sm', contents: footer };
+  return bubble;
+}
+
+function staffCard(kind, trip, now, said, result, invited) {
+  return { type: 'flex', altText: (staffParts(kind, trip, now, said).title).slice(0, 380), contents: staffBubble(kind, trip, now, said, result, invited) };
 }
 
 /** 官方帳號後台（chat.line.biz）這位旅客的聊天室網址。 */
@@ -957,21 +1012,28 @@ function chatLink(userId) {
   return bot && userId ? 'https://chat.line.biz/' + bot + '/chat/' + userId : '';
 }
 
-function notifyStaff(kind, state, now, said) {
-  if (!listProp('PUSH_TO').length) return;
-  var msg = staffMessage(kind, state, now, said);
-  if (isNight(now)) return queueNight(msg);
-  pushToStaff(msg, now);
+var TRIP_KEYS = ['id', 'userId', 'name', 'lang', 'date', 'departure', 'people', 'minutes', 'pickup', 'phone', 'notes', 'noLocal', 'price'];
+
+function snapshot(trip) {
+  var o = {};
+  TRIP_KEYS.forEach(function (k) { if (trip[k]) o[k] = typeof trip[k] === 'string' ? trip[k].slice(0, 200) : trip[k]; });
+  return o;
 }
 
-/** 晚上的通知先存起來（最多 6 則全文），早上再合成一則推。 */
-function queueNight(msg) {
+function notifyStaff(kind, state, now, said) {
+  if (!listProp('PUSH_TO').length) return;
+  if (isNight(now)) return queueNight({ kind: kind, said: (said || '').slice(0, 120), trip: snapshot(state) });
+  pushToStaff([staffCard(kind, state, now, said, '', false)], now);
+}
+
+/** 晚上的通知先存起來（最多 6 筆），早上再合成一則推。 */
+function queueNight(item) {
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
     var q = readQueue();
     q.count += 1;
-    if (q.items.length < 6) q.items.push(msg.slice(0, 400));
+    if (q.items.length < 6) q.items.push(item);
     setProp('PUSH_QUEUE', JSON.stringify(q));
   } finally {
     lock.releaseLock();
@@ -986,7 +1048,11 @@ function readQueue() {
   return { count: 0, items: [] };
 }
 
-/** 每天早上由觸發執行：把晚上的詢問合成一則推給負責人。 */
+/**
+ * 每天早上由觸發執行：一則訊息裡有
+ *   1. 文字：晚上幾筆詢問＋「追蹤中」（超過 2 天還沒回覆的、日期已過還沒邀評論的）
+ *   2. 晚上詢問的卡片（carousel，可以直接按狀態）
+ */
 function sendMorningDigest(now) {
   now = now && typeof now.getTime === 'function' ? now : new Date();
   var lock = LockService.getScriptLock();
@@ -998,15 +1064,117 @@ function sendMorningDigest(now) {
   } finally {
     lock.releaseLock();
   }
-  if (!q.count) return;
-  var body = ['🌅 晚上有 ' + q.count + ' 筆詢問'].concat(q.items).join('\n\n———\n\n');
-  if (q.count > q.items.length) body += '\n\n另外 ' + (q.count - q.items.length) + ' 筆請看試算表。';
-  pushToStaff(body, now);
+  var parts = [];
+  if (q.count) {
+    var head = '🌅 晚上有 ' + q.count + ' 筆詢問';
+    if (q.count > q.items.length) head += '（另外 ' + (q.count - q.items.length) + ' 筆請看試算表）';
+    parts.push(head);
+  }
+  var follow = followUps(now);
+  if (follow.length) parts.push('📋 追蹤中\n' + follow.join('\n'));
+  if (!parts.length) return;
+  var messages = [text(parts.join('\n\n').slice(0, 5000))];
+  var bubbles = q.items.filter(function (it) { return it && it.trip; }).map(function (it) {
+    return staffBubble(it.kind, it.trip, now, it.said, '', false);
+  });
+  if (bubbles.length) messages.push({ type: 'flex', altText: '晚上有 ' + q.count + ' 筆詢問', contents: { type: 'carousel', contents: bubbles } });
+  pushToStaff(messages, now);
 }
 
-/** 推給所有綁定的負責人。超過每月上限或帳號額度不夠就不推（試算表還是有紀錄）。 */
-function pushToStaff(msg, now) {
-  var ids = listProp('PUSH_TO');
+/** 追蹤中的單：最近 14 天內，超過 2 天還是待回覆的；日期已過但仍是已確認、還沒邀評論的。 */
+function followUps(now) {
+  var sheet = logSheet();
+  var last = sheet.getLastRow();
+  if (last < 2) return [];
+  var rows = sheet.getRange(2, 1, last - 1, LOG_HEADERS.length).getValues();
+  var today = taipeiNow(now).date;
+  var pending = [], review = [];
+  rows.forEach(function (r) {
+    var get = function (name) { return r[COL[name] - 1]; };
+    var status = get('狀態'), result = get('結果') || '';
+    if (status === STATUS.ASKING) return;
+    var age = (now.getTime() - new Date(get('收到時間')).getTime()) / 86400000;
+    if (!(age <= 14)) return;
+    var trip = rowTrip(r);
+    var line = '・' + (trip.name || '旅客') + ' ' + guestSummary(trip, 'zh').split('\n')[0].replace('📅 ', '');
+    var link = chatLink(trip.userId);
+    if (!result && age >= 2) pending.push(line + '｜待回覆 ' + Math.floor(age) + ' 天' + (link ? '\n  ' + link : ''));
+    var date = String(get('日期') || '');
+    if (result === '已確認' && /^\d{4}-\d{2}-\d{2}$/.test(date) && date < today && !get('已邀評論')) {
+      review.push(line + '｜已過日期，記得邀評論' + (link ? '\n  ' + link : ''));
+    }
+  });
+  return pending.slice(0, 10).concat(review.slice(0, 10));
+}
+
+/** 從試算表的一列還原成摘要用的資料。 */
+function rowTrip(r) {
+  var get = function (name) { return r[COL[name] - 1]; };
+  var reminder = String(get('提醒') || '');
+  return { id: String(get('編號') || ''), userId: get('旅客 ID'), name: get('旅客名稱'), lang: get('語言') || 'zh',
+    date: String(get('日期') || ''), departure: String(get('出發時間') || ''), people: Number(get('人數')) || '',
+    minutes: Number(get('導覽分鐘')) || '', pickup: get('上下車地點') || '', phone: String(get('手機') || ''),
+    notes: get('其他需求') || '', price: get('參考價') || '', noLocal: reminder.indexOf('沒有台灣手機') !== -1 };
+}
+
+function rowKind(r) {
+  var status = r[COL['狀態'] - 1], source = r[COL['來源'] - 1];
+  if (status === STATUS.CHAT) return 'chat';
+  if (source === 'website' || status === STATUS.WEBSITE) return 'website';
+  return 'done';
+}
+
+/** 負責人在卡片上按的按鈕：改狀態、邀請留評論。只有綁定的負責人按才有效。 */
+function handleStaffAction(data, staffId, replyToken, now) {
+  if (listProp('PUSH_TO').indexOf(staffId) === -1) return;
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  var sheet, row, r;
+  try {
+    sheet = logSheet();
+    row = data.id ? findRow(sheet, data.id) : 0;
+    if (!row) return reply(replyToken, [text('找不到這一單，可能已經從試算表刪掉了。')]);
+    r = sheet.getRange(row, 1, 1, LOG_HEADERS.length).getValues()[0];
+    if (data.f === 'st') {
+      if (CARD_RESULTS.indexOf(data.v) === -1) return;
+      sheet.getRange(row, COL['結果'], 1, 1).setValues([[data.v]]);
+      r[COL['結果'] - 1] = data.v;
+    }
+  } finally {
+    lock.releaseLock();
+  }
+  var trip = rowTrip(r);
+  var invited = Boolean(r[COL['已邀評論'] - 1]);
+  if (data.f === 'st') {
+    return reply(replyToken, [staffCard(rowKind(r), trip, now, '', data.v, invited)]);
+  }
+  // 邀請留評論
+  if (invited) return reply(replyToken, [text('已經邀請過 ' + (trip.name || '這位旅客') + ' 了。')]);
+  var msg = trip.lang === 'en'
+    ? 'Thank you for touring Lukang with GtourLK 🦌\nIf you enjoyed it, would you leave us a quick Google review? It means a lot to us.\n' + prop('REVIEW_URL')
+    : '謝謝您搭乘導鹿的鹿港導覽 🦌\n如果玩得開心，願意花一分鐘幫我們留個 Google 評論嗎？對我們幫助很大！\n' + prop('REVIEW_URL');
+  if (!pushTo([trip.userId], [text(msg)], now)) {
+    return reply(replyToken, [text('這個月的推播額度不夠，沒有送出。可以直接到聊天室貼評論連結：\n' + prop('REVIEW_URL'))]);
+  }
+  var stamp = Utilities.formatDate(now, TZ, 'yyyy-MM-dd HH:mm');
+  lock.waitLock(20000);
+  try {
+    sheet.getRange(row, COL['已邀評論'], 1, 1).setValues([[stamp]]);
+    sheet.getRange(row, COL['結果'], 1, 1).setValues([['已搭乘']]);
+  } finally {
+    lock.releaseLock();
+  }
+  reply(replyToken, [text('已邀請 ' + (trip.name || '這位旅客') + ' 留評論 ⭐'), staffCard(rowKind(r), trip, now, '', '已搭乘', true)]);
+}
+
+/** 推給所有綁定的負責人。 */
+function pushToStaff(messages, now) {
+  return pushTo(listProp('PUSH_TO'), messages, now);
+}
+
+/** 推播（會用到每月額度）。超過 PUSH_MONTHLY_LIMIT 或帳號額度不夠就不推（試算表還是有紀錄）。 */
+function pushTo(ids, messages, now) {
+  ids = ids.filter(String);
   if (!ids.length) return false;
   var key = 'PUSH_COUNT_' + taipeiNow(now).date.slice(0, 7);
   var sent = Number(prop(key)) || 0;
@@ -1018,11 +1186,12 @@ function pushToStaff(msg, now) {
     console.warn('官方帳號本月額度不夠，不推。');
     return false;
   }
+  var ok = false;
   ids.forEach(function (id) {
-    if (lineFetch('post', '/message/push', { to: id, messages: [text(msg.slice(0, 5000))] }).code < 300) sent += 1;
+    if (lineFetch('post', '/message/push', { to: id, messages: messages.slice(0, 5) }).code < 300) { sent += 1; ok = true; }
   });
   setProp(key, String(sent));
-  return true;
+  return ok;
 }
 
 function quotaLeft(n) {
