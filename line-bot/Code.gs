@@ -1156,9 +1156,8 @@ function handleStaffAction(data, staffId, replyToken, now) {
   }
   var trip = rowTrip(r);
   var invited = Boolean(r[COL['已邀評論'] - 1]);
-  if (data.f === 'st') {
-    return reply(replyToken, [staffCard(rowKind(r), trip, now, '', data.v, invited)]);
-  }
+  // 改狀態只記進試算表，不回訊息（按鈕本身會在聊天室留下「標記為「已確認」」這句）
+  if (data.f === 'st') return;
   // 邀請留評論
   if (invited) return reply(replyToken, [text('已經邀請過 ' + (trip.name || '這位旅客') + ' 了。')]);
   var msg = trip.lang === 'en'
@@ -1175,7 +1174,7 @@ function handleStaffAction(data, staffId, replyToken, now) {
   } finally {
     lock.releaseLock();
   }
-  reply(replyToken, [text('已邀請 ' + (trip.name || '這位旅客') + ' 留評論 ⭐'), staffCard(rowKind(r), trip, now, '', '已搭乘', true)]);
+  reply(replyToken, [text('已邀請 ' + (trip.name || '這位旅客') + ' 留評論 ⭐')]);
 }
 
 /** 推給所有綁定的負責人。 */
