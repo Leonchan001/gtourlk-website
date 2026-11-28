@@ -40,6 +40,11 @@ const TOUR_DEFINITIONS = [
       tagline: '多一點時間，走進寺廟與巷弄的故事。',
       fit: '想兼顧經典景點與在地故事',
       stops: ['鹿港天后宮', '鹿港老街', '摸乳巷', '九曲巷', '鹿港龍山寺'],
+      route: {
+        path: ['天后宮停車場旁上車', '日茂行', '鹿港天后宮', '新祖宮', '鹿港公會堂', '桂花巷藝術村', '摸乳巷', '鹿港龍山寺', '興安宮・九曲巷・意樓', '天后宮廣場下車'],
+        hopOff: ['日茂行或新祖宮', '桂花巷藝術村', '摸乳巷', '鹿港龍山寺'],
+        notes: ['週一日茂行休館，改在新祖宮下車導覽。'],
+      },
     },
     en: {
       duration: '90 minutes',
@@ -50,6 +55,11 @@ const TOUR_DEFINITIONS = [
       tagline: 'More time for temple stories and historic lanes.',
       fit: 'Travelers who want both landmark sights and local stories',
       stops: ['Lukang Tianhou Temple', 'Lukang Old Street', 'Molu Lane', 'Nine-Turns Lane', 'Lukang Longshan Temple'],
+      route: {
+        path: ['Pick-up beside the Tianhou Temple car park', 'Rimao Hang', 'Lukang Tianhou Temple', 'Xinzu Temple', 'Lukang Public Hall', 'Osmanthus Alley Art Village', 'Molu Lane', 'Lukang Longshan Temple', 'Xing’an Temple · Nine-Turns Lane · Yi House', 'Drop-off at Tianhou Temple square'],
+        hopOff: ['Rimao Hang or Xinzu Temple', 'Osmanthus Alley Art Village', 'Molu Lane', 'Lukang Longshan Temple'],
+        notes: ['Rimao Hang is closed on Mondays; we stop at Xinzu Temple instead.'],
+      },
     },
   },
   {
@@ -66,6 +76,14 @@ const TOUR_DEFINITIONS = [
       tagline: '從北鹿港到南鹿港，從容看得更完整。',
       fit: '想深度走讀，並安排米其林綠色指南推薦景點',
       stops: ['鹿港天后宮', '鹿港龍山寺', '鹿港老街', '桂花巷藝術村', '辜家大宅', '南北鹿港經典古蹟'],
+      route: {
+        path: ['天后宮停車場旁上車', '日茂行', '鹿港天后宮', '新祖宮', '鹿港公會堂', '桂花巷藝術村', '摸乳巷', '鹿港龍山寺', '興安宮・九曲巷・意樓', '丁家大宅', '和興青創基地', '謝家甕牆', '鹿港民俗文物館', '天后宮廣場下車'],
+        hopOff: ['日茂行或新祖宮', '桂花巷藝術村', '摸乳巷', '鹿港龍山寺', '九曲巷（意樓、十宜樓）', '丁家大宅', '鹿港民俗文物館（入館參觀）'],
+        notes: [
+          '民俗文物館需購票入館，門票 NT$70／人，由旅客自行購買，不含在導覽費內。',
+          '週一休館：日茂行、丁家大宅、民俗文物館；週二休館：丁家大宅。',
+        ],
+      },
     },
     en: {
       duration: '150 minutes',
@@ -76,6 +94,14 @@ const TOUR_DEFINITIONS = [
       tagline: 'Take your time exploring both north and south Lukang.',
       fit: 'Travelers seeking an in-depth visit including Michelin Green Guide–recommended sights',
       stops: ['Lukang Tianhou Temple', 'Lukang Longshan Temple', 'Lukang Old Street', 'Osmanthus Alley Art Village', 'Koo Family Mansion', 'Historic sights across north and south Lukang'],
+      route: {
+        path: ['Pick-up beside the Tianhou Temple car park', 'Rimao Hang', 'Lukang Tianhou Temple', 'Xinzu Temple', 'Lukang Public Hall', 'Osmanthus Alley Art Village', 'Molu Lane', 'Lukang Longshan Temple', 'Xing’an Temple · Nine-Turns Lane · Yi House', 'Ding Family Mansion', 'Hexing Creative Hub', 'Xie Family Urn Wall', 'Lukang Folk Arts Museum', 'Drop-off at Tianhou Temple square'],
+        hopOff: ['Rimao Hang or Xinzu Temple', 'Osmanthus Alley Art Village', 'Molu Lane', 'Lukang Longshan Temple', 'Nine-Turns Lane (Yi House, Shiyi House)', 'Ding Family Mansion', 'Lukang Folk Arts Museum (with a visit inside)'],
+        notes: [
+          'The Folk Arts Museum charges admission of NT$70 per person, paid by guests and not included in the tour fee.',
+          'Closed on Mondays: Rimao Hang, Ding Family Mansion and the Folk Arts Museum. Closed on Tuesdays: Ding Family Mansion.',
+        ],
+      },
     },
   },
 ]

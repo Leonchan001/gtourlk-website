@@ -167,6 +167,9 @@ export const PAGE_COPY = {
     ctaBody:
       '導鹿的導覽員兼任司機，與你同車，依你的時間與想看的地方安排路線。',
     tourStops: '參考景點',
+    tourRoute: '標準路線',
+    tourHopOff: '會下車導覽：',
+    tourRouteNote: '實際停留依現場導覽時間而定；時間不夠時，部分景點改在車上解說、不下車。',
     fit: '適合：',
     price: '導覽費用',
     pair: (n) => `1–2 人：每車 NT$${n}`,
@@ -230,6 +233,9 @@ export const PAGE_COPY = {
     ctaBody:
       'Your GtourLK guide drives and stays with your group, shaping the route around your time and the places you want to see.',
     tourStops: 'Suggested sights',
+    tourRoute: 'Standard route',
+    tourHopOff: 'We stop and walk at: ',
+    tourRouteNote: 'Stops depend on how long each visit takes; if time runs short, some sights are explained from the vehicle instead.',
     fit: 'Best for: ',
     price: 'Pricing',
     pair: (n) => `1–2 guests: NT$${n} per vehicle`,

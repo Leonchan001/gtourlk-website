@@ -6,7 +6,7 @@ export function getFaqs(lang) {
     return [
       {
         q: 'How much does a tour cost?',
-        a: `${price.minimumMinutes}-minute minimum; choose 60, 90 or 150 minutes. For 1–2 guests: NT$${price.oneToTwoHourly} per vehicle per hour. For 3 or more: NT$${price.threePlusHourlyPerPerson} per guest per hour, including groups using multiple vehicles. Add our official LINE account and book through LINE for 5% off. Private charters, companies and schools can ask for a tailored quote. Payment: cash or bank transfer. Bank details are provided after confirmation.`,
+        a: `${price.minimumMinutes}-minute minimum; choose 60, 90 or 150 minutes. For 1–2 guests: NT$${price.oneToTwoHourly} per vehicle per hour. For 3 or more: NT$${price.threePlusHourlyPerPerson} per guest per hour, including groups using multiple vehicles. Add our official LINE account and book through LINE for 5% off. Private charters, companies and schools can ask for a tailored quote. Payment: cash or bank transfer. Bank details are provided after confirmation. The 150-minute tour includes a visit to the Folk Arts Museum; admission is NT$70 per person, paid by guests and not included in the tour fee.`,
       },
       {
         q: 'How many guests can ride?',
@@ -41,7 +41,7 @@ export function getFaqs(lang) {
   return [
     {
       q: '費用怎麼收？',
-      a: `${price.minimumMinutes} 分鐘起訂，可選 60、90、150 分鐘。1–2 人為 NT$${price.oneToTwoHourly}／車／小時；3 人以上為 NT$${price.threePlusHourlyPerPerson}／人／小時，多車仍依總人數計費。加入官方 LINE 好友並透過 LINE 預約，享導覽費 95 折。包車、企業或學校團體可洽詢專案報價。付款方式：現金或銀行轉帳；匯款資訊於確認後提供。`,
+      a: `${price.minimumMinutes} 分鐘起訂，可選 60、90、150 分鐘。1–2 人為 NT$${price.oneToTwoHourly}／車／小時；3 人以上為 NT$${price.threePlusHourlyPerPerson}／人／小時，多車仍依總人數計費。加入官方 LINE 好友並透過 LINE 預約，享導覽費 95 折。包車、企業或學校團體可洽詢專案報價。付款方式：現金或銀行轉帳；匯款資訊於確認後提供。150 分鐘行程會進入民俗文物館參觀，門票 NT$70／人由旅客自行購買，不含在導覽費內。`,
     },
     {
       q: '一台車可以坐幾個人？',
