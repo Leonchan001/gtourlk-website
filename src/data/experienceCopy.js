@@ -118,6 +118,10 @@ export const EXPERIENCE_COPY = {
       sightsNote:
         '先選想去的地方，不代表保證停靠；導覽員會依時間與路況，和你確認實際安排。',
       guide: '我還不知道，請導覽員幫我安排',
+      mobile: '聯絡手機（選填）',
+      mobileHint: '例如 0912-345-678',
+      mobileNote: '留下手機，方便導覽員確認時段與當天聯絡；只用於這次預約。',
+      mobileError: '請輸入正確的手機或電話，例如 0912-345-678。',
       pickup: '上下車地點（選填）',
       pickupHint: '可填停車場、住宿處，或交由我們確認',
       notes: '其他需求（選填）',
@@ -270,6 +274,10 @@ export const EXPERIENCE_COPY = {
       sightsNote:
         'These are preferences, not guaranteed stops. Your guide will confirm what fits your time and road conditions.',
       guide: 'I’m not sure yet. Please let the guide arrange it.',
+      mobile: 'Mobile number (optional)',
+      mobileHint: 'e.g. +81 90 1234 5678',
+      mobileNote: 'Helps your guide reach you on the day. No local number? Leave it blank and we will use LINE.',
+      mobileError: 'Please enter a valid phone number, including the country code if outside Taiwan.',
       pickup: 'Pick-up / drop-off (optional)',
       pickupHint: 'Car park, accommodation, or to be confirmed',
       notes: 'Other requests (optional)',

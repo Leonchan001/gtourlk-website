@@ -1,0 +1,34 @@
+name: LINE bot health
+
+# Checks the LINE booking helper (Google Apps Script) from outside, so a fully
+# broken script (expired authorisation, deleted deployment) is still noticed.
+# GitHub emails the repository owner when a scheduled run fails.
+on:
+  schedule:
+    # Every 3 hours, minute 41 (UTC)
+    - cron: '41 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check health endpoint
+        env:
+          HEALTH_URL: ${{ secrets.LINE_BOT_HEALTH_URL }}
+        run: |
+          if [ -z "$HEALTH_URL" ]; then
+            echo "::notice::LINE_BOT_HEALTH_URL secret is not set; skipping."
+            exit 0
+          fi
+          body=$(curl -sSL --max-time 60 --retry 2 "$HEALTH_URL") || { echo "::error::Apps Script did not respond"; exit 1; }
+          echo "$body" | jq . >/dev/null 2>&1 || { echo "::error::Apps Script returned a non-JSON page (authorisation expired or deployment removed?)"; exit 1; }
+          if [ "$(echo "$body" | jq -r .ok)" != "true" ]; then
+            echo "$body" | jq -r '.problems[]' | sed 's/^/::error::/'
+            exit 1
+          fi
+          echo "LINE bot healthy. Last event: $(echo "$body" | jq -r .lastEventAt)"
