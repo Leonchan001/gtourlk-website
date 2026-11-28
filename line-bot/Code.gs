@@ -161,14 +161,54 @@ function tripFlags(date, now) {
   return flags;
 }
 
-/** 旅客打字的日期：2026-12-05、12/5、12月5日、今天、明天。回傳 yyyy-MM-dd 或 ''。 */
+var ZH_DIGITS = { 零: 0, 〇: 0, 一: 1, 二: 2, 兩: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+
+/** 國字數字（一到九十九）轉成數字：三、兩、十五、二十、二十五。 */
+function zhToNum(z) {
+  if (z.indexOf('十') !== -1) {
+    var parts = z.split('十');
+    return (parts[0] ? ZH_DIGITS[parts[0]] : 1) * 10 + (parts[1] ? ZH_DIGITS[parts[1]] : 0);
+  }
+  return z.split('').reduce(function (n, ch) { return n * 10 + ZH_DIGITS[ch]; }, 0);
+}
+
+/** 把文字裡的國字數字換成阿拉伯數字，並去掉空白、全形數字轉半形。 */
+function normalizeNums(textValue) {
+  return String(textValue || '')
+    .replace(/[０-９]/g, function (ch) { return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0); })
+    .replace(/[：]/g, ':').replace(/\s/g, '')
+    .replace(/(?:[一二兩三四五六七八九]?十[一二三四五六七八九]?|[零〇一二兩三四五六七八九]+)/g, function (m) { return String(zhToNum(m)); });
+}
+
+/** 這週六／下週六／週六（最近的那天）。回傳 yyyy-MM-dd、''（看不懂）或 null（不是星期的說法）。 */
+function parseWeekday(t, today) {
+  var m = t.match(/^(這|本|下下|下)?(?:個)?(?:週|周|星期|禮拜)([一二三四五六日天])$/);
+  if (!m) return null;
+  var target = '日一二三四五六'.indexOf(m[2] === '天' ? '日' : m[2]);
+  var todayIdx = (new Date(today + 'T00:00:00Z').getUTCDay() + 6) % 7; // 週一 = 0
+  var targetIdx = (target + 6) % 7;
+  var monday = addDays(today, -todayIdx);
+  if (m[1] === '這' || m[1] === '本') {
+    var d = addDays(monday, targetIdx);
+    return d < today ? '' : d;
+  }
+  if (m[1] === '下') return addDays(monday, 7 + targetIdx);
+  if (m[1] === '下下') return addDays(monday, 14 + targetIdx);
+  return addDays(today, (targetIdx - todayIdx + 7) % 7);
+}
+
+/** 旅客打字的日期：2026-12-05、12/5、12月5日、十二月二十號、今天、明天、後天、這週六、下週六。回傳 yyyy-MM-dd 或 ''。 */
 function parseDateText(textValue, now) {
-  var t = String(textValue || '').replace(/\s/g, '');
+  var raw = String(textValue || '').replace(/\s/g, '');
   var today = taipeiNow(now).date;
-  if (/^(今天|today)$/i.test(t)) return today;
-  if (/^(明天|tomorrow)$/i.test(t)) return addDays(today, 1);
+  if (/^(今天|today)$/i.test(raw)) return today;
+  if (/^(明天|tomorrow)$/i.test(raw)) return addDays(today, 1);
+  if (/^後天$/.test(raw)) return addDays(today, 2);
+  var wd = parseWeekday(raw, today);
+  if (wd !== null) return wd;
+  var t = normalizeNums(raw);
   var y, mo, d, yearGiven = false;
-  var m = t.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+  var m = t.match(/^(\d{4})[-/.年](\d{1,2})[-/.月](\d{1,2})(?:日|號)?$/);
   if (m) { y = +m[1]; mo = +m[2]; d = +m[3]; yearGiven = true; } else {
     m = t.match(/^(\d{1,2})(?:[/.-]|月)(\d{1,2})(?:日|號)?$/);
     if (!m) return '';
@@ -180,17 +220,19 @@ function parseDateText(textValue, now) {
   return out;
 }
 
-/** 旅客打字的時間：14:00、2點、下午2點半、2pm。回傳 HH:mm 或 ''。 */
+/** 旅客打字的時間：14:00、2點、下午2點半、下午兩點、早上十點、2pm。回傳 HH:mm 或 ''。 */
 function parseTimeText(textValue) {
-  var t = String(textValue || '').replace(/\s/g, '').toLowerCase();
+  var t = normalizeNums(textValue).toLowerCase();
   var h, min = 0;
-  var m = t.match(/^(\d{1,2})[:：](\d{2})$/);
-  if (m) { h = +m[1]; min = +m[2]; } else if ((m = t.match(/^(\d{1,2})(am|pm)$/))) {
+  var m = t.match(/^(\d{1,2}):(\d{2})$/);
+  if (m) { h = +m[1]; min = +m[2]; } else if ((m = t.match(/^(\d{1,2})(?::(\d{2}))?(am|pm)$/))) {
     h = +m[1];
-    if (m[2] === 'pm' && h < 12) h += 12;
-  } else if ((m = t.match(/^(上午|早上|中午|下午|晚上)?(\d{1,2})(?:點|時)(半)?$/))) {
+    min = m[2] ? +m[2] : 0;
+    if (m[3] === 'pm' && h < 12) h += 12;
+  } else if ((m = t.match(/^(上午|早上|中午|下午|晚上)?(\d{1,2})(?:點|時)(?:(半)|(\d{1,2})分?)?(?:左右|出發)?$/))) {
     h = +m[2];
     if (m[3]) min = 30;
+    if (m[4]) min = +m[4];
     if ((m[1] === '下午' || m[1] === '晚上') && h < 12) h += 12;
     if (!m[1] && h >= 1 && h <= 6) h += 12; // 「2點」通常是下午
   } else {
@@ -198,6 +240,59 @@ function parseTimeText(textValue) {
   }
   if (h > 23 || min > 59) return '';
   return (h < 10 ? '0' : '') + h + ':' + (min < 10 ? '0' : '') + min;
+}
+
+/**
+ * 日期後面可能接著時間：「12/20 下午2點」「下週六早上十點」。
+ * 回傳 { date, time, period }（period 是只說了「下午」這類時段），看不懂回傳 null。
+ */
+function parseDateTime(textValue, now) {
+  var t = String(textValue || '').replace(/\s/g, '');
+  if (t.length > 30) return null;
+  var whole = parseDateText(t, now);
+  if (whole) return { date: whole, time: '', period: '' };
+  for (var i = t.length - 1; i >= 2; i--) {
+    var date = parseDateText(t.slice(0, i), now);
+    if (!date) continue;
+    var rest = t.slice(i).replace(/^[,，、的]/, '');
+    var time = parseTimeText(rest);
+    if (time) return { date: date, time: time, period: '' };
+    if (/^(上午|早上|中午|下午|晚上)$/.test(rest)) return { date: date, time: '', period: rest };
+  }
+  return null;
+}
+
+/** 人數：5、5位、三位、4位大人、2大1小、大人2小孩1、2 adults 1 child、二十幾位。回傳 { total, kids, approx } 或 null。 */
+function parsePeople(textValue) {
+  var t = normalizeNums(textValue).toLowerCase();
+  var m = t.match(/^(?:共|總共|大約|約|一共)?(\d{1,3})(幾|多)?(?:位|個人|個|人|名|guests?|people|persons?|pax|adults?)?(?:大人)?$/);
+  if (m) return { total: +m[1], kids: 0, approx: Boolean(m[2]) };
+  var adults = 0, kids = 0, found = false;
+  var token = /(\d{1,3})(?:位|個|名)?(大人|大|adults?|小孩|小朋友|兒童|小|kids?|child(?:ren)?)|(大人|小孩|小朋友|兒童)(\d{1,3})(?:位|個|名)?/g;
+  var rest = t.replace(token, function (all, n1, w1, w2, n2) {
+    var n = +(n1 || n2), w = w1 || w2;
+    if (/^(大人|大|adult)/.test(w)) adults += n; else kids += n;
+    found = true;
+    return '';
+  });
+  if (!found || rest.replace(/[+＋、,，和跟及與共位人and&]/g, '') !== '') return null;
+  return { total: adults + kids, kids: kids, approx: false };
+}
+
+/** 導覽時長：90、90分鐘、1小時、一個半小時、兩個半小時。回傳 60／90／150 或 0。 */
+function parseMinutesText(textValue) {
+  var t = normalizeNums(textValue).toLowerCase();
+  var m = t.match(/^(60|90|150)(?:分鐘|分|min(?:utes?)?)?$/);
+  if (m) return +m[1];
+  if (/^1(?:個)?小時$|^1h(?:ours?)?$/.test(t)) return 60;
+  if (/^1(?:個)?半小時$|^1\.5(?:個)?小時$|^1\.5h(?:ours?)?$/.test(t)) return 90;
+  if (/^2(?:個)?半小時$|^2\.5(?:個)?小時$|^2\.5h(?:ours?)?$/.test(t)) return 150;
+  return 0;
+}
+
+/** 看起來是在問問題（不是回答）。 */
+function looksLikeQuestion(textValue) {
+  return /[?？]|嗎|請問|可以|能不能|可不可以|有沒有|怎麼|多少|是否|\b(can|could|do you|is there|are there|how|what|where)\b/i.test(String(textValue || ''));
 }
 
 /**
@@ -275,7 +370,12 @@ var COPY = {
     summaryTitle: '這是您的預約詢問 🦌',
     dayReply: '導鹿會在這裡跟您確認時段與費用，通常幾分鐘內回覆。',
     nightReply: function (h) { return '現在是休息時間，導鹿明天早上 ' + h + ' 點後回覆您。'; },
-    edit: '想修改或有其他需求，直接打字告訴我們就好。'
+    edit: '想修改或有其他需求，直接打字告訴我們就好。',
+    handoff: '收到，我請專人回覆您 🦌',
+    handoffNight: function (h) { return '收到 🦌 現在是休息時間，導鹿明天早上 ' + h + ' 點後回覆您。'; },
+    groupReply: '團體要確認車輛和導覽員，導鹿會請專人幫您報價 🦌',
+    miss: function (hint) { return '不好意思沒看懂 🙏 可以用下面的按鈕選，或打「' + hint + '」這樣的格式。'; },
+    hints: { date: '12/20', time: '14:00 或 下午2點', people: '5 或 2大1小', minutes: '90', pickup: '民宿名稱', phone: '0912-345-678' }
   },
   en: {
     intro: function (n) { return 'Great, let’s plan your tour 🦌\nAnswer ' + n + ' quick questions (about 30 seconds) and we can confirm your tour right away.'; },
@@ -296,7 +396,12 @@ var COPY = {
     summaryTitle: 'Your booking request 🦌',
     dayReply: 'We will confirm the time and fee with you here, usually within minutes.',
     nightReply: function (h) { return 'We are offline now and will reply after ' + h + ':00 AM (Taiwan time).'; },
-    edit: 'Anything to change or add? Just type it here.'
+    edit: 'Anything to change or add? Just type it here.',
+    handoff: 'Got it, a team member will reply to you here 🦌',
+    handoffNight: function (h) { return 'Got it 🦌 We are offline now and will reply after ' + h + ':00 AM (Taiwan time).'; },
+    groupReply: 'For groups we need to arrange vehicles and guides, so a team member will send you a quote 🦌',
+    miss: function (hint) { return 'Sorry, I didn’t catch that. Please use the buttons below, or type it like “' + hint + '”.'; },
+    hints: { date: '12/20', time: '14:00', people: '5', minutes: '90', pickup: 'your hotel name', phone: '0912 345 678' }
   }
 };
 
@@ -683,25 +788,63 @@ function handleText(msg, userId, replyToken, now) {
   if (!state) return nightAck(msg, userId, replyToken, now); // 一般聊天，交給真人
   var c = COPY[state.lang];
   var step = state.step;
-  // 問到一半，有些步驟可以直接打字回答
-  if (step === 'date' && parseDateText(msg, now)) return answer(state, 'date', parseDateText(msg, now), replyToken, now);
-  if (step === 'time' && parseTimeText(msg)) return answer(state, 'time', parseTimeText(msg), replyToken, now);
-  if (step === 'people' && /^\d{1,3}\s*(位|人|guests?|people|pax)?$/i.test(msg)) {
-    var n = parseInt(msg, 10);
-    if (n >= 1 && n <= 200) return answer(state, 'people', String(n), replyToken, now);
-    return reply(replyToken, [ask(c.badPeople, [chatItem(state.lang)])]);
+  // 旅客在問問題（例如「可以帶狗嗎？」）：不當成答案，直接交給真人
+  if (looksLikeQuestion(msg)) return handOff(state, replyToken, now, msg, 'chat');
+  // 問到一半，每一步都可以直接打字回答
+  if (step === 'date') {
+    var dt = parseDateTime(msg, now);
+    if (dt) {
+      if (dt.time && !state.done.time) { state.departure = dt.time; state.done.time = true; }
+      if (dt.period) addNote(state, '時段：' + dt.period);
+      return answer(state, 'date', dt.date, replyToken, now);
+    }
   }
+  if (step === 'time' && parseTimeText(msg)) return answer(state, 'time', parseTimeText(msg), replyToken, now);
+  if (step === 'people') {
+    var p = parsePeople(msg);
+    if (p) {
+      if (p.total < 1 || p.total > 200) return reply(replyToken, [ask(c.badPeople, [chatItem(state.lang)])]);
+      if (p.kids) addNote(state, '小孩 ' + p.kids + ' 位');
+      if (p.approx) addNote(state, '人數約 ' + p.total + ' 多位');
+      if (p.total > 10) {
+        state.people = p.total;
+        return handOff(state, replyToken, now, '', 'group');
+      }
+      return answer(state, 'people', String(p.total), replyToken, now);
+    }
+  }
+  if (step === 'minutes' && parseMinutesText(msg)) return answer(state, 'minutes', String(parseMinutesText(msg)), replyToken, now);
   if (step === 'pickup' && msg.length <= 100) return answer(state, 'pickup', msg, replyToken, now);
   if (step === 'phone') {
     if (validPhone(msg)) return answer(state, 'phone', msg, replyToken, now);
     if (/^[\d\s\-+().]{4,}$/.test(msg)) return reply(replyToken, [text(c.badPhone), question('phone', state, now)]);
   }
-  // 其他文字：旅客想直接聊，小幫手安靜退出，交給真人
-  clearState(userId);
-  state.notes = (state.notes ? state.notes + '／' : '') + msg.slice(0, 200);
+  // 看不懂：第一次再問一次並附格式範例；第二次就交給真人
+  if (!state.miss) {
+    state.miss = 1;
+    saveState(userId, state);
+    return reply(replyToken, [text(c.miss(c.hints[step] || '')), question(step, state, now)]);
+  }
+  handOff(state, replyToken, now, msg, 'chat');
+}
+
+function addNote(state, note) {
+  state.notes = (state.notes ? state.notes + '／' : '') + note;
+}
+
+/** 小幫手退出、交給真人：一定回旅客一句，晚上說明幾點回覆；記到試算表並通知負責人。 */
+function handOff(state, replyToken, now, said, kind) {
+  var c = COPY[state.lang];
+  clearState(state.userId);
+  if (said) addNote(state, said.slice(0, 200));
+  if (kind === 'group') addNote(state, '大團體，需報價');
   writeRow(state, STATUS.CHAT, now);
-  nightAck(msg, userId, replyToken, now);
-  notifyStaff('chat', state, now, msg);
+  var night = isNight(now);
+  var h = Number(prop('REPLY_START_HOUR'));
+  if (night) markNightAck(state.userId); // 已經說過幾點回覆，今晚不再回「訊息收到」
+  var msg = kind === 'group' ? c.groupReply + (night ? '\n' + c.nightReply(h) : '') : night ? c.handoffNight(h) : c.handoff;
+  reply(replyToken, [text(msg)]);
+  notifyStaff(kind, state, now, said);
 }
 
 function handlePostback(event, userId, now) {
@@ -747,6 +890,7 @@ function answer(state, step, value, replyToken, now) {
   if (step === 'pickup') state.pickup = value;
   if (step === 'phone') state.phone = value;
   state.done[step] = true;
+  state.miss = 0;
   state.step = nextStep(state);
   if (state.step) {
     saveState(state.userId, state);
@@ -789,12 +933,15 @@ function handleBinding(msg, userId, replyToken) {
 /** 給負責人看的一則通知。 */
 function staffMessage(kind, state, now, said) {
   var who = state.name || '旅客';
-  var head = kind === 'chat' ? '🙋 有人想找真人｜' : kind === 'website' ? '🦌 官網預約詢問｜' : '🦌 新預約詢問｜';
+  var head = kind === 'chat' ? '🙋 有人想找真人｜' : kind === 'group' ? '👥 大團體報價｜' : kind === 'website' ? '🦌 官網預約詢問｜' : '🦌 新預約詢問｜';
   var lines = [head + who];
   if (said) lines.push('「' + said.slice(0, 200) + '」');
   var hasTrip = state.date || state.departure || state.people || state.minutes || state.pickup || state.phone;
-  if (kind !== 'chat' || hasTrip) lines.push(guestSummary(state, 'zh'));
+  var summary = guestSummary(state, 'zh');
+  if (kind === 'group') summary = summary.replace(/💰[^\n]*/, '💰 需另外報價（車輛、導覽員）');
+  if (kind !== 'chat' || hasTrip) lines.push(summary);
   var flags = tripFlags(state.date, now);
+  if (kind === 'group') flags.unshift('大團體 ' + state.people + ' 位');
   if (state.lang === 'en') flags.push('英文旅客');
   if (flags.length) lines.push('⚠️ ' + flags.join('・'));
   if (kind !== 'chat' && state.notes) lines.push('📝 ' + state.notes.slice(0, 200));

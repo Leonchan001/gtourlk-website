@@ -237,7 +237,7 @@ test('"not sure" and typed answers all work; night reply says when we answer', (
   send(bot, pb('f=time&v='), NIGHT)
   send(bot, pb('f=people&v=more'), NIGHT)
   assert.match(lastReply(bot)[0].text, /type the number/)
-  send(bot, event('25'), NIGHT)
+  send(bot, event('8'), NIGHT)
   // 150 minutes came from the website button, so no duration question
   assert.match(lastReply(bot)[0].text, /pick you up/)
   send(bot, pb('f=pickup&v='), NIGHT)
@@ -246,7 +246,7 @@ test('"not sure" and typed answers all work; night reply says when we answer', (
   send(bot, event('+81 90 1234 5678'), NIGHT)
   const done = lastReply(bot)[0].text
   assert.match(done, /Thu 12\/24 · time TBC/)
-  assert.match(done, /25 guests · 150 min/)
+  assert.match(done, /8 guests · 150 min/)
   assert.match(done, /Mobile: \+81 90 1234 5678/)
   assert.match(done, /8:00 AM/)
   // already told when we reply, so no "message received" later tonight
@@ -255,13 +255,13 @@ test('"not sure" and typed answers all work; night reply says when we answer', (
   assert.equal(replies(bot).length, n)
 })
 
-test('typing anything else hands the chat to a person, quietly', () => {
+test('a question mid-flow hands the chat to a person, and the guest is told so', () => {
   const bot = load()
   send(bot, event('我要預約導覽'))
   send(bot, pb('f=date&v=2026-12-05'))
-  const before = replies(bot).length
   send(bot, event('請問可以帶狗嗎？'))
-  assert.equal(replies(bot).length, before) // 不回話，交給真人
+  assert.equal(lastReply(bot)[0].text, '收到，我請專人回覆您 🦌')
+  const before = replies(bot).length
   const row = bot.getSheet().rows[1]
   assert.equal(row[15], '交給真人')
   assert.match(row[12], /帶狗/)
@@ -497,4 +497,100 @@ test('health endpoint needs the webhook key', () => {
   const body = JSON.parse(bot.ctx.doGet({ parameter: { health: '1', key: 'k' } }))
   assert.equal(body.ok, true)
   assert.equal(body.tokenOk, true)
+})
+
+test('typed answers in everyday words: Chinese numbers, weekdays, date + time, adults + kids', () => {
+  const { ctx } = load()
+  const now = DAY // Tue 2026-12-01
+  assert.equal(ctx.parseDateText('這週六', now), '2026-12-05')
+  assert.equal(ctx.parseDateText('下週六', now), '2026-12-12')
+  assert.equal(ctx.parseDateText('星期日', now), '2026-12-06')
+  assert.equal(ctx.parseDateText('這週一', now), '') // already past
+  assert.equal(ctx.parseDateText('後天', now), '2026-12-03')
+  assert.equal(ctx.parseDateText('十二月二十號', now), '2026-12-20')
+  assert.deepEqual({ ...ctx.parseDateTime('12/20 下午2點', now) }, { date: '2026-12-20', time: '14:00', period: '' })
+  assert.deepEqual({ ...ctx.parseDateTime('12月20號下午', now) }, { date: '2026-12-20', time: '', period: '下午' })
+  assert.deepEqual({ ...ctx.parseDateTime('下週六早上十點', now) }, { date: '2026-12-12', time: '10:00', period: '' })
+  assert.equal(ctx.parseTimeText('下午兩點'), '14:00')
+  assert.equal(ctx.parseTimeText('下午兩點半'), '14:30')
+  assert.equal(ctx.parseTimeText('兩點'), '14:00')
+  assert.equal(ctx.parseTimeText('早上十點'), '10:00')
+  assert.equal(ctx.parseTimeText('10點30分'), '10:30')
+  const people = (t) => { const p = ctx.parsePeople(t); return p && { ...p } }
+  assert.deepEqual(people('三位'), { total: 3, kids: 0, approx: false })
+  assert.deepEqual(people('兩位'), { total: 2, kids: 0, approx: false })
+  assert.deepEqual(people('4位大人'), { total: 4, kids: 0, approx: false })
+  assert.deepEqual(people('2大1小'), { total: 3, kids: 1, approx: false })
+  assert.deepEqual(people('大人2小孩1'), { total: 3, kids: 1, approx: false })
+  assert.deepEqual(people('2 adults 1 child'), { total: 3, kids: 1, approx: false })
+  assert.deepEqual(people('二十幾位'), { total: 20, kids: 0, approx: true })
+  assert.equal(people('可以帶狗嗎'), null)
+  assert.equal(ctx.parseMinutesText('一個半小時'), 90)
+  assert.equal(ctx.parseMinutesText('90分鐘'), 90)
+  assert.equal(ctx.parseMinutesText('兩個半小時'), 150)
+})
+
+test('date + time typed together skips the time question; kids are noted', () => {
+  const bot = load()
+  send(bot, event('我要預約導覽'))
+  send(bot, event('12/20 下午2點'))
+  assert.match(lastReply(bot)[0].text, /幾位/)
+  send(bot, event('2大1小'))
+  assert.match(lastReply(bot)[0].text, /多久/)
+  const row = bot.getSheet().rows[1]
+  assert.equal(row[6], '2026-12-20')
+  assert.equal(row[7], '14:00')
+  assert.equal(row[8], 3)
+  assert.match(row[12], /小孩 1 位/)
+})
+
+test('not understood: ask again once with an example, then hand to a person', () => {
+  const bot = load({ props: { PUSH_TO: MOM } })
+  send(bot, event('我要預約導覽'))
+  send(bot, event('過陣子'))
+  const again = lastReply(bot)
+  assert.match(again[0].text, /沒看懂.*12\/20/)
+  assert.match(again[1].text, /想哪一天/) // buttons again
+  assert.ok(again[1].quickReply)
+  assert.equal(pushes(bot).length, 0)
+  send(bot, event('還不確定欸'))
+  assert.equal(lastReply(bot)[0].text, '收到，我請專人回覆您 🦌')
+  assert.equal(bot.getSheet().rows[1][15], '交給真人')
+  assert.match(pushes(bot).at(-1).body.messages[0].text, /找真人[\s\S]*「還不確定欸」/)
+  // a miss only counts for the step it happened on
+  const b2 = load()
+  send(b2, event('我要預約導覽'))
+  send(b2, event('過陣子'))
+  send(b2, event('12/20'))
+  send(b2, event('看情況'))
+  assert.match(lastReply(b2)[0].text, /沒看懂/)
+})
+
+test('big groups (over 10) go to a person for a quote, keeping the date and time', () => {
+  const bot = load({ props: { PUSH_TO: MOM } })
+  send(bot, event('我要預約導覽'))
+  send(bot, pb('f=date&v=2026-12-17'))
+  send(bot, pb('f=time&v=10:00'))
+  send(bot, pb('f=people&v=more'))
+  send(bot, event('25位'))
+  const r = lastReply(bot)[0].text
+  assert.match(r, /團體要確認車輛和導覽員/)
+  assert.doesNotMatch(r, /NT\$/)
+  const row = bot.getSheet().rows[1]
+  assert.equal(row[15], '交給真人')
+  assert.equal(row[6], '2026-12-17')
+  assert.equal(row[7], '10:00')
+  assert.equal(row[8], 25)
+  const p = pushes(bot).at(-1).body.messages[0].text
+  assert.match(p, /大團體報價/)
+  assert.match(p, /大團體 25 位/)
+  assert.match(p, /需另外報價/)
+  assert.doesNotMatch(p, /NT\$/)
+  // typing a big number directly works too, and at night says when we reply
+  const b2 = load()
+  send(b2, event('我要預約導覽'), NIGHT)
+  send(b2, pb('f=date&v='), NIGHT)
+  send(b2, pb('f=time&v='), NIGHT)
+  send(b2, event('十五位'), NIGHT)
+  assert.match(lastReply(b2)[0].text, /團體[\s\S]*明天早上 8 點後/)
 })
