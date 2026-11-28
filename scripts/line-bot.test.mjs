@@ -34,9 +34,10 @@ function fakeSheet() {
   return sheet
 }
 
-function load({ props = {}, quota = { type: 'limited', value: 200 }, used = 10 } = {}) {
+function load({ props = {}, quota = { type: 'limited', value: 200 }, used = 10, sheetThrows = false, infoCode = 200 } = {}) {
   const store = { WEBHOOK_KEY: 'k', BIND_CODE: '123456', LINE_CHANNEL_ACCESS_TOKEN: 't', ...props }
   const calls = []
+  const mails = []
   let sheet = null
   const cache = new Map()
   const ctx = {
@@ -53,12 +54,17 @@ function load({ props = {}, quota = { type: 'limited', value: 200 }, used = 10 }
       if (path.startsWith('/profile/')) body = JSON.stringify({ displayName: '王小明' })
       if (path === '/message/quota') body = JSON.stringify(quota)
       if (path === '/message/quota/consumption') body = JSON.stringify({ totalUsage: used })
+      if (path === '/info') return { getResponseCode: () => infoCode, getContentText: () => '{"userId":"Ubot"}' }
       return { getResponseCode: () => 200, getContentText: () => body }
     } },
-    SpreadsheetApp: { getActiveSpreadsheet: () => ({
+    MailApp: { sendEmail: (to, subject, body) => mails.push({ to, subject, body }) },
+    Session: { getEffectiveUser: () => ({ getEmail: () => 'owner@example.com' }) },
+    SpreadsheetApp: { getActiveSpreadsheet: () => {
+      if (sheetThrows) throw new Error('sheet down')
+      return {
       getSheetByName: () => sheet,
       insertSheet: () => (sheet = fakeSheet()),
-    }) },
+    } } },
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
     CacheService: { getScriptCache: () => ({
       get: (k) => (cache.has(k) ? cache.get(k) : null),
@@ -79,7 +85,7 @@ function load({ props = {}, quota = { type: 'limited', value: 200 }, used = 10 }
   }
   vm.createContext(ctx)
   vm.runInContext(code, ctx)
-  return { ctx, store, calls, getSheet: () => sheet }
+  return { ctx, store, calls, mails, getSheet: () => sheet }
 }
 
 const trip = { date: '2026-12-02', departure: '14:00', people: 4, minutes: 90, phone: '0912-345-678', pickup: '', notes: '' }
@@ -417,4 +423,78 @@ test('push stops at the monthly limit and when the account quota is used up', ()
   finish(full)
   assert.equal(pushes(full).length, 0)
   assert.equal(full.getSheet().rows[1][15], '資料齊了') // still logged
+})
+
+
+test('pickup offers the car parks and lets guests type their guesthouse', () => {
+  const bot = load()
+  send(bot, event('我要預約導覽'))
+  for (const d of ['f=date&v=2026-12-17', 'f=time&v=10:00', 'f=people&v=5', 'f=minutes&v=90']) send(bot, pb(d))
+  const [msg] = lastReply(bot)
+  assert.match(msg.text, /民宿/)
+  const labels = quick(msg).map((a) => a.label)
+  assert.ok(labels.includes('鹿港生態公園停車場'))
+  assert.ok(labels.includes('鹿草路停車場'))
+  assert.ok(!labels.some((l) => l.includes('天后宮')))
+  send(bot, event('鹿港老街民宿'))
+  assert.equal(bot.getSheet().rows.at(-1)[10], '鹿港老街民宿')
+})
+
+test('a crash mid-event still answers the guest and is recorded', () => {
+  const bot = load({ sheetThrows: true })
+  post(bot, [event('我要預約導覽')])
+  const r = replies(bot)
+  assert.equal(r.length, 1)
+  assert.match(r[0].body.messages[0].text, /訊息收到/)
+  assert.match(r[0].body.messages[0].text, /0927-013-167/)
+  assert.equal(JSON.parse(bot.store.ERROR_LOG).count, 1)
+  assert.ok(Number(bot.store.LAST_EVENT_AT) > 0)
+})
+
+test('no fallback when the guest was already answered before the error', () => {
+  const bot = load()
+  bot.ctx.notifyStaff = () => { throw new Error('push failed') }
+  post(bot, [event('我要預約導覽')])
+  post(bot, [pb('f=chat')])
+  assert.equal(replies(bot).filter((c) => c.body.replyToken === 'rp').length, 1)
+  assert.equal(JSON.parse(bot.store.ERROR_LOG).count, 1)
+})
+
+test('health check emails the owner once, and again when it recovers', () => {
+  const bot = load({ infoCode: 401, props: { PUSH_TO: 'Umom' } })
+  const status = bot.ctx.healthCheck(DAY)
+  assert.equal(status.ok, false)
+  assert.equal(bot.mails.length, 1)
+  assert.equal(bot.mails[0].to, 'owner@example.com')
+  assert.match(bot.mails[0].body, /導覽｜預約表單/)
+  assert.equal(pushes(bot).length, 0) // token is broken, so no LINE push
+  bot.ctx.healthCheck(new Date(DAY.getTime() + 3600e3))
+  assert.equal(bot.mails.length, 1) // throttled
+})
+
+test('health check pushes staff on errors and reports recovery', () => {
+  const bot = load({ props: { PUSH_TO: 'Umom', ALERT_EMAIL: 'leon@example.com' } })
+  bot.ctx.recordError(new Error('boom'))
+  assert.equal(bot.ctx.healthCheck(DAY).ok, false)
+  assert.equal(bot.mails.at(-1).to, 'leon@example.com')
+  assert.match(pushes(bot)[0].body.messages[0].text, /小幫手暫時有狀況/)
+  assert.equal(bot.store.ERROR_LOG, undefined)
+  assert.equal(bot.ctx.healthCheck(new Date(DAY.getTime() + 3600e3)).ok, true)
+  assert.match(bot.mails.at(-1).subject, /恢復/)
+  assert.equal(bot.store.ALERT_OPEN, undefined)
+})
+
+test('health flags a webhook that has gone quiet', () => {
+  const bot = load({ props: { LAST_EVENT_AT: String(DAY.getTime() - 80 * 3600e3) } })
+  const status = bot.ctx.healthStatus(DAY)
+  assert.equal(status.ok, false)
+  assert.match(status.problems[0], /72/)
+})
+
+test('health endpoint needs the webhook key', () => {
+  const bot = load()
+  assert.equal(bot.ctx.doGet({ parameter: { health: '1' } }), 'GtourLK LINE bot is running.')
+  const body = JSON.parse(bot.ctx.doGet({ parameter: { health: '1', key: 'k' } }))
+  assert.equal(body.ok, true)
+  assert.equal(body.tokenOk, true)
 })

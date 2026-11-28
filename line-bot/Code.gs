@@ -26,7 +26,7 @@
 var DEFAULTS = {
   INTENT_KEYWORDS: '我要預約導覽,預約導覽,導覽預約,我想預約,book a tour,booking',
   TIME_OPTIONS: '09:00,10:00,11:00,13:00,14:00,15:00,16:00',
-  PICKUP_OPTIONS: '天后宮停車場旁',
+  PICKUP_OPTIONS: '鹿港生態公園停車場,鹿草路停車場', // 上車地點由旅客決定；民宿等其他地點直接打字
   REPLY_START_HOUR: '8',    // 真人回覆時段（台北時間），和官方帳號的回應時間一致
   REPLY_END_HOUR: '19',
   // 非回應時間由小幫手回這句（每位旅客一晚只回一次），請關掉官方帳號的「非回應時間｜通用」自動回應，避免重複
@@ -34,7 +34,10 @@ var DEFAULTS = {
   // 官方帳號關鍵字自動回應已經會回的字，晚上不再加回「訊息收到」
   OA_KEYWORDS: '停車資訊,上車停車,停車,上車地點,回覆時間,營業時間,幾點回覆,優惠,LINE優惠,95折,常見問題,FAQ,活動優惠,優惠券,150分鐘優惠,價格,費用,收費,行程怎麼選,導覽行程,行程,我要詢問接送,在地接送,接送',
   FLOW_HOURS: '6',          // 問到一半多久沒動作就作廢（最多 6 小時）
-  PUSH_MONTHLY_LIMIT: '150' // 小幫手每月最多推幾則給負責人（額度和群發共用）
+  PUSH_MONTHLY_LIMIT: '150', // 小幫手每月最多推幾則給負責人（額度和群發共用）
+  // 小幫手出錯時回給旅客的話（和原本「導覽｜預約表單」自動回應同樣的用意），確保旅客不會石沉大海
+  FALLBACK_TEXT: '訊息收到 🦌 想預約導覽的話，請告訴我們哪一天來鹿港、大概幾位，導鹿會盡快回覆您。\n急件請撥 0927-013-167（08:00–19:00）。',
+  STALE_HOURS: '72'         // 超過幾小時沒收到任何 LINE 事件，健康檢查就當成異常
 };
 
 var TZ = 'Asia/Taipei';
@@ -63,9 +66,11 @@ function setup() {
   ScriptApp.getProjectTriggers().forEach(function (t) { ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('sendMorningDigest').timeBased().everyDays(1)
     .atHour(Number(prop('REPLY_START_HOUR'))).inTimezone(TZ).create();
+  ScriptApp.newTrigger('healthCheck').timeBased().everyHours(1).create();
   if (!prop('WEBHOOK_KEY')) setProp('WEBHOOK_KEY', Utilities.getUuid().replace(/-/g, ''));
   if (!prop('BIND_CODE')) setProp('BIND_CODE', String(Math.floor(100000 + Math.random() * 900000)));
   console.log('完成。WEBHOOK_KEY 與 BIND_CODE（綁定碼）已寫入指令碼屬性，請到「專案設定」查看。');
+  healthCheck(); // 第一次執行會要求寄信權限，順便確認 token 正常
 }
 
 // ---------------------------------------------------------------- 設定
@@ -259,7 +264,7 @@ var COPY = {
     people: '幾位一起搭呢？', more: '超過 10 位', moreAsk: '請直接輸入人數，例如 25',
     minutes: '想導覽多久呢？按鈕上是 LINE 預約的參考價（95 折）。',
     minutesLabel: function (m, p) { return m + ' 分鐘' + (p ? ' ' + money(p) : ''); },
-    pickup: '要在哪裡上車呢？\n住宿、停車場、景點都可以，直接打字告訴我們就好。',
+    pickup: '要在哪裡上車呢？\n可以選停車場，住民宿的話直接打民宿名稱就好。',
     phone: '最後，方便留一支手機嗎？確認時段和當天聯絡會比較快，號碼只用於這次預約。',
     badPhone: '這個號碼好像不太對，可以再輸入一次嗎？',
     badPeople: '請輸入 1 到 200 之間的人數，例如 25。',
@@ -280,7 +285,7 @@ var COPY = {
     people: 'How many guests?', more: 'More than 10', moreAsk: 'Please type the number of guests, e.g. 25',
     minutes: 'How long would you like the tour to be? Prices shown are the LINE booking estimate (5% off).',
     minutesLabel: function (m, p) { return m + ' min' + (p ? ' ' + money(p) : ''); },
-    pickup: 'Where should we pick you up?\nA hotel, car park or sight is fine. Just type it.',
+    pickup: 'Where should we pick you up?\nPick a car park, or type the name of your guesthouse or hotel.',
     phone: 'Lastly, could you leave a mobile number? It helps us reach you on the day, and we only use it for this booking.',
     badPhone: 'That number doesn’t look right. Could you type it again?',
     badPeople: 'Please type a number from 1 to 200, e.g. 25.',
@@ -436,10 +441,13 @@ function lineFetch(method, path, payload) {
   return { code: code, body: res.getContentText() };
 }
 
+var REPLIED = {}; // 這次 webhook 已經回過的 replyToken（出錯時用來判斷要不要補回一句）
+
 /** 回覆訊息是免費的，不算在每月推播額度裡。 */
 function reply(token, messages) {
   if (!token || !messages.length) return;
-  lineFetch('post', '/message/reply', { replyToken: token, messages: messages.slice(0, 5) });
+  var res = lineFetch('post', '/message/reply', { replyToken: token, messages: messages.slice(0, 5) });
+  if (res.code < 300) REPLIED[token] = true;
 }
 
 function text(t) { return { type: 'text', text: t }; }
@@ -511,14 +519,125 @@ function doPost(e) {
   }
   var body = {};
   try { body = JSON.parse(e.postData.contents); } catch (err) { return ContentService.createTextOutput('bad request'); }
-  (body.events || []).forEach(function (event) {
-    try { handleEvent(event, new Date()); } catch (err) { console.error(err && err.stack || err); }
+  var events = body.events || [];
+  if (events.length) safeSetProp('LAST_EVENT_AT', String(Date.now()));
+  events.forEach(function (event) {
+    try { handleEvent(event, new Date()); } catch (err) { onEventError(event, err); }
   });
   return ContentService.createTextOutput('ok');
 }
 
-function doGet() {
-  return ContentService.createTextOutput('GtourLK LINE bot is running.');
+/**
+ * 健康狀態：GET <exec 網址>?key=<WEBHOOK_KEY>&health=1 回 JSON，給 GitHub Actions 定時檢查。
+ * 沒帶 key 只回一句話，不透露任何狀態。
+ */
+function doGet(e) {
+  var key = e && e.parameter ? e.parameter.key : '';
+  if (!(e && e.parameter && e.parameter.health) || !prop('WEBHOOK_KEY') || key !== prop('WEBHOOK_KEY')) {
+    return ContentService.createTextOutput('GtourLK LINE bot is running.');
+  }
+  var out = ContentService.createTextOutput(JSON.stringify(healthStatus(new Date())));
+  if (out && out.setMimeType && typeof ContentService.MimeType === 'object') out.setMimeType(ContentService.MimeType.JSON);
+  return out;
+}
+
+// ---------------------------------------------------------------- 故障退路與警報
+
+/** 某則事件處理到一半出錯：記下來，而且只要還沒回過旅客，就補回一句 FALLBACK_TEXT，旅客不會收不到回應。 */
+function onEventError(event, err) {
+  console.error(err && err.stack || err);
+  recordError(err);
+  var token = event && event.replyToken;
+  var isGuest = event && event.source && event.source.type === 'user';
+  var isText = event && (event.type === 'postback' || (event.type === 'message' && event.message && event.message.type === 'text'));
+  if (!token || REPLIED[token] || !isGuest || !isText || !prop('FALLBACK_TEXT')) return;
+  try {
+    reply(token, [text(prop('FALLBACK_TEXT').replace(/\\n/g, '\n'))]);
+  } catch (err2) {
+    console.error(err2 && err2.stack || err2);
+  }
+}
+
+function safeSetProp(name, value) {
+  try { setProp(name, value); } catch (err) { console.error(err); }
+}
+
+/** 錯誤次數與最後一則錯誤，存在指令碼屬性，健康檢查會讀。 */
+function recordError(err) {
+  try {
+    var log = readErrors();
+    log.count += 1;
+    log.last = Date.now();
+    log.message = String(err && err.message || err).slice(0, 300);
+    setProp('ERROR_LOG', JSON.stringify(log));
+  } catch (e2) { console.error(e2); }
+}
+
+function readErrors() {
+  try {
+    var log = JSON.parse(prop('ERROR_LOG'));
+    if (log && typeof log.count === 'number') return log;
+  } catch (err) { /* 空的 */ }
+  return { count: 0, last: 0, message: '' };
+}
+
+/** token 能不能用、最近有沒有出錯、多久沒收到事件。 */
+function healthStatus(now) {
+  var problems = [];
+  var tokenOk = false;
+  try { tokenOk = lineFetch('get', '/info').code < 300; } catch (err) { tokenOk = false; }
+  if (!tokenOk) problems.push('LINE token 無法使用（可能過期或被重新發行）');
+  var errors = readErrors();
+  if (errors.count) problems.push('最近有 ' + errors.count + ' 次處理失敗：' + errors.message);
+  var last = Number(prop('LAST_EVENT_AT')) || 0;
+  var staleHours = Number(prop('STALE_HOURS')) || 72;
+  if (last && now.getTime() - last > staleHours * 3600 * 1000) {
+    problems.push('已經超過 ' + staleHours + ' 小時沒收到任何 LINE 訊息（Webhook 可能被關掉）');
+  }
+  return { ok: problems.length === 0, tokenOk: tokenOk, errors: errors.count,
+    lastEventAt: last ? new Date(last).toISOString() : '', problems: problems };
+}
+
+/** 每小時由觸發執行：有問題就寄信給管理者，並（token 還能用時）推一則給負責人。同一個問題 6 小時內只通知一次。 */
+function healthCheck(now) {
+  now = now && typeof now.getTime === 'function' ? now : new Date();
+  var status = healthStatus(now);
+  if (status.ok) {
+    if (prop('ALERT_OPEN')) {
+      PropertiesService.getScriptProperties().deleteProperty('ALERT_OPEN');
+      sendAlertMail('導鹿 LINE 小幫手已恢復正常', '小幫手已恢復正常運作。記得把剛才重新打開的自動回應再關掉，避免旅客收到兩則。');
+    }
+    return status;
+  }
+  var lastAlert = Number(prop('ALERT_OPEN')) || 0;
+  if (now.getTime() - lastAlert >= 6 * 3600 * 1000) {
+    setProp('ALERT_OPEN', String(now.getTime()));
+    sendAlertMail('【導鹿】LINE 小幫手異常，請處理', alertBody(status));
+    if (status.tokenOk) {
+      pushToStaff('⚠️ LINE 預約小幫手暫時有狀況，leon 已收到通知。\n這段時間請多留意官方帳號聊天室，旅客點「我要預約導覽」可能沒有自動回覆。', now);
+    }
+  }
+  PropertiesService.getScriptProperties().deleteProperty('ERROR_LOG');
+  return status;
+}
+
+function alertBody(status) {
+  return ['LINE 預約小幫手健康檢查發現問題：', ''].concat(status.problems.map(function (p) { return '・' + p; })).concat([
+    '',
+    '先讓旅客有回應（約 1 分鐘）：',
+    '1. 到 LINE 官方帳號後台 →「自動回應訊息」，重新啟用「導覽｜預約表單」，並把時段改成「永遠」。',
+    '2. 重新啟用「非回應時間｜通用」。',
+    '',
+    '再修小幫手：看 Apps Script「執行作業」的錯誤；token 過期就到 LINE Developers 重新發行並更新指令碼屬性 LINE_CHANNEL_ACCESS_TOKEN。',
+    '修好後把上面兩則自動回應再關掉。詳細步驟見 line-bot/README.md 的「小幫手故障時」。'
+  ]).join('\n');
+}
+
+function sendAlertMail(subject, body) {
+  try {
+    var to = prop('ALERT_EMAIL') || Session.getEffectiveUser().getEmail();
+    if (to) MailApp.sendEmail(to, subject, body);
+  } catch (err) { console.error('警報信寄不出去：' + err); }
 }
 
 function handleEvent(event, now) {
