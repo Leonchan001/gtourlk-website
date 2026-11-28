@@ -137,13 +137,13 @@ function guestSummary(trip, lang) {
     '👥 ' + (trip.people ? trip.people + (trip.people === 1 ? ' guest' : ' guests') : tbc) + ' · ' + (trip.minutes ? trip.minutes + ' min' : tbc),
     '💰 ' + (est ? 'Estimate ' + money(est.linePrice) + ' (LINE 5% off)' : 'We will send you a quote'),
     '📍 Pick-up: ' + (trip.pickup || tbc),
-    '📞 Mobile: ' + (trip.phone || tbc)
+    '📞 Mobile: ' + (trip.phone || (trip.noLocal ? 'We will contact you on LINE' : tbc))
   ] : [
     '📅 ' + date + '・' + (trip.departure || '時間待確認'),
     '👥 ' + (trip.people ? trip.people + ' 位' : tbc) + '・' + (trip.minutes ? trip.minutes + ' 分鐘' : tbc),
     '💰 ' + (est ? '參考價 ' + money(est.linePrice) + '（LINE 95 折）' : '導鹿會另外幫您報價'),
     '📍 上車：' + (trip.pickup || tbc),
-    '📞 手機：' + (trip.phone || tbc)
+    '📞 手機：' + (trip.phone || (trip.noLocal ? '沒有台灣手機，用 LINE 聯絡' : tbc))
   ];
   return lines.join('\n');
 }
@@ -385,7 +385,8 @@ var COPY = {
     minutes: 'How long would you like the tour to be? Prices shown are the LINE booking estimate (5% off).',
     minutesLabel: function (m, p) { return m + ' min' + (p ? ' ' + money(p) : ''); },
     pickup: 'Where should we pick you up?\nPick a car park, or type the name of your guesthouse or hotel.',
-    phone: 'Lastly, could you leave a mobile number? It helps us reach you on the day, and we only use it for this booking.',
+    phone: 'Lastly, could you leave a mobile number? It helps us reach you on the day, and we only use it for this booking.\nNo Taiwan number? Tap “No local number” and we will reach you here on LINE.',
+    noLocal: 'No local number',
     badPhone: 'That number doesn’t look right. Could you type it again?',
     badPeople: 'Please type a number from 1 to 200, e.g. 25.',
     chat: 'Talk to a person', chatDisplay: 'I’d like to talk to a person',
@@ -473,7 +474,8 @@ function rawQuestion(step, state, now) {
     });
     return ask(c.pickup, spots.concat([postbackItem(c.notSure, 'f=pickup&v=', c.notSure), chatItem(state.lang)]));
   }
-  return ask(c.phone, [chatItem(state.lang)]);
+  // 英文流程多一顆「No local number」（外國旅客常沒有台灣手機）；中文流程不加略過按鈕
+  return ask(c.phone, (state.lang === 'en' ? [postbackItem(c.noLocal, 'f=phone&v=none', c.noLocal)] : []).concat([chatItem(state.lang)]));
 }
 
 function nextStep(state) {
@@ -587,7 +589,7 @@ function rowValues(state, status, now) {
   var est = estimateTour(state.people, state.minutes);
   return [state.id, new Date(state.createdAt || now.getTime()), state.userId, state.name || '', state.lang, state.source,
     state.date, state.departure, state.people, state.minutes, state.pickup, state.phone, state.notes,
-    est ? money(est.linePrice) : (state.price || ''), tripFlags(state.date, now).join('、'), status, '', (state.raw || '').slice(0, 1000)];
+    est ? money(est.linePrice) : (state.price || ''), tripFlags(state.date, now).concat(state.noLocal ? ['沒有台灣手機，用 LINE 聯絡'] : []).join('、'), status, '', (state.raw || '').slice(0, 1000)];
 }
 
 /** 新增或更新一列。日期、時間、手機存成文字，避免試算表自動改格式（例如吃掉手機開頭的 0）。 */
@@ -881,7 +883,10 @@ function answer(state, step, value, replyToken, now) {
   if (step === 'people') state.people = Number(value) || '';
   if (step === 'minutes') state.minutes = Number(value) || '';
   if (step === 'pickup') state.pickup = value;
-  if (step === 'phone') state.phone = value;
+  if (step === 'phone') {
+    state.noLocal = value === 'none';
+    state.phone = state.noLocal ? '' : value;
+  }
   state.done[step] = true;
   state.miss = 0;
   state.step = nextStep(state);
@@ -932,6 +937,7 @@ function staffMessage(kind, state, now, said) {
   var hasTrip = state.date || state.departure || state.people || state.minutes || state.pickup || state.phone;
   if (kind !== 'chat' || hasTrip) lines.push(guestSummary(state, 'zh'));
   var flags = tripFlags(state.date, now);
+  if (state.noLocal) flags.push('沒有台灣手機，用 LINE 聯絡');
   if (state.lang === 'en') flags.push('英文旅客');
   if (flags.length) lines.push('⚠️ ' + flags.join('・'));
   if (kind !== 'chat' && state.notes) lines.push('📝 ' + state.notes.slice(0, 200));

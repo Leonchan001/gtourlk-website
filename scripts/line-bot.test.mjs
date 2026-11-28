@@ -241,8 +241,8 @@ test('"not sure" and typed answers all work; night reply says when we answer', (
   // 150 minutes came from the website button, so no duration question
   assert.match(lastReply(bot)[0].text, /pick you up/)
   send(bot, pb('f=pickup&v='), NIGHT)
-  // phone step: no skip button, only "talk to a person"
-  assert.deepEqual(lastReply(bot)[0].quickReply.items.map(i => i.action.label), ['Talk to a person'])
+  // English phone step: "No local number" plus "talk to a person"
+  assert.deepEqual(lastReply(bot)[0].quickReply.items.map(i => i.action.label), ['No local number', 'Talk to a person'])
   send(bot, event('+81 90 1234 5678'), NIGHT)
   const done = lastReply(bot)[0].text
   assert.match(done, /Thu 12\/24 · time TBC/)
@@ -583,4 +583,25 @@ test('large private groups follow the normal flow: price up to 50, quote after t
   send(b4, event('六十位'))
   assert.match(lastReply(b4)[0].text, /多久/)
   assert.doesNotMatch(quick(lastReply(b4)[0])[0].label, /NT\$/)
+})
+
+test('English guests without a Taiwan number can tap "No local number"; Chinese flow has no such button', () => {
+  const bot = load({ props: { PUSH_TO: MOM } })
+  send(bot, event('book a tour'))
+  for (const d of ['f=date&v=2026-12-17', 'f=time&v=10:00', 'f=people&v=2', 'f=minutes&v=60', 'f=pickup&v=']) send(bot, pb(d))
+  assert.match(lastReply(bot)[0].text, /No Taiwan number\?/)
+  send(bot, pb('f=phone&v=none'))
+  const done = lastReply(bot)[0].text
+  assert.match(done, /Mobile: We will contact you on LINE/)
+  const row = bot.getSheet().rows[1]
+  assert.equal(row[15], '資料齊了')
+  assert.equal(row[11], '')
+  assert.match(row[14], /沒有台灣手機，用 LINE 聯絡/)
+  const p = pushes(bot).at(-1).body.messages[0].text
+  assert.match(p, /新預約詢問/)
+  assert.match(p, /沒有台灣手機，用 LINE 聯絡/)
+  const zh = load()
+  send(zh, event('我要預約導覽'))
+  for (const d of ['f=date&v=2026-12-17', 'f=time&v=10:00', 'f=people&v=2', 'f=minutes&v=60', 'f=pickup&v=']) send(zh, pb(d))
+  assert.deepEqual(quick(lastReply(zh)[0]).map((a) => a.label), ['找真人'])
 })
