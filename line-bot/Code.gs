@@ -14,8 +14,7 @@
  *
  * 晚上（REPLY_END_HOUR 後）一般訊息由小幫手回一次「訊息收到」，取代官方帳號的「非回應時間｜通用」。
  *
- * 全部用免費的「回覆訊息」，不花每月推播額度。旅客打的字如果不是答案（例如「可以帶狗嗎？」），小幫手就安靜退出，交給真人。
- * （舊版的「改用文字聊」按鈕已拿掉，容易讓人以為要按它才能打字；舊訊息上的按鈕仍可用。）
+ * 全部用免費的「回覆訊息」，不花每月推播額度。旅客任何時候打字聊天，小幫手就安靜退出，交給真人。
  * 官網送出的完整預約訊息不再問一次，只記到試算表。
  *
  * 設定都放在「專案設定 → 指令碼屬性」，程式裡不放任何金鑰。安裝步驟見 README.md。
@@ -42,7 +41,7 @@ var LOG_HEADERS = ['編號', '收到時間', '旅客 ID', '旅客名稱', '語�
 var COL = {};
 LOG_HEADERS.forEach(function (name, i) { COL[name] = i + 1; });
 var RESULTS = ['成交', '沒成交', '改電話', '其他'];
-var STATUS = { ASKING: '問資料中', DONE: '資料齊了', CHAT: '改用文字聊', WEBSITE: '官網表單' };
+var STATUS = { ASKING: '問資料中', DONE: '資料齊了', CHAT: '交給真人', WEBSITE: '官網表單' };
 var STEPS = ['date', 'time', 'people', 'minutes', 'pickup', 'phone'];
 
 // 和官網 src/data/tours.js 的 TOUR_PRICING 相同
@@ -256,9 +255,9 @@ var COPY = {
     phone: '最後，方便留一支手機嗎？確認時段和當天聯絡會比較快。',
     badPhone: '這個號碼好像不太對，可以再輸入一次嗎？',
     badPeople: '請輸入 1 到 200 之間的人數，例如 25。',
-    chat: '改用文字聊', chatDisplay: '我想直接用文字聊',
-    chatReply: '好的，直接在這裡留言就可以，導鹿會盡快回覆您 🦌',
-    chatReplyNight: function (h) { return '好的，直接在這裡留言就可以 🦌\n現在是休息時間，導鹿明天早上 ' + h + ' 點後回覆您。'; },
+    chat: '找真人', chatDisplay: '我想找真人',
+    chatReply: '好的，請直接在這裡留言，導鹿會盡快回覆您 🦌',
+    chatReplyNight: function (h) { return '好的，請直接在這裡留言 🦌\n現在是休息時間，導鹿明天早上 ' + h + ' 點後回覆您。'; },
     expired: '這個選單已經過期了，請再點一次「我要預約導覽」。',
     summaryTitle: '這是您的預約詢問 🦌',
     dayReply: '導鹿會在這裡跟您確認時段與費用，通常幾分鐘內回覆。',
@@ -276,7 +275,7 @@ var COPY = {
     phone: 'Lastly, could you leave a mobile number? It helps us reach you on the day.',
     badPhone: 'That number doesn’t look right. Could you type it again?',
     badPeople: 'Please type a number from 1 to 200, e.g. 25.',
-    chat: 'Just chat', chatDisplay: 'I’d like to just chat',
+    chat: 'Talk to a person', chatDisplay: 'I’d like to talk to a person',
     chatReply: 'Sure, just send us a message here and we will reply soon 🦌',
     chatReplyNight: function (h) { return 'Sure, just send us a message here 🦌\nWe are offline now and will reply after ' + h + ':00 AM (Taiwan time).'; },
     expired: 'This menu has expired. Please tap “Book a tour” again.',
@@ -303,6 +302,10 @@ function ask(textValue, items) {
   return msg;
 }
 
+function chatItem(lang) {
+  return postbackItem(COPY[lang].chat, 'f=chat', COPY[lang].chatDisplay);
+}
+
 /** 某一步的問題（含按鈕）。 */
 function question(step, state, now) {
   var c = COPY[state.lang];
@@ -312,14 +315,16 @@ function question(step, state, now) {
       pickerItem(c.pickDate, 'f=date', 'date', { initial: today, min: today, max: addDays(today, 365) }),
       postbackItem(c.today, 'f=date&v=' + today, c.today),
       postbackItem(c.tomorrow, 'f=date&v=' + addDays(today, 1), c.tomorrow),
-      postbackItem(c.notSure, 'f=date&v=', c.notSure)
+      postbackItem(c.notSure, 'f=date&v=', c.notSure),
+      chatItem(state.lang)
     ]);
   }
   if (step === 'time') {
     var times = listProp('TIME_OPTIONS').slice(0, 9).map(function (t) { return postbackItem(t, 'f=time&v=' + t, t); });
     return ask(c.time, times.concat([
       pickerItem(c.otherTime, 'f=time', 'time', { initial: '10:00', min: '08:00', max: '18:00' }),
-      postbackItem(c.notSure, 'f=time&v=', c.notSure)
+      postbackItem(c.notSure, 'f=time&v=', c.notSure),
+      chatItem(state.lang)
     ]));
   }
   if (step === 'people') {
@@ -327,22 +332,22 @@ function question(step, state, now) {
     for (var n = 1; n <= 10; n++) {
       nums.push(postbackItem(String(n), 'f=people&v=' + n, state.lang === 'en' ? n + (n === 1 ? ' guest' : ' guests') : n + ' 位'));
     }
-    return ask(c.people, nums.concat([postbackItem(c.more, 'f=people&v=more', c.more)]));
+    return ask(c.people, nums.concat([postbackItem(c.more, 'f=people&v=more', c.more), chatItem(state.lang)]));
   }
   if (step === 'minutes') {
     return ask(c.minutes, [60, 90, 150].map(function (m) {
       var est = estimateTour(state.people, m);
       var label = c.minutesLabel(m, est && est.linePrice);
       return postbackItem(label, 'f=minutes&v=' + m, label);
-    }));
+    }).concat([chatItem(state.lang)]));
   }
   if (step === 'pickup') {
     var spots = listProp('PICKUP_OPTIONS').slice(0, 10).map(function (s) {
       return postbackItem(s, 'f=pickup&v=' + encodeURIComponent(s), s);
     });
-    return ask(c.pickup, spots.concat([postbackItem(c.notSure, 'f=pickup&v=', c.notSure)]));
+    return ask(c.pickup, spots.concat([postbackItem(c.notSure, 'f=pickup&v=', c.notSure), chatItem(state.lang)]));
   }
-  return ask(c.phone, []);
+  return ask(c.phone, [chatItem(state.lang)]);
 }
 
 function nextStep(state) {
@@ -543,7 +548,7 @@ function handleText(msg, userId, replyToken, now) {
   if (step === 'people' && /^\d{1,3}\s*(位|人|guests?|people|pax)?$/i.test(msg)) {
     var n = parseInt(msg, 10);
     if (n >= 1 && n <= 200) return answer(state, 'people', String(n), replyToken, now);
-    return reply(replyToken, [text(c.badPeople)]);
+    return reply(replyToken, [ask(c.badPeople, [chatItem(state.lang)])]);
   }
   if (step === 'pickup' && msg.length <= 100) return answer(state, 'pickup', msg, replyToken, now);
   if (step === 'phone') {
@@ -584,7 +589,7 @@ function handlePostback(event, userId, now) {
     return reply(event.replyToken, [question(state.step, state, now)]);
   }
   if (data.f === 'people' && data.v === 'more') {
-    return reply(event.replyToken, [text(c.moreAsk)]);
+    return reply(event.replyToken, [ask(c.moreAsk, [chatItem(state.lang)])]);
   }
   var value = data.f === 'date' && params.date ? params.date : data.f === 'time' && params.time ? params.time : (data.v || '');
   answer(state, data.f, value, event.replyToken, now);

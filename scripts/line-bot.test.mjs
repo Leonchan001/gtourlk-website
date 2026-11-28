@@ -234,7 +234,8 @@ test('"not sure" and typed answers all work; night reply says when we answer', (
   // 150 minutes came from the website button, so no duration question
   assert.match(lastReply(bot)[0].text, /pick you up/)
   send(bot, pb('f=pickup&v='), NIGHT)
-  assert.equal(lastReply(bot)[0].quickReply, undefined) // no skip / chat buttons
+  // phone step: no skip button, only "talk to a person"
+  assert.deepEqual(lastReply(bot)[0].quickReply.items.map(i => i.action.label), ['Talk to a person'])
   send(bot, event('+81 90 1234 5678'), NIGHT)
   const done = lastReply(bot)[0].text
   assert.match(done, /Thu 12\/24 · time TBC/)
@@ -255,7 +256,7 @@ test('typing anything else hands the chat to a person, quietly', () => {
   send(bot, event('請問可以帶狗嗎？'))
   assert.equal(replies(bot).length, before) // 不回話，交給真人
   const row = bot.getSheet().rows[1]
-  assert.equal(row[15], '改用文字聊')
+  assert.equal(row[15], '交給真人')
   assert.match(row[12], /帶狗/)
   // flow is over: later chat is ignored, old buttons say the menu expired
   send(bot, event('謝謝'))
@@ -264,17 +265,19 @@ test('typing anything else hands the chat to a person, quietly', () => {
   assert.match(lastReply(bot)[0].text, /過期/)
 })
 
-test('old "just chat" button and old buttons still work', () => {
+test('every question has a "找真人" button, and old buttons still work', () => {
   const bot = load()
   send(bot, event('預約導覽'))
+  const labels = lastReply(bot)[0].quickReply.items.map(i => i.action.label)
+  assert.equal(labels.at(-1), '找真人')
   send(bot, pb('f=time&v=10:00')) // pressed a button from a later step: ask the current one again
   assert.match(lastReply(bot)[0].text, /哪一天/)
   send(bot, pb('f=chat'))
   assert.match(lastReply(bot)[0].text, /直接在這裡留言/)
-  assert.equal(bot.getSheet().rows[1][15], '改用文字聊')
+  assert.equal(bot.getSheet().rows[1][15], '交給真人')
 })
 
-test('"just chat" at night says when we reply, then stays quiet', () => {
+test('"找真人" at night says when we reply, then stays quiet', () => {
   const bot = load()
   send(bot, event('我要預約導覽'), NIGHT)
   send(bot, pb('f=chat'), NIGHT)
