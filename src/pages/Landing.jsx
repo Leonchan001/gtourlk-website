@@ -446,6 +446,22 @@ function tourView(lang, minutes) {
             ))}
           </ol>
           <p className="small-copy">{copy.note}</p>
+          {plan.route && (
+            <>
+              <h2>{copy.tourRoute}</h2>
+              <p className="body-copy">{plan.route.path.join(' → ')}</p>
+              <p className="body-copy">
+                <strong>{copy.tourHopOff}</strong>
+                {plan.route.hopOff.join(lang === 'en' ? ', ' : '、')}
+              </p>
+              <ul className="lp-route-notes">
+                {plan.route.notes.map((note) => (
+                  <li key={note} className="small-copy">{note}</li>
+                ))}
+              </ul>
+              <p className="small-copy">{copy.tourRouteNote}</p>
+            </>
+          )}
         </section>
         <aside>
           <h2>{copy.price}</h2>
