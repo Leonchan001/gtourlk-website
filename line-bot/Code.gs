@@ -252,7 +252,7 @@ function blankTrip(source, lang) {
 
 var COPY = {
   zh: {
-    intro: function (n) { return '好的，幫您安排導覽 🦌\n回答 ' + n + ' 個小問題（約 30 秒），就能拿到參考價。'; },
+    intro: function (n) { return '好的，幫您安排導覽 🦌\n回答 ' + n + ' 個小問題（約 30 秒），導鹿就能直接幫您確認時段。'; },
     date: '想哪一天來鹿港呢？',
     pickDate: '選日期', today: '今天', tomorrow: '明天', notSure: '還沒決定',
     time: '大概幾點出發呢？', otherTime: '其他時間',
@@ -273,7 +273,7 @@ var COPY = {
     edit: '想修改或有其他需求，直接打字告訴我們就好。'
   },
   en: {
-    intro: function (n) { return 'Great, let’s plan your tour 🦌\nAnswer ' + n + ' quick questions (about 30 seconds) to get an estimate.'; },
+    intro: function (n) { return 'Great, let’s plan your tour 🦌\nAnswer ' + n + ' quick questions (about 30 seconds) and we can confirm your tour right away.'; },
     date: 'Which day would you like to visit Lukang?',
     pickDate: 'Pick a date', today: 'Today', tomorrow: 'Tomorrow', notSure: 'Not sure yet',
     time: 'Roughly what time would you like to start?', otherTime: 'Other time',
