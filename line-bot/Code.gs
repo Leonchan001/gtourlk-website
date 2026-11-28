@@ -26,7 +26,7 @@
 var DEFAULTS = {
   INTENT_KEYWORDS: '我要預約導覽,預約導覽,導覽預約,我想預約,book a tour,booking',
   TIME_OPTIONS: '09:00,10:00,11:00,13:00,14:00,15:00,16:00',
-  PICKUP_OPTIONS: '鹿港生態公園停車場,鹿草路停車場', // 上車地點由旅客決定；民宿等其他地點直接打字
+  PICKUP_OPTIONS: '天后宮停車場旁,鹿港生態公園停車場,鹿草路停車場', // 天后宮停車場旁是預設上車點；民宿等其他地點直接打字
   REPLY_START_HOUR: '8',    // 真人回覆時段（台北時間），和官方帳號的回應時間一致
   REPLY_END_HOUR: '19',
   // 非回應時間由小幫手回這句（每位旅客一晚只回一次），請關掉官方帳號的「非回應時間｜通用」自動回應，避免重複
@@ -949,8 +949,19 @@ function staffParts(kind, trip, now, said) {
   if (trip.noLocal) flags.push('沒有台灣手機，用 LINE 聯絡');
   if (trip.lang === 'en') flags.push('英文旅客');
   if (flags.length) lines.push('⚠️ ' + flags.join('・'));
+  var closed = closedNote(trip.date);
+  if (closed) lines.push('⚠️ ' + closed);
   if (kind !== 'chat' && trip.notes) lines.push('📝 ' + String(trip.notes).slice(0, 200));
   return { title: head + who, lines: lines, phone: trip.phone ? cleanPhone(trip.phone) : '', link: chatLink(trip.userId) };
+}
+
+/** 休館提醒（只給負責人看）：週一日茂行、丁家大宅、民俗文物館；週二丁家大宅。 */
+function closedNote(date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return '';
+  var wd = new Date(date + 'T00:00:00Z').getUTCDay();
+  if (wd === 1) return '週一：日茂行、丁家大宅、民俗文物館休館';
+  if (wd === 2) return '週二：丁家大宅休館';
+  return '';
 }
 
 /** 文字版（舊的通知格式，也用在測試與卡片的替代文字）。 */

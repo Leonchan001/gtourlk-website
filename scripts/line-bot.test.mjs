@@ -449,7 +449,7 @@ test('pickup offers the car parks and lets guests type their guesthouse', () => 
   const labels = quick(msg).map((a) => a.label)
   assert.ok(labels.includes('鹿港生態公園停車場'))
   assert.ok(labels.includes('鹿草路停車場'))
-  assert.ok(!labels.some((l) => l.includes('天后宮')))
+  assert.equal(labels[0], '天后宮停車場旁')
   send(bot, event('鹿港老街民宿'))
   assert.equal(bot.getSheet().rows.at(-1)[10], '鹿港老街民宿')
 })
@@ -723,4 +723,18 @@ test('night cards come in the morning as a carousel with status buttons', () => 
   assert.match(msgs[0].text, /晚上有 1 筆詢問/)
   assert.equal(msgs[1].contents.type, 'carousel')
   assert.deepEqual(buttons(msgs[1]).map((a) => a.label).slice(-3), ['已確認', '沒成交', '邀請留評論'])
+})
+
+test('pick-up buttons start with 天后宮停車場旁; staff cards warn about Monday/Tuesday closures', () => {
+  const bot = load({ props: { PUSH_TO: MOM } })
+  send(bot, event('我要預約導覽'))
+  for (const d of ['f=date&v=2026-12-14', 'f=time&v=10:00', 'f=people&v=2', 'f=minutes&v=150']) send(bot, pb(d))
+  assert.deepEqual(quick(lastReply(bot)[0]).map((a) => a.label).slice(0, 3), ['天后宮停車場旁', '鹿港生態公園停車場', '鹿草路停車場'])
+  send(bot, pb('f=pickup&v=' + encodeURIComponent('天后宮停車場旁')))
+  send(bot, event('0912-345-678'))
+  const t = allText(pushes(bot).at(-1).body.messages)
+  assert.match(t, /週一：日茂行、丁家大宅、民俗文物館休館/)
+  assert.doesNotMatch(allText(lastReply(bot)), /休館/) // guests are not told
+  assert.equal(bot.ctx.closedNote('2026-12-15'), '週二：丁家大宅休館')
+  assert.equal(bot.ctx.closedNote('2026-12-17'), '')
 })
